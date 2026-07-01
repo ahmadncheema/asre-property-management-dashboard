@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ASRE — Property Management</title>
+  <link rel="stylesheet" href="css/main.css" />
+  <script src="https://cdn.jsdelivr.net/npm/bcryptjs@2.4.3/dist/bcrypt.min.js"></script>
+</head>
+<body>
+
+<div class="login-page">
+  <div class="login-card">
+
+    <div class="login-logo">
+      <div class="login-logo-badge">ASRE</div>
+      <div class="login-logo-title">Property Management Dashboard</div>
+      <div class="login-logo-subtitle">Ahmed Al Sheebani Real Estate</div>
+    </div>
+
+    <div class="login-error" id="login-error"></div>
+
+    <div class="form-group">
+      <label class="form-label" for="username">Username</label>
+      <input
+        type="text"
+        id="username"
+        class="form-control"
+        placeholder="Enter your username"
+        autocomplete="username"
+        autofocus
+      />
+    </div>
+
+    <div class="form-group">
+      <label class="form-label" for="password">Password</label>
+      <input
+        type="password"
+        id="password"
+        class="form-control"
+        placeholder="Enter your password"
+        autocomplete="current-password"
+      />
+    </div>
+
+    <button class="btn btn-primary" id="login-btn" style="width:100%; margin-top:8px; padding: 13px; font-size:1rem;">
+      Sign In
+    </button>
+
+    <p style="text-align:center; margin-top:24px; font-size:0.78rem; color:var(--text-muted);">
+      Ahmed Al Sheebani Real Estate &mdash; Internal Use Only
+    </p>
+
+  </div>
+</div>
+
+<script type="module">
+  import { login } from './js/auth.js';
+  import { getSession } from './js/auth.js';
+
+  // If already logged in, go straight to dashboard
+  if (getSession()) {
+    window.location.href = '/dashboard.html';
+  }
+
+  const loginBtn  = document.getElementById('login-btn');
+  const errorBox  = document.getElementById('login-error');
+  const usernameF = document.getElementById('username');
+  const passwordF = document.getElementById('password');
+
+  function showError(msg) {
+    errorBox.textContent = msg;
+    errorBox.classList.add('show');
+  }
+
+  function hideError() {
+    errorBox.classList.remove('show');
+  }
+
+  async function handleLogin() {
+    hideError();
+
+    const username = usernameF.value.trim();
+    const password = passwordF.value;
+
+    if (!username || !password) {
+      showError('Please enter both username and password.');
+      return;
+    }
+
+    // Show loading state
+    loginBtn.disabled = true;
+    loginBtn.textContent = 'Signing in...';
+
+    const result = await login(username, password);
+
+    if (result.success) {
+      window.location.href = '/dashboard.html';
+    } else {
+      showError(result.message);
+      loginBtn.disabled = false;
+      loginBtn.textContent = 'Sign In';
+      passwordF.value = '';
+      passwordF.focus();
+    }
+  }
+
+  // Click handler
+  loginBtn.addEventListener('click', handleLogin);
+
+  // Enter key on either field
+  usernameF.addEventListener('keydown', e => { if (e.key === 'Enter') passwordF.focus(); });
+  passwordF.addEventListener('keydown', e => { if (e.key === 'Enter') handleLogin(); });
+</script>
+
+</body>
+</html>

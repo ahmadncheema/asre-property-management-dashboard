@@ -1,0 +1,177 @@
+// ================================================================
+// ASRE Property Management Dashboard
+// Shared Utilities — used across all pages
+// ================================================================
+
+import { supabase } from './supabase.js';
+import { getSession, logout } from './auth.js';
+
+// ── Format currency ───────────────────────────────────────────────
+export function formatCurrency(amount) {
+  if (!amount && amount !== 0) return 'AED 0.00';
+  return 'AED ' + parseFloat(amount).toLocaleString('en-AE', {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2
+  });
+}
+
+// ── Format date ───────────────────────────────────────────────────
+export function formatDate(dateStr) {
+  if (!dateStr) return '—';
+  const d = new Date(dateStr);
+  return d.toLocaleDateString('en-GB', {
+    day:   '2-digit',
+    month: 'short',
+    year:  'numeric'
+  });
+}
+
+// ── Days between today and a date ────────────────────────────────
+export function daysUntil(dateStr) {
+  if (!dateStr) return null;
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  const target = new Date(dateStr);
+  target.setHours(0, 0, 0, 0);
+  const diff = Math.ceil((target - today) / (1000 * 60 * 60 * 24));
+  return diff;
+}
+
+// ── Get reminder stage based on days until expiry ────────────────
+export function getReminderStage(endDate) {
+  const days = daysUntil(endDate);
+  if (days === null) return null;
+  if (days <= 30)  return '30d';
+  if (days <= 60)  return '60d';
+  if (days <= 90)  return '90d';
+  return null;
+}
+
+// ── Show toast notification ───────────────────────────────────────
+export function showToast(message, type = 'success') {
+  const existing = document.getElementById('asre-toast');
+  if (existing) existing.remove();
+
+  const toast = document.createElement('div');
+  toast.id = 'asre-toast';
+  toast.className = `toast toast-${type}`;
+  toast.textContent = message;
+  document.body.appendChild(toast);
+
+  setTimeout(() => toast.classList.add('toast-show'), 10);
+  setTimeout(() => {
+    toast.classList.remove('toast-show');
+    setTimeout(() => toast.remove(), 300);
+  }, 3500);
+}
+
+// ── Show confirmation dialog ──────────────────────────────────────
+export function showConfirm(message) {
+  return new Promise(resolve => {
+    const overlay = document.createElement('div');
+    overlay.className = 'confirm-overlay';
+    overlay.innerHTML = `
+      <div class="confirm-box">
+        <p>${message}</p>
+        <div class="confirm-actions">
+          <button class="btn-confirm-yes">Confirm</button>
+          <button class="btn-confirm-no">Cancel</button>
+        </div>
+      </div>
+    `;
+    document.body.appendChild(overlay);
+
+    overlay.querySelector('.btn-confirm-yes').onclick = () => {
+      overlay.remove();
+      resolve(true);
+    };
+    overlay.querySelector('.btn-confirm-no').onclick = () => {
+      overlay.remove();
+      resolve(false);
+    };
+  });
+}
+
+// ── Render navigation bar ─────────────────────────────────────────
+export function renderNav(activePage) {
+  const session = getSession();
+  const nav = document.getElementById('main-nav');
+  if (!nav || !session) return;
+
+  const links = [
+    { href: '/dashboard.html',    label: 'Dashboard',    key: 'dashboard'    },
+    { href: '/properties.html',   label: 'Properties',   key: 'properties'   },
+    { href: '/vacancy.html',      label: 'Vacancy',      key: 'vacancy'      },
+    { href: '/upcoming.html',     label: 'Upcoming',     key: 'upcoming'     },
+    { href: '/bounce.html',       label: 'Bounce Check', key: 'bounce'       },
+    { href: '/maintenance.html',  label: 'Maintenance',  key: 'maintenance'  },
+    { href: '/invoices.html',     label: 'Invoices',     key: 'invoices'     },
+    { href: '/emails.html',       label: 'Emails',       key: 'emails'       },
+    { href: '/admin.html',        label: 'Admin',        key: 'admin'        },
+  ];
+
+  nav.innerHTML = `
+    <div class="nav-brand">
+      <span class="nav-logo">ASRE</span>
+      <span class="nav-title">Property Management</span>
+    </div>
+    <div class="nav-links">
+      ${links.map(l => `
+        <a href="${l.href}" class="nav-link ${activePage === l.key ? 'active' : ''}">
+          ${l.label}
+        </a>
+      `).join('')}
+    </div>
+    <div class="nav-user">
+      <span class="nav-username">👤 ${session.full_name}</span>
+      <button class="nav-logout" onclick="handleLogout()">Logout</button>
+    </div>
+  `;
+}
+
+// ── Logout handler (called from nav) ─────────────────────────────
+window.handleLogout = function() {
+  logout();
+};
+
+// ── Fetch all buildings ───────────────────────────────────────────
+export async function fetchBuildings() {
+  const { data, error } = await supabase
+    .from('buildings')
+    .select('*')
+    .order('name');
+  if (error) { console.error(error); return []; }
+  return data;
+}
+
+// ── Fetch floors for a building ───────────────────────────────────
+export async function fetchFloors(buildingId) {
+  const { data, error } = await supabase
+    .from('floors')
+    .select('*')
+    .eq('building_id', buildingId)
+    .order('sort_order');
+  if (error) { console.error(error); return []; }
+  return data;
+}
+
+// ── Fetch units for a floor ───────────────────────────────────────
+export async function fetchUnits(floorId) {
+  const { data, error } = await supabase
+    .from('units')
+    .select('*')
+    .eq('floor_id', floorId)
+    .order('unit_number');
+  if (error) { console.error(error); return []; }
+  return data;
+}
+
+// ── Fetch all units for a building ───────────────────────────────
+export async function fetchBuildingUnits(buildingId) {
+  const { data, error } = await supabase
+    .from('units')
+    .select('*')
+    .eq('building_id', buildingId);
+  if (error) { console.error(error); return []; }
+  return data;
+}
