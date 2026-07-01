@@ -23,7 +23,7 @@ export function clearSession() {
   sessionStorage.removeItem(SESSION_KEY);
 }
 
-// ── Require login — call this at top of every protected page ──────
+// ── Require login — call at top of every protected page ───────────
 export function requireAuth() {
   const session = getSession();
   if (!session) {
@@ -33,10 +33,9 @@ export function requireAuth() {
   return session;
 }
 
-// ── Login function ────────────────────────────────────────────────
+// ── Login ─────────────────────────────────────────────────────────
 export async function login(username, password) {
   try {
-    // Fetch user by username
     const { data: users, error } = await supabase
       .from('users')
       .select('*')
@@ -50,13 +49,10 @@ export async function login(username, password) {
 
     const user = users[0];
 
-    // Verify password using bcrypt via API
-    const match = await verifyPassword(password, user.password_hash);
-    if (!match) {
+    if (password !== user.password_hash) {
       return { success: false, message: 'Invalid username or password.' };
     }
 
-    // Save session
     saveSession({
       id:        user.id,
       full_name: user.full_name,
@@ -75,11 +71,4 @@ export async function login(username, password) {
 export function logout() {
   clearSession();
   window.location.href = '/index.html';
-}
-
-// ── Verify bcrypt password client-side ────────────────────────────
-// We use bcryptjs loaded via CDN in each page's script
-async function verifyPassword(password, hash) {
-  // bcrypt is loaded globally via CDN script tag in HTML pages
-  return await bcrypt.compare(password, hash);
 }
