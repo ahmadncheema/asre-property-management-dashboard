@@ -1,0 +1,496 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ASRE — Dashboard</title>
+  <link rel="stylesheet" href="css/main.css" />
+  <script src="https://cdn.jsdelivr.net/npm/bcryptjs@2.4.3/dist/bcrypt.min.js"></script>
+  <style>
+    .dashboard-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 20px;
+      margin-top: 8px;
+    }
+
+    @media (max-width: 1200px) {
+      .dashboard-grid { grid-template-columns: repeat(2, 1fr); }
+    }
+
+    @media (max-width: 600px) {
+      .dashboard-grid { grid-template-columns: 1fr; }
+    }
+
+    .stat-card {
+      animation: slideUp 0.3s ease forwards;
+      opacity: 0;
+    }
+
+    .stat-card:nth-child(1) { animation-delay: 0.05s; }
+    .stat-card:nth-child(2) { animation-delay: 0.10s; }
+    .stat-card:nth-child(3) { animation-delay: 0.15s; }
+    .stat-card:nth-child(4) { animation-delay: 0.20s; }
+    .stat-card:nth-child(5) { animation-delay: 0.25s; }
+    .stat-card:nth-child(6) { animation-delay: 0.30s; }
+    .stat-card:nth-child(7) { animation-delay: 0.35s; }
+    .stat-card:nth-child(8) { animation-delay: 0.40s; }
+
+    .dashboard-welcome {
+      margin-bottom: 32px;
+    }
+
+    .dashboard-welcome h1 {
+      font-size: 1.8rem;
+      font-weight: 700;
+      color: var(--white);
+    }
+
+    .dashboard-welcome h1 span {
+      color: var(--green);
+    }
+
+    .dashboard-welcome p {
+      color: var(--text-muted);
+      font-size: 0.9rem;
+      margin-top: 4px;
+    }
+
+    .stat-card-icon img {
+      width: 72px;
+      height: 72px;
+      object-fit: contain;
+    }
+
+    .stat-card-number {
+      font-size: 2.8rem;
+    }
+
+    /* Maintenance breakdown inside card */
+    .maint-breakdown {
+      margin-top: 10px;
+      padding-top: 10px;
+      border-top: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+    }
+
+    .maint-breakdown-row {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.78rem;
+      color: var(--text-muted);
+    }
+
+    .maint-breakdown-row span:last-child {
+      color: var(--green);
+      font-weight: 600;
+    }
+
+    /* Last updated */
+    .last-updated {
+      text-align: right;
+      font-size: 0.78rem;
+      color: var(--text-muted);
+      margin-bottom: 16px;
+    }
+  </style>
+</head>
+<body>
+
+<!-- Navigation -->
+<nav id="main-nav"></nav>
+
+<!-- Page -->
+<div class="page-wrapper">
+  <div class="container">
+
+    <!-- Welcome -->
+    <div class="dashboard-welcome">
+      <h1>Good <span id="greeting-time"></span>, <span id="greeting-name"></span> 👋</h1>
+      <p id="greeting-date"></p>
+    </div>
+
+    <!-- Last Updated -->
+    <div class="last-updated" id="last-updated"></div>
+
+    <!-- Dashboard Grid -->
+    <div class="dashboard-grid" id="dashboard-grid">
+
+      <!-- 1. Our Properties -->
+      <a href="properties.html" class="stat-card" id="card-properties">
+        <div class="stat-card-icon">
+          <img src="assets/icons/building.gif" alt="Properties"
+               onerror="this.style.display='none'; this.nextElementSibling.style.display='block'"/>
+          <div class="stat-icon-placeholder" style="display:none">🏢</div>
+        </div>
+        <div class="stat-card-body">
+          <div class="stat-card-number" id="num-properties">—</div>
+          <div class="stat-card-label">Our Properties</div>
+          <div class="stat-card-breakdown">
+            <div class="breakdown-item">
+              <span>Total Buildings</span>
+              <span id="num-buildings">—</span>
+            </div>
+            <div class="breakdown-item">
+              <span>Total Units</span>
+              <span id="num-units">—</span>
+            </div>
+          </div>
+        </div>
+      </a>
+
+      <!-- 2. Vacancy List -->
+      <a href="vacancy.html" class="stat-card" id="card-vacancy">
+        <div class="stat-card-icon">
+          <img src="assets/icons/vacancy.gif" alt="Vacancy"
+               onerror="this.style.display='none'; this.nextElementSibling.style.display='block'"/>
+          <div class="stat-icon-placeholder" style="display:none">🔑</div>
+        </div>
+        <div class="stat-card-body">
+          <div class="stat-card-number" id="num-vacant">—</div>
+          <div class="stat-card-label">Vacant Units</div>
+          <div class="stat-card-breakdown">
+            <div class="breakdown-item">
+              <span>Occupied</span>
+              <span id="num-occupied">—</span>
+            </div>
+            <div class="breakdown-item">
+              <span>Occupancy Rate</span>
+              <span id="occupancy-rate">—</span>
+            </div>
+          </div>
+        </div>
+      </a>
+
+      <!-- 3. Upcoming Vacancy -->
+      <a href="upcoming.html" class="stat-card" id="card-upcoming">
+        <div class="stat-card-icon">
+          <img src="assets/icons/upcoming.gif" alt="Upcoming Vacancy"
+               onerror="this.style.display='none'; this.nextElementSibling.style.display='block'"/>
+          <div class="stat-icon-placeholder" style="display:none">📅</div>
+        </div>
+        <div class="stat-card-body">
+          <div class="stat-card-number" id="num-upcoming">—</div>
+          <div class="stat-card-label">Upcoming Vacancy</div>
+          <div class="stat-card-breakdown">
+            <div class="breakdown-item">
+              <span>Within 30 days</span>
+              <span id="upcoming-30">—</span>
+            </div>
+            <div class="breakdown-item">
+              <span>Within 60 days</span>
+              <span id="upcoming-60">—</span>
+            </div>
+            <div class="breakdown-item">
+              <span>Within 90 days</span>
+              <span id="upcoming-90">—</span>
+            </div>
+          </div>
+        </div>
+      </a>
+
+      <!-- 4. Bounce Check -->
+      <a href="bounce.html" class="stat-card" id="card-bounce">
+        <div class="stat-card-icon">
+          <img src="assets/icons/bounce.gif" alt="Bounce Check"
+               onerror="this.style.display='none'; this.nextElementSibling.style.display='block'"/>
+          <div class="stat-icon-placeholder" style="display:none">💳</div>
+        </div>
+        <div class="stat-card-body">
+          <div class="stat-card-number" id="num-bounce">—</div>
+          <div class="stat-card-label">Bounced Checks</div>
+          <div class="stat-card-breakdown">
+            <div class="breakdown-item">
+              <span>Active</span>
+              <span id="bounce-active">—</span>
+            </div>
+            <div class="breakdown-item">
+              <span>Resolved</span>
+              <span id="bounce-resolved">—</span>
+            </div>
+          </div>
+        </div>
+      </a>
+
+      <!-- 5. Maintenance -->
+      <a href="maintenance.html" class="stat-card" id="card-maintenance">
+        <div class="stat-card-icon">
+          <img src="assets/icons/maintenance.gif" alt="Maintenance"
+               onerror="this.style.display='none'; this.nextElementSibling.style.display='block'"/>
+          <div class="stat-icon-placeholder" style="display:none">🔧</div>
+        </div>
+        <div class="stat-card-body">
+          <div class="stat-card-number" id="num-maintenance">—</div>
+          <div class="stat-card-label">Maintenance Requests</div>
+          <div class="maint-breakdown" id="maint-breakdown">
+            <div class="maint-breakdown-row">
+              <span>Loading...</span>
+            </div>
+          </div>
+        </div>
+      </a>
+
+      <!-- 6. Invoice Generator -->
+      <a href="invoices.html" class="stat-card" id="card-invoices">
+        <div class="stat-card-icon">
+          <img src="assets/icons/invoice.gif" alt="Invoices"
+               onerror="this.style.display='none'; this.nextElementSibling.style.display='block'"/>
+          <div class="stat-icon-placeholder" style="display:none">🧾</div>
+        </div>
+        <div class="stat-card-body">
+          <div class="stat-card-number" id="num-invoices">—</div>
+          <div class="stat-card-label">Invoice Generator</div>
+          <div class="stat-card-breakdown">
+            <div class="breakdown-item">
+              <span>This Month</span>
+              <span id="invoices-month">—</span>
+            </div>
+            <div class="breakdown-item">
+              <span>Total Generated</span>
+              <span id="invoices-total">—</span>
+            </div>
+          </div>
+        </div>
+      </a>
+
+      <!-- 7. Emails -->
+      <a href="emails.html" class="stat-card" id="card-emails">
+        <div class="stat-card-icon">
+          <img src="assets/icons/email.gif" alt="Emails"
+               onerror="this.style.display='none'; this.nextElementSibling.style.display='block'"/>
+          <div class="stat-icon-placeholder" style="display:none">📧</div>
+        </div>
+        <div class="stat-card-body">
+          <div class="stat-card-number" id="num-reminders">—</div>
+          <div class="stat-card-label">Email Reminders</div>
+          <div class="stat-card-breakdown">
+            <div class="breakdown-item">
+              <span>Sent This Month</span>
+              <span id="emails-month">—</span>
+            </div>
+            <div class="breakdown-item">
+              <span>Pending Reminders</span>
+              <span id="emails-pending">—</span>
+            </div>
+          </div>
+        </div>
+      </a>
+
+      <!-- 8. Admin -->
+      <a href="admin.html" class="stat-card" id="card-admin">
+        <div class="stat-card-icon">
+          <img src="assets/icons/admin.gif" alt="Admin"
+               onerror="this.style.display='none'; this.nextElementSibling.style.display='block'"/>
+          <div class="stat-icon-placeholder" style="display:none">⚙️</div>
+        </div>
+        <div class="stat-card-body">
+          <div class="stat-card-number" id="num-users">—</div>
+          <div class="stat-card-label">Admin Panel</div>
+          <div class="stat-card-breakdown">
+            <div class="breakdown-item">
+              <span>Total Users</span>
+              <span id="admin-users">—</span>
+            </div>
+            <div class="breakdown-item">
+              <span>Last Backup</span>
+              <span id="admin-backup">Never</span>
+            </div>
+          </div>
+        </div>
+      </a>
+
+    </div>
+  </div>
+</div>
+
+<script type="module">
+  import { requireAuth } from './js/auth.js';
+  import { renderNav }   from './js/shared.js';
+  import { supabase }    from './js/supabase.js';
+  import { daysUntil }   from './js/shared.js';
+
+  // ── Auth check ──────────────────────────────────────────────────
+  const session = requireAuth();
+  if (!session) throw new Error('Not authenticated');
+
+  // ── Render nav ──────────────────────────────────────────────────
+  renderNav('dashboard');
+
+  // ── Greeting ────────────────────────────────────────────────────
+  function setGreeting() {
+    const hour = new Date().getHours();
+    let time = 'Morning';
+    if (hour >= 12 && hour < 17) time = 'Afternoon';
+    else if (hour >= 17)         time = 'Evening';
+
+    document.getElementById('greeting-time').textContent = time;
+    document.getElementById('greeting-name').textContent = session.full_name.split(' ')[0];
+
+    const now = new Date();
+    document.getElementById('greeting-date').textContent = now.toLocaleDateString('en-GB', {
+      weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'
+    });
+  }
+
+  setGreeting();
+
+  // ── Load all dashboard stats ────────────────────────────────────
+  async function loadDashboard() {
+    document.getElementById('last-updated').textContent =
+      'Loading data...';
+
+    try {
+      // Fetch all data in parallel
+      const [
+        buildingsRes,
+        unitsRes,
+        bounceRes,
+        maintenanceRes,
+        invoicesRes,
+        usersRes,
+        emailLogsRes
+      ] = await Promise.all([
+        supabase.from('buildings').select('id, name, type'),
+        supabase.from('units').select('id, tenant_name, end_date'),
+        supabase.from('bounce_checks').select('id, status'),
+        supabase.from('maintenance_requests').select('id, category, status'),
+        supabase.from('invoices').select('id, created_at'),
+        supabase.from('users').select('id'),
+        supabase.from('email_logs').select('id, sent_at, status')
+      ]);
+
+      const buildings   = buildingsRes.data  || [];
+      const units       = unitsRes.data       || [];
+      const bounces     = bounceRes.data      || [];
+      const maintenance = maintenanceRes.data || [];
+      const invoices    = invoicesRes.data    || [];
+      const users       = usersRes.data       || [];
+      const emailLogs   = emailLogsRes.data   || [];
+
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+
+      // ── Properties ──────────────────────────────────────────────
+      document.getElementById('num-properties').textContent  = buildings.length;
+      document.getElementById('num-buildings').textContent   = buildings.length;
+      document.getElementById('num-units').textContent       = units.length;
+
+      // ── Vacancy ─────────────────────────────────────────────────
+      const vacant   = units.filter(u => !u.tenant_name || u.tenant_name.trim() === '');
+      const occupied = units.filter(u => u.tenant_name && u.tenant_name.trim() !== '');
+      const occRate  = units.length > 0
+        ? Math.round((occupied.length / units.length) * 100) + '%'
+        : '0%';
+
+      document.getElementById('num-vacant').textContent     = vacant.length;
+      document.getElementById('num-occupied').textContent   = occupied.length;
+      document.getElementById('occupancy-rate').textContent = occRate;
+
+      // ── Upcoming Vacancy ─────────────────────────────────────────
+      const upcoming = occupied.filter(u => {
+        if (!u.end_date) return false;
+        const days = daysUntil(u.end_date);
+        return days !== null && days >= 0 && days <= 90;
+      });
+
+      const up30 = upcoming.filter(u => daysUntil(u.end_date) <= 30).length;
+      const up60 = upcoming.filter(u => { const d = daysUntil(u.end_date); return d > 30 && d <= 60; }).length;
+      const up90 = upcoming.filter(u => { const d = daysUntil(u.end_date); return d > 60 && d <= 90; }).length;
+
+      document.getElementById('num-upcoming').textContent  = upcoming.length;
+      document.getElementById('upcoming-30').textContent   = up30;
+      document.getElementById('upcoming-60').textContent   = up60;
+      document.getElementById('upcoming-90').textContent   = up90;
+
+      // ── Bounce Checks ────────────────────────────────────────────
+      const activeB   = bounces.filter(b => b.status === 'active').length;
+      const resolvedB = bounces.filter(b => b.status === 'resolved').length;
+
+      document.getElementById('num-bounce').textContent      = activeB;
+      document.getElementById('bounce-active').textContent   = activeB;
+      document.getElementById('bounce-resolved').textContent = resolvedB;
+
+      // ── Maintenance ──────────────────────────────────────────────
+      const openMaint = maintenance.filter(m => m.status === 'open');
+
+      // Category breakdown
+      const categories = {};
+      openMaint.forEach(m => {
+        const cat = m.category || 'Other';
+        categories[cat] = (categories[cat] || 0) + 1;
+      });
+
+      document.getElementById('num-maintenance').textContent = openMaint.length;
+
+      const breakdownEl = document.getElementById('maint-breakdown');
+      if (Object.keys(categories).length === 0) {
+        breakdownEl.innerHTML = `
+          <div class="maint-breakdown-row">
+            <span>No open requests</span>
+            <span>—</span>
+          </div>`;
+      } else {
+        breakdownEl.innerHTML = Object.entries(categories)
+          .sort((a, b) => b[1] - a[1])
+          .map(([cat, count]) => `
+            <div class="maint-breakdown-row">
+              <span>${cat}</span>
+              <span>${count}</span>
+            </div>`)
+          .join('');
+      }
+
+      // ── Invoices ─────────────────────────────────────────────────
+      const thisMonth = invoices.filter(i => {
+        const d = new Date(i.created_at);
+        return d.getMonth() === today.getMonth() &&
+               d.getFullYear() === today.getFullYear();
+      });
+
+      document.getElementById('num-invoices').textContent      = invoices.length;
+      document.getElementById('invoices-month').textContent     = thisMonth.length;
+      document.getElementById('invoices-total').textContent     = invoices.length;
+
+      // ── Emails ───────────────────────────────────────────────────
+      const emailsThisMonth = emailLogs.filter(e => {
+        const d = new Date(e.sent_at);
+        return d.getMonth() === today.getMonth() &&
+               d.getFullYear() === today.getFullYear();
+      });
+
+      document.getElementById('num-reminders').textContent  = emailsThisMonth.length;
+      document.getElementById('emails-month').textContent   = emailsThisMonth.length;
+      document.getElementById('emails-pending').textContent = upcoming.length;
+
+      // ── Admin ────────────────────────────────────────────────────
+      document.getElementById('num-users').textContent    = users.length;
+      document.getElementById('admin-users').textContent  = users.length;
+
+      // Last backup from localStorage
+      const lastBackup = localStorage.getItem('asre_last_backup');
+      document.getElementById('admin-backup').textContent = lastBackup
+        ? new Date(lastBackup).toLocaleDateString('en-GB')
+        : 'Never';
+
+      // ── Last updated time ────────────────────────────────────────
+      document.getElementById('last-updated').textContent =
+        'Last updated: ' + new Date().toLocaleTimeString('en-GB', {
+          hour: '2-digit', minute: '2-digit'
+        });
+
+    } catch (err) {
+      console.error('Dashboard load error:', err);
+      document.getElementById('last-updated').textContent = 'Error loading data. Please refresh.';
+    }
+  }
+
+  loadDashboard();
+
+  // Auto-refresh every 5 minutes
+  setInterval(loadDashboard, 5 * 60 * 1000);
+</script>
+
+</body>
+</html>
