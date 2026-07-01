@@ -1,0 +1,593 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ASRE — Upcoming Vacancy</title>
+  <link rel="stylesheet" href="css/main.css" />
+  <style>
+    .upcoming-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 20px;
+      margin-bottom: 12px;
+      transition: var(--transition);
+      animation: slideUp 0.3s ease forwards;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .upcoming-card::before {
+      content: '';
+      position: absolute;
+      left: 0; top: 0; bottom: 0;
+      width: 4px;
+    }
+
+    .upcoming-card.stage-30d::before { background: var(--danger); }
+    .upcoming-card.stage-60d::before { background: var(--warning); }
+    .upcoming-card.stage-90d::before { background: var(--green); }
+
+    .upcoming-card:hover {
+      box-shadow: var(--shadow);
+      transform: translateY(-1px);
+    }
+
+    .upcoming-card-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 14px;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .upcoming-card-left {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .upcoming-unit-num {
+      font-size: 1.05rem;
+      font-weight: 700;
+      color: var(--white);
+    }
+
+    .upcoming-tenant {
+      font-size: 0.88rem;
+      color: var(--text-muted);
+    }
+
+    .days-remaining {
+      font-size: 0.82rem;
+      font-weight: 700;
+      padding: 4px 12px;
+      border-radius: 20px;
+    }
+
+    .days-30 {
+      background: rgba(229,83,83,0.15);
+      color: #f08080;
+    }
+
+    .days-60 {
+      background: rgba(240,165,0,0.15);
+      color: #f0c060;
+    }
+
+    .days-90 {
+      background: rgba(62,173,130,0.15);
+      color: var(--green-light);
+    }
+
+    .upcoming-details {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+      gap: 12px;
+      margin-bottom: 14px;
+    }
+
+    .upcoming-detail-label {
+      color: var(--text-muted);
+      font-size: 0.72rem;
+      text-transform: uppercase;
+      letter-spacing: 0.3px;
+      margin-bottom: 3px;
+    }
+
+    .upcoming-detail-value {
+      color: var(--text);
+      font-weight: 500;
+      font-size: 0.88rem;
+    }
+
+    .upcoming-actions {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      padding-top: 12px;
+      border-top: 1px solid var(--border);
+    }
+
+    .building-section {
+      margin-bottom: 36px;
+    }
+
+    .building-section-header {
+      background: rgba(42,85,144,0.15);
+      border: 1px solid var(--blue);
+      border-radius: var(--radius-sm);
+      padding: 14px 18px;
+      margin-bottom: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .building-section-name {
+      font-size: 1rem;
+      font-weight: 700;
+      color: var(--blue-light);
+    }
+
+    .building-section-count {
+      font-size: 0.82rem;
+      color: var(--text-muted);
+    }
+
+    .summary-bar {
+      display: flex;
+      gap: 20px;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 16px 24px;
+      margin-bottom: 28px;
+      flex-wrap: wrap;
+    }
+
+    .summary-item-num { font-size: 1.6rem; font-weight: 800; }
+    .summary-item-label {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.4px;
+    }
+
+    .filter-bar {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 24px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+
+    .top-actions {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 24px;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    /* Email log table */
+    .log-section {
+      margin-top: 48px;
+      padding-top: 32px;
+      border-top: 1px solid var(--border);
+    }
+  </style>
+</head>
+<body>
+
+<nav id="main-nav"></nav>
+
+<div class="page-wrapper">
+  <div class="container">
+
+    <div class="page-header">
+      <div>
+        <div class="page-title">Upcoming <span>Vacancy</span></div>
+        <div class="page-subtitle">Leases expiring within 90 days — auto-updated daily</div>
+      </div>
+    </div>
+
+    <!-- Summary Bar -->
+    <div class="summary-bar">
+      <div class="summary-item">
+        <div class="summary-item-num" id="s-total" style="color:var(--warning)">—</div>
+        <div class="summary-item-label">Total Upcoming</div>
+      </div>
+      <div class="summary-item">
+        <div class="summary-item-num" id="s-30" style="color:var(--danger)">—</div>
+        <div class="summary-item-label">Within 30 Days</div>
+      </div>
+      <div class="summary-item">
+        <div class="summary-item-num" id="s-60" style="color:var(--warning)">—</div>
+        <div class="summary-item-label">Within 60 Days</div>
+      </div>
+      <div class="summary-item">
+        <div class="summary-item-num" id="s-90" style="color:var(--green)">—</div>
+        <div class="summary-item-label">Within 90 Days</div>
+      </div>
+    </div>
+
+    <!-- Top Actions -->
+    <div class="top-actions">
+      <div class="filter-bar" style="margin-bottom:0; flex:1">
+        <input type="text" class="form-control" id="search-input"
+          placeholder="🔍  Search by tenant or unit..." oninput="applyFilters()"
+          style="min-width:200px; flex:1" />
+        <select class="form-control" id="filter-building" onchange="applyFilters()"
+          style="min-width:200px">
+          <option value="">All Buildings</option>
+        </select>
+        <select class="form-control" id="filter-stage" onchange="applyFilters()"
+          style="min-width:160px">
+          <option value="">All Stages</option>
+          <option value="30d">Within 30 Days</option>
+          <option value="60d">Within 60 Days</option>
+          <option value="90d">Within 90 Days</option>
+        </select>
+      </div>
+      <button class="btn btn-green" onclick="sendAllReminders()" id="send-all-btn"
+        style="white-space:nowrap">
+        📧 Send All Reminders
+      </button>
+    </div>
+
+    <!-- Upcoming List -->
+    <div id="upcoming-container">
+      <div class="loading-state">
+        <div class="spinner"></div>
+        <p>Loading upcoming vacancies...</p>
+      </div>
+    </div>
+
+    <!-- Email Log Section -->
+    <div class="log-section">
+      <div class="section-header">
+        <div class="section-title">Email Reminder Log</div>
+        <button class="btn btn-outline btn-sm" onclick="loadEmailLog()">🔄 Refresh</button>
+      </div>
+      <div id="email-log-container">
+        <div class="loading-state">
+          <div class="spinner"></div>
+          <p>Loading email log...</p>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script type="module">
+  import { requireAuth } from './js/auth.js';
+  import { renderNav, showToast, showConfirm, formatCurrency, formatDate, daysUntil, getReminderStage } from './js/shared.js';
+  import { supabase } from './js/supabase.js';
+
+  const session = requireAuth();
+  if (!session) throw new Error('Not authenticated');
+  renderNav('upcoming');
+
+  let allUpcoming  = [];
+  let allBuildings = [];
+  let filtered     = [];
+
+  // ── Load Data ────────────────────────────────────────────────────
+  async function loadUpcoming() {
+    const { data: buildings } = await supabase
+      .from('buildings').select('*').order('name');
+    allBuildings = buildings || [];
+
+    // Populate filter
+    const sel = document.getElementById('filter-building');
+    sel.innerHTML = '<option value="">All Buildings</option>' +
+      allBuildings.map(b => `<option value="${b.id}">${b.name}</option>`).join('');
+
+    // Fetch occupied units with end date
+    const { data: units, error } = await supabase
+      .from('units')
+      .select('*, floors(name), buildings(name, type)')
+      .not('tenant_name', 'is', null)
+      .not('end_date', 'is', null);
+
+    if (error) {
+      console.error(error);
+      document.getElementById('upcoming-container').innerHTML =
+        '<p style="color:var(--danger)">Error loading data.</p>';
+      return;
+    }
+
+    const today = new Date();
+    today.setHours(0,0,0,0);
+
+    // Filter to units expiring within 90 days
+    allUpcoming = (units || []).filter(u => {
+      if (!u.tenant_name || u.tenant_name.trim() === '') return false;
+      const days = daysUntil(u.end_date);
+      return days !== null && days >= 0 && days <= 90;
+    });
+
+    // Sort by days remaining (urgent first)
+    allUpcoming.sort((a, b) => daysUntil(a.end_date) - daysUntil(b.end_date));
+
+    updateSummary();
+    applyFilters();
+    loadEmailLog();
+  }
+
+  function updateSummary() {
+    const total = allUpcoming.length;
+    const s30   = allUpcoming.filter(u => daysUntil(u.end_date) <= 30).length;
+    const s60   = allUpcoming.filter(u => { const d = daysUntil(u.end_date); return d > 30 && d <= 60; }).length;
+    const s90   = allUpcoming.filter(u => { const d = daysUntil(u.end_date); return d > 60 && d <= 90; }).length;
+
+    document.getElementById('s-total').textContent = total;
+    document.getElementById('s-30').textContent    = s30;
+    document.getElementById('s-60').textContent    = s60;
+    document.getElementById('s-90').textContent    = s90;
+  }
+
+  window.applyFilters = function() {
+    const search    = document.getElementById('search-input').value.toLowerCase().trim();
+    const buildingF = document.getElementById('filter-building').value;
+    const stageF    = document.getElementById('filter-stage').value;
+
+    filtered = allUpcoming;
+
+    if (buildingF) filtered = filtered.filter(u => u.building_id === buildingF);
+
+    if (stageF) {
+      filtered = filtered.filter(u => {
+        const days = daysUntil(u.end_date);
+        if (stageF === '30d') return days <= 30;
+        if (stageF === '60d') return days > 30 && days <= 60;
+        if (stageF === '90d') return days > 60 && days <= 90;
+        return true;
+      });
+    }
+
+    if (search) {
+      filtered = filtered.filter(u =>
+        u.tenant_name?.toLowerCase().includes(search) ||
+        u.unit_number?.toLowerCase().includes(search)
+      );
+    }
+
+    renderUpcoming(filtered);
+  };
+
+  function renderUpcoming(units) {
+    const container = document.getElementById('upcoming-container');
+
+    if (units.length === 0) {
+      container.innerHTML = `
+        <div class="empty-state">
+          <div class="empty-state-icon">📅</div>
+          <div class="empty-state-title">No Upcoming Vacancies</div>
+          <div class="empty-state-text">
+            No leases are expiring within 90 days, or no units match your filter.
+          </div>
+        </div>`;
+      return;
+    }
+
+    // Group by building
+    const grouped = {};
+    units.forEach(u => {
+      const bName = u.buildings?.name || 'Unknown';
+      if (!grouped[bName]) grouped[bName] = [];
+      grouped[bName].push(u);
+    });
+
+    container.innerHTML = Object.entries(grouped).map(([bName, bUnits]) => `
+      <div class="building-section">
+        <div class="building-section-header">
+          <div class="building-section-name">🏢 ${bName}</div>
+          <div class="building-section-count">${bUnits.length} upcoming</div>
+        </div>
+        ${bUnits.map(u => renderUpcomingCard(u)).join('')}
+      </div>
+    `).join('');
+  }
+
+  function renderUpcomingCard(u) {
+    const days  = daysUntil(u.end_date);
+    const stage = getReminderStage(u.end_date);
+    const floorName = u.floors?.name || '—';
+
+    let stageClass  = 'stage-90d';
+    let daysClass   = 'days-90';
+    let stageLabel  = '90 Days';
+    if (days <= 30)       { stageClass = 'stage-30d'; daysClass = 'days-30'; stageLabel = '30 Days'; }
+    else if (days <= 60)  { stageClass = 'stage-60d'; daysClass = 'days-60'; stageLabel = '60 Days'; }
+
+    return `
+      <div class="upcoming-card ${stageClass}">
+        <div class="upcoming-card-header">
+          <div class="upcoming-card-left">
+            <div class="upcoming-unit-num">Unit ${u.unit_number}</div>
+            <span class="badge badge-grey">Floor: ${floorName}</span>
+            <div class="upcoming-tenant">👤 ${u.tenant_name}</div>
+          </div>
+          <div style="display:flex; gap:8px; align-items:center; flex-wrap:wrap;">
+            <span class="badge stage-${stage || '90d'}">
+              ${stage ? stage.replace('d',' Days') : '—'}
+            </span>
+            <span class="days-remaining ${daysClass}">
+              ${days} day${days !== 1 ? 's' : ''} remaining
+            </span>
+          </div>
+        </div>
+
+        <div class="upcoming-details">
+          <div>
+            <div class="upcoming-detail-label">Vacancy Date</div>
+            <div class="upcoming-detail-value">${formatDate(u.end_date)}</div>
+          </div>
+          ${u.size ? `
+            <div>
+              <div class="upcoming-detail-label">Size</div>
+              <div class="upcoming-detail-value">${u.size}</div>
+            </div>` : ''}
+          ${u.rent ? `
+            <div>
+              <div class="upcoming-detail-label">Rent</div>
+              <div class="upcoming-detail-value">${formatCurrency(u.rent)}</div>
+            </div>` : ''}
+          ${u.deposit ? `
+            <div>
+              <div class="upcoming-detail-label">Security Deposit</div>
+              <div class="upcoming-detail-value">${formatCurrency(u.deposit)}</div>
+            </div>` : ''}
+          ${u.tenant_email ? `
+            <div>
+              <div class="upcoming-detail-label">Email</div>
+              <div class="upcoming-detail-value">${u.tenant_email}</div>
+            </div>` : ''}
+        </div>
+
+        ${u.remarks ? `
+          <div style="font-size:0.82rem;color:var(--text-muted);margin-bottom:12px">
+            <strong>Remarks:</strong> ${u.remarks}
+          </div>` : ''}
+
+        <div class="upcoming-actions">
+          ${u.tenant_email
+            ? `<button class="btn btn-green btn-sm"
+                onclick="sendReminder('${u.id}', '${u.tenant_name}', '${u.tenant_email}', '${stage || '90d'}')">
+                📧 Send Reminder
+              </button>`
+            : `<span style="font-size:0.8rem;color:var(--text-muted)">
+                ⚠️ No email on file
+              </span>`
+          }
+          <a href="properties.html" class="btn btn-outline btn-sm">
+            ✏️ Update Lease
+          </a>
+        </div>
+      </div>`;
+  }
+
+  // ── Send Single Reminder ──────────────────────────────────────────
+  window.sendReminder = async function(unitId, tenantName, email, stage) {
+    const ok = await showConfirm(
+      `Send a ${stage.replace('d',' day')} reminder to ${tenantName} at ${email}?`
+    );
+    if (!ok) return;
+
+    // Log the reminder (actual email sending requires Resend — Phase 2)
+    const { error } = await supabase.from('email_logs').insert({
+      unit_id:        unitId,
+      tenant_name:    tenantName,
+      tenant_email:   email,
+      reminder_stage: stage,
+      status:         'sent',
+    });
+
+    if (error) {
+      showToast('Error logging reminder.', 'error');
+      return;
+    }
+
+    showToast(`Reminder logged for ${tenantName}. (Email sending active in Phase 2)`);
+    loadEmailLog();
+  };
+
+  // ── Send All Reminders ────────────────────────────────────────────
+  window.sendAllReminders = async function() {
+    const withEmail = filtered.filter(u => u.tenant_email);
+
+    if (withEmail.length === 0) {
+      showToast('No tenants with email addresses in current view.', 'warning');
+      return;
+    }
+
+    const ok = await showConfirm(
+      `Send reminders to all ${withEmail.length} tenant(s) with email addresses in the current view?`
+    );
+    if (!ok) return;
+
+    let success = 0;
+    let failed  = 0;
+
+    for (const u of withEmail) {
+      const stage = getReminderStage(u.end_date) || '90d';
+      const { error } = await supabase.from('email_logs').insert({
+        unit_id:        u.id,
+        tenant_name:    u.tenant_name,
+        tenant_email:   u.tenant_email,
+        reminder_stage: stage,
+        status:         'sent',
+      });
+      if (error) failed++; else success++;
+    }
+
+    showToast(`${success} reminder(s) logged. ${failed > 0 ? failed + ' failed.' : ''}`);
+    loadEmailLog();
+  };
+
+  // ── Email Log ────────────────────────────────────────────────────
+  async function loadEmailLog() {
+    const { data: logs, error } = await supabase
+      .from('email_logs')
+      .select('*')
+      .order('sent_at', { ascending: false })
+      .limit(50);
+
+    const container = document.getElementById('email-log-container');
+
+    if (error || !logs || logs.length === 0) {
+      container.innerHTML = `
+        <div class="empty-state" style="padding:30px">
+          <div class="empty-state-title">No reminders sent yet</div>
+        </div>`;
+      return;
+    }
+
+    container.innerHTML = `
+      <div class="table-wrapper">
+        <table>
+          <thead>
+            <tr>
+              <th>Tenant</th>
+              <th>Email</th>
+              <th>Stage</th>
+              <th>Sent At</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${logs.map(l => `
+              <tr>
+                <td>${l.tenant_name || '—'}</td>
+                <td>${l.tenant_email || '—'}</td>
+                <td>
+                  <span class="badge stage-${l.reminder_stage}">
+                    ${l.reminder_stage?.replace('d',' Days')}
+                  </span>
+                </td>
+                <td>${formatDate(l.sent_at)}</td>
+                <td>
+                  <span class="badge ${l.status === 'sent' ? 'badge-green' : 'badge-red'}">
+                    ${l.status}
+                  </span>
+                </td>
+              </tr>`).join('')}
+          </tbody>
+        </table>
+      </div>`;
+  }
+
+  window.loadEmailLog = loadEmailLog;
+
+  loadUpcoming();
+</script>
+
+</body>
+</html>
