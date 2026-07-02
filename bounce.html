@@ -1,375 +1,470 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>ASRE — Bounce Check Tracker</title>
-  <link rel="stylesheet" href="css/main.css" />
-  <style>
-    .bounce-card {
-      background: var(--bg-card);
-      border: 1px solid var(--border);
-      border-left: 4px solid var(--danger);
-      border-radius: var(--radius);
-      padding: 20px;
-      margin-bottom: 12px;
-      transition: var(--transition);
-      animation: slideUp 0.3s ease forwards;
-    }
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ASRE — Bounce Check Tracker</title>
+    <link rel="stylesheet" href="css/main.css" />
+    <style>
+      .bounce-card {
+        background: var(--bg-card);
+        border: 1px solid var(--border);
+        border-left: 4px solid var(--danger);
+        border-radius: var(--radius);
+        padding: 20px;
+        margin-bottom: 12px;
+        transition: var(--transition);
+        animation: slideUp 0.3s ease forwards;
+      }
 
-    .bounce-card.resolved {
-      border-left-color: var(--green);
-      opacity: 0.75;
-    }
+      .bounce-card.resolved {
+        border-left-color: var(--green);
+        opacity: 0.75;
+      }
 
-    .bounce-card:hover {
-      box-shadow: var(--shadow);
-      transform: translateY(-1px);
-    }
+      .bounce-card:hover {
+        box-shadow: var(--shadow);
+        transform: translateY(-1px);
+      }
 
-    .bounce-card-header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      margin-bottom: 14px;
-      flex-wrap: wrap;
-      gap: 10px;
-    }
+      .bounce-card-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 14px;
+        flex-wrap: wrap;
+        gap: 10px;
+      }
 
-    .bounce-card-left {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      flex-wrap: wrap;
-    }
+      .bounce-card-left {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        flex-wrap: wrap;
+      }
 
-    .bounce-unit-num {
-      font-size: 1.05rem;
-      font-weight: 700;
-      color: var(--white);
-    }
+      .bounce-unit-num {
+        font-size: 1.05rem;
+        font-weight: 700;
+        color: var(--white);
+      }
 
-    .bounce-tenant {
-      font-size: 0.88rem;
-      color: var(--text-muted);
-    }
+      .bounce-tenant {
+        font-size: 0.88rem;
+        color: var(--text-muted);
+      }
 
-    .bounce-details {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-      gap: 12px;
-      margin-bottom: 14px;
-    }
+      .bounce-details {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+        gap: 12px;
+        margin-bottom: 14px;
+      }
 
-    .bounce-detail-label {
-      color: var(--text-muted);
-      font-size: 0.72rem;
-      text-transform: uppercase;
-      letter-spacing: 0.3px;
-      margin-bottom: 3px;
-    }
+      .bounce-detail-label {
+        color: var(--text-muted);
+        font-size: 0.72rem;
+        text-transform: uppercase;
+        letter-spacing: 0.3px;
+        margin-bottom: 3px;
+      }
 
-    .bounce-detail-value {
-      color: var(--text);
-      font-weight: 500;
-      font-size: 0.88rem;
-    }
+      .bounce-detail-value {
+        color: var(--text);
+        font-weight: 500;
+        font-size: 0.88rem;
+      }
 
-    .bounce-actions {
-      display: flex;
-      gap: 8px;
-      flex-wrap: wrap;
-      padding-top: 12px;
-      border-top: 1px solid var(--border);
-    }
+      .bounce-actions {
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap;
+        padding-top: 12px;
+        border-top: 1px solid var(--border);
+      }
 
-    .bounce-remarks {
-      font-size: 0.82rem;
-      color: var(--text-muted);
-      margin-bottom: 12px;
-    }
+      .bounce-remarks {
+        font-size: 0.82rem;
+        color: var(--text-muted);
+        margin-bottom: 12px;
+      }
 
-    .building-section {
-      margin-bottom: 36px;
-    }
+      .building-section {
+        margin-bottom: 36px;
+      }
 
-    .building-section-header {
-      background: rgba(42,85,144,0.15);
-      border: 1px solid var(--blue);
-      border-radius: var(--radius-sm);
-      padding: 14px 18px;
-      margin-bottom: 14px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-    }
+      .building-section-header {
+        background: rgba(42, 85, 144, 0.15);
+        border: 1px solid var(--blue);
+        border-radius: var(--radius-sm);
+        padding: 14px 18px;
+        margin-bottom: 14px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+      }
 
-    .building-section-name {
-      font-size: 1rem;
-      font-weight: 700;
-      color: var(--blue-light);
-    }
+      .building-section-name {
+        font-size: 1rem;
+        font-weight: 700;
+        color: var(--blue-light);
+      }
 
-    .unit-group {
-      margin-bottom: 24px;
-    }
+      .unit-group {
+        margin-bottom: 24px;
+      }
 
-    .unit-group-header {
-      background: rgba(229,83,83,0.08);
-      border: 1px solid rgba(229,83,83,0.2);
-      border-radius: var(--radius-sm);
-      padding: 10px 16px;
-      margin-bottom: 10px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-    }
+      .unit-group-header {
+        background: rgba(229, 83, 83, 0.08);
+        border: 1px solid rgba(229, 83, 83, 0.2);
+        border-radius: var(--radius-sm);
+        padding: 10px 16px;
+        margin-bottom: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+      }
 
-    .unit-group-title {
-      font-size: 0.9rem;
-      font-weight: 600;
-      color: var(--text);
-    }
+      .unit-group-title {
+        font-size: 0.9rem;
+        font-weight: 600;
+        color: var(--text);
+      }
 
-    .summary-bar {
-      display: flex;
-      gap: 20px;
-      background: var(--bg-card);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      padding: 16px 24px;
-      margin-bottom: 28px;
-      flex-wrap: wrap;
-    }
+      .summary-bar {
+        display: flex;
+        gap: 20px;
+        background: var(--bg-card);
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        padding: 16px 24px;
+        margin-bottom: 28px;
+        flex-wrap: wrap;
+      }
 
-    .summary-item-num {
-      font-size: 1.6rem;
-      font-weight: 800;
-    }
+      .summary-item-num {
+        font-size: 1.6rem;
+        font-weight: 800;
+      }
 
-    .summary-item-label {
-      font-size: 0.75rem;
-      color: var(--text-muted);
-      text-transform: uppercase;
-      letter-spacing: 0.4px;
-    }
+      .summary-item-label {
+        font-size: 0.75rem;
+        color: var(--text-muted);
+        text-transform: uppercase;
+        letter-spacing: 0.4px;
+      }
 
-    .filter-bar {
-      display: flex;
-      gap: 12px;
-      margin-bottom: 24px;
-      flex-wrap: wrap;
-      align-items: center;
-    }
-  </style>
-</head>
-<body>
+      .filter-bar {
+        display: flex;
+        gap: 12px;
+        margin-bottom: 24px;
+        flex-wrap: wrap;
+        align-items: center;
+      }
+    </style>
+  </head>
+  <body>
+    <nav id="main-nav"></nav>
 
-<nav id="main-nav"></nav>
+    <div class="page-wrapper">
+      <div class="container">
+        <div class="page-header">
+          <div>
+            <div class="page-title">Bounce Check <span>Tracker</span></div>
+            <div class="page-subtitle">
+              Track and manage bounced cheques across all properties
+            </div>
+          </div>
+          <button class="btn btn-green" onclick="openAddBounce()">
+            + Add Bounce Check
+          </button>
+        </div>
 
-<div class="page-wrapper">
-  <div class="container">
+        <!-- Summary Bar -->
+        <div class="summary-bar">
+          <div class="summary-item">
+            <div
+              class="summary-item-num"
+              style="color: var(--danger)"
+              id="s-active"
+            >
+              —
+            </div>
+            <div class="summary-item-label">Active</div>
+          </div>
+          <div class="summary-item">
+            <div
+              class="summary-item-num"
+              style="color: var(--green)"
+              id="s-resolved"
+            >
+              —
+            </div>
+            <div class="summary-item-label">Resolved</div>
+          </div>
+          <div class="summary-item">
+            <div
+              class="summary-item-num"
+              style="color: var(--warning)"
+              id="s-total"
+            >
+              —
+            </div>
+            <div class="summary-item-label">Total Records</div>
+          </div>
+          <div class="summary-item">
+            <div
+              class="summary-item-num"
+              style="color: var(--blue-light)"
+              id="s-buildings"
+            >
+              —
+            </div>
+            <div class="summary-item-label">Buildings Affected</div>
+          </div>
+        </div>
 
-    <div class="page-header">
-      <div>
-        <div class="page-title">Bounce Check <span>Tracker</span></div>
-        <div class="page-subtitle">Track and manage bounced cheques across all properties</div>
-      </div>
-      <button class="btn btn-green" onclick="openAddBounce()">
-        + Add Bounce Check
-      </button>
-    </div>
-
-    <!-- Summary Bar -->
-    <div class="summary-bar">
-      <div class="summary-item">
-        <div class="summary-item-num" style="color:var(--danger)" id="s-active">—</div>
-        <div class="summary-item-label">Active</div>
-      </div>
-      <div class="summary-item">
-        <div class="summary-item-num" style="color:var(--green)" id="s-resolved">—</div>
-        <div class="summary-item-label">Resolved</div>
-      </div>
-      <div class="summary-item">
-        <div class="summary-item-num" style="color:var(--warning)" id="s-total">—</div>
-        <div class="summary-item-label">Total Records</div>
-      </div>
-      <div class="summary-item">
-        <div class="summary-item-num" style="color:var(--blue-light)" id="s-buildings">—</div>
-        <div class="summary-item-label">Buildings Affected</div>
-      </div>
-    </div>
-
-    <!-- Filter Bar -->
-    <div class="filter-bar">
-      <input type="text" class="form-control" id="search-input"
-        placeholder="🔍  Search by tenant or unit..."
-        oninput="applyFilters()" style="flex:1; min-width:200px" />
-      <select class="form-control" id="filter-building"
-        onchange="applyFilters()" style="min-width:200px">
-        <option value="">All Buildings</option>
-      </select>
-      <select class="form-control" id="filter-status"
-        onchange="applyFilters()" style="min-width:160px">
-        <option value="">All Status</option>
-        <option value="active">Active</option>
-        <option value="resolved">Resolved</option>
-      </select>
-    </div>
-
-    <!-- Bounce List -->
-    <div id="bounce-container">
-      <div class="loading-state">
-        <div class="spinner"></div>
-        <p>Loading bounce check records...</p>
-      </div>
-    </div>
-
-  </div>
-</div>
-
-<!-- ── Add / Edit Bounce Check Modal ──────────────────────────── -->
-<div class="modal-overlay" id="modal-bounce" style="display:none">
-  <div class="modal modal-lg">
-    <div class="modal-header">
-      <div class="modal-title" id="bounce-modal-title">Add Bounce Check</div>
-      <button class="modal-close" onclick="closeModal('modal-bounce')">×</button>
-    </div>
-    <div class="modal-body">
-
-      <div class="form-row">
-        <div class="form-group">
-          <label class="form-label">Building *</label>
-          <select id="b-building" class="form-control" onchange="loadUnitsForBuilding()">
-            <option value="">Select Building</option>
+        <!-- Filter Bar -->
+        <div class="filter-bar">
+          <input
+            type="text"
+            class="form-control"
+            id="search-input"
+            placeholder="🔍  Search by tenant or unit..."
+            oninput="applyFilters()"
+            style="flex: 1; min-width: 200px"
+          />
+          <select
+            class="form-control"
+            id="filter-building"
+            onchange="applyFilters()"
+            style="min-width: 200px"
+          >
+            <option value="">All Buildings</option>
+          </select>
+          <select
+            class="form-control"
+            id="filter-status"
+            onchange="applyFilters()"
+            style="min-width: 160px"
+          >
+            <option value="">All Status</option>
+            <option value="active">Active</option>
+            <option value="resolved">Resolved</option>
           </select>
         </div>
-        <div class="form-group">
-          <label class="form-label">Unit *</label>
-          <select id="b-unit" class="form-control" onchange="autoFillUnit()">
-            <option value="">Select Unit</option>
-          </select>
+
+        <!-- Bounce List -->
+        <div id="bounce-container">
+          <div class="loading-state">
+            <div class="spinner"></div>
+            <p>Loading bounce check records...</p>
+          </div>
         </div>
       </div>
-
-      <div class="form-row">
-        <div class="form-group">
-          <label class="form-label">Tenant Name</label>
-          <input type="text" id="b-tenant" class="form-control"
-            placeholder="Auto-filled from unit" />
-        </div>
-        <div class="form-group">
-          <label class="form-label">Unit Size</label>
-          <input type="text" id="b-size" class="form-control"
-            placeholder="Auto-filled from unit" readonly />
-        </div>
-      </div>
-
-      <div class="form-row">
-        <div class="form-group">
-          <label class="form-label">Date of Bounce *</label>
-          <input type="date" id="b-date" class="form-control" />
-        </div>
-        <div class="form-group">
-          <label class="form-label">Rent Amount (AED)</label>
-          <input type="number" id="b-rent" class="form-control"
-            placeholder="Auto-filled from unit" />
-        </div>
-      </div>
-
-      <div class="form-group">
-        <label class="form-label">Security Deposit (AED)</label>
-        <input type="number" id="b-deposit" class="form-control"
-          placeholder="Auto-filled from unit" />
-      </div>
-
-      <div class="form-group">
-        <label class="form-label">Remarks</label>
-        <textarea id="b-remarks" class="form-control" rows="3"
-          placeholder="Additional notes about this bounce check..."></textarea>
-      </div>
-
     </div>
-    <div class="modal-footer">
-      <button class="btn btn-outline" onclick="closeModal('modal-bounce')">Cancel</button>
-      <button class="btn btn-green" id="bounce-save-btn" onclick="saveBounce()">
-        Save Record
-      </button>
+
+    <!-- ── Add / Edit Bounce Check Modal ──────────────────────────── -->
+    <div class="modal-overlay" id="modal-bounce" style="display: none">
+      <div class="modal modal-lg">
+        <div class="modal-header">
+          <div class="modal-title" id="bounce-modal-title">
+            Add Bounce Check
+          </div>
+          <button class="modal-close" onclick="closeModal('modal-bounce')">
+            ×
+          </button>
+        </div>
+        <div class="modal-body">
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Building *</label>
+              <select
+                id="b-building"
+                class="form-control"
+                onchange="loadUnitsForBuilding()"
+              >
+                <option value="">Select Building</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Unit *</label>
+              <select
+                id="b-unit"
+                class="form-control"
+                onchange="autoFillUnit()"
+              >
+                <option value="">Select Unit</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Tenant Name</label>
+              <input
+                type="text"
+                id="b-tenant"
+                class="form-control"
+                placeholder="Auto-filled from unit"
+              />
+            </div>
+            <div class="form-group">
+              <label class="form-label">Unit Size</label>
+              <input
+                type="text"
+                id="b-size"
+                class="form-control"
+                placeholder="Auto-filled from unit"
+                readonly
+              />
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Date of Bounce *</label>
+              <input type="date" id="b-date" class="form-control" />
+            </div>
+            <div class="form-group">
+              <label class="form-label">Rent Amount (AED)</label>
+              <input
+                type="number"
+                id="b-rent"
+                class="form-control"
+                placeholder="Auto-filled from unit"
+              />
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Security Deposit (AED)</label>
+            <input
+              type="number"
+              id="b-deposit"
+              class="form-control"
+              placeholder="Auto-filled from unit"
+            />
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Remarks</label>
+            <textarea
+              id="b-remarks"
+              class="form-control"
+              rows="3"
+              placeholder="Additional notes about this bounce check..."
+            ></textarea>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button class="btn btn-outline" onclick="closeModal('modal-bounce')">
+            Cancel
+          </button>
+          <button
+            class="btn btn-green"
+            id="bounce-save-btn"
+            onclick="saveBounce()"
+          >
+            Save Record
+          </button>
+        </div>
+      </div>
     </div>
-  </div>
-</div>
 
-<script type="module">
-  import { requireAuth } from './js/auth.js';
-  import { renderNav, showToast, showConfirm, formatCurrency, formatDate } from './js/shared.js';
-  import { supabase } from './js/supabase.js';
+    <script type="module">
+      import { requireAuth } from "./js/auth.js";
+      import {
+        renderNav,
+        showToast,
+        showConfirm,
+        formatCurrency,
+        formatDate,
+      } from "./js/shared.js";
+      import { supabase } from "./js/supabase.js";
 
-  const session = requireAuth();
-  if (!session) throw new Error('Not authenticated');
-  renderNav('bounce');
+      const session = requireAuth();
+      if (!session) throw new Error("Not authenticated");
+      renderNav("bounce");
 
-  let allRecords   = [];
-  let allBuildings = [];
-  let allUnits     = [];
-  let editingId    = null;
+      let allRecords = [];
+      let allBuildings = [];
+      let allUnits = [];
+      let editingId = null;
 
-  // ── Load Data ────────────────────────────────────────────────────
-  async function loadBounceChecks() {
-    const [buildingsRes, recordsRes] = await Promise.all([
-      supabase.from('buildings').select('*').order('name'),
-      supabase.from('bounce_checks')
-        .select('*, units(unit_number, size, rent, deposit, tenant_name), buildings(name)')
-        .order('created_at', { ascending: false })
-    ]);
+      // ── Load Data ────────────────────────────────────────────────────
+      async function loadBounceChecks() {
+        const [buildingsRes, recordsRes] = await Promise.all([
+          supabase.from("buildings").select("*").order("name"),
+          supabase
+            .from("bounce_checks")
+            .select(
+              "*, units(unit_number, size, rent, deposit, tenant_name), buildings(name)",
+            )
+            .order("created_at", { ascending: false }),
+        ]);
 
-    allBuildings = buildingsRes.data || [];
-    allRecords   = recordsRes.data   || [];
+        allBuildings = buildingsRes.data || [];
+        allRecords = recordsRes.data || [];
 
-    // Populate building filter
-    const filterSel = document.getElementById('filter-building');
-    filterSel.innerHTML = '<option value="">All Buildings</option>' +
-      allBuildings.map(b => `<option value="${b.id}">${b.name}</option>`).join('');
+        // Populate building filter
+        const filterSel = document.getElementById("filter-building");
+        filterSel.innerHTML =
+          '<option value="">All Buildings</option>' +
+          allBuildings
+            .map((b) => `<option value="${b.id}">${b.name}</option>`)
+            .join("");
 
-    updateSummary();
-    applyFilters();
-  }
+        updateSummary();
+        applyFilters();
+      }
 
-  function updateSummary() {
-    const active   = allRecords.filter(r => r.status === 'active').length;
-    const resolved = allRecords.filter(r => r.status === 'resolved').length;
-    const bldgs    = new Set(allRecords.filter(r => r.status === 'active')
-      .map(r => r.building_id)).size;
+      function updateSummary() {
+        const active = allRecords.filter((r) => r.status === "active").length;
+        const resolved = allRecords.filter(
+          (r) => r.status === "resolved",
+        ).length;
+        const bldgs = new Set(
+          allRecords
+            .filter((r) => r.status === "active")
+            .map((r) => r.building_id),
+        ).size;
 
-    document.getElementById('s-active').textContent   = active;
-    document.getElementById('s-resolved').textContent = resolved;
-    document.getElementById('s-total').textContent    = allRecords.length;
-    document.getElementById('s-buildings').textContent = bldgs;
-  }
+        document.getElementById("s-active").textContent = active;
+        document.getElementById("s-resolved").textContent = resolved;
+        document.getElementById("s-total").textContent = allRecords.length;
+        document.getElementById("s-buildings").textContent = bldgs;
+      }
 
-  window.applyFilters = function() {
-    const search    = document.getElementById('search-input').value.toLowerCase().trim();
-    const buildingF = document.getElementById('filter-building').value;
-    const statusF   = document.getElementById('filter-status').value;
+      window.applyFilters = function () {
+        const search = document
+          .getElementById("search-input")
+          .value.toLowerCase()
+          .trim();
+        const buildingF = document.getElementById("filter-building").value;
+        const statusF = document.getElementById("filter-status").value;
 
-    let filtered = allRecords;
+        let filtered = allRecords;
 
-    if (buildingF) filtered = filtered.filter(r => r.building_id === buildingF);
-    if (statusF)   filtered = filtered.filter(r => r.status === statusF);
-    if (search) {
-      filtered = filtered.filter(r =>
-        r.tenant_name?.toLowerCase().includes(search) ||
-        r.units?.unit_number?.toLowerCase().includes(search)
-      );
-    }
+        if (buildingF)
+          filtered = filtered.filter((r) => r.building_id === buildingF);
+        if (statusF) filtered = filtered.filter((r) => r.status === statusF);
+        if (search) {
+          filtered = filtered.filter(
+            (r) =>
+              r.tenant_name?.toLowerCase().includes(search) ||
+              r.units?.unit_number?.toLowerCase().includes(search),
+          );
+        }
 
-    renderBounceChecks(filtered);
-  };
+        renderBounceChecks(filtered);
+      };
 
-  function renderBounceChecks(records) {
-    const container = document.getElementById('bounce-container');
+      function renderBounceChecks(records) {
+        const container = document.getElementById("bounce-container");
 
-    if (records.length === 0) {
-      container.innerHTML = `
+        if (records.length === 0) {
+          container.innerHTML = `
         <div class="empty-state">
           <div class="empty-state-icon">✅</div>
           <div class="empty-state-title">No Bounce Check Records</div>
@@ -377,20 +472,22 @@
             No records found. Click "Add Bounce Check" to add one.
           </div>
         </div>`;
-      return;
-    }
+          return;
+        }
 
-    // Group by building
-    const grouped = {};
-    records.forEach(r => {
-      const bName = r.buildings?.name || 'Unknown Building';
-      if (!grouped[bName]) grouped[bName] = {};
-      const uNum = r.units?.unit_number || r.unit_id;
-      if (!grouped[bName][uNum]) grouped[bName][uNum] = [];
-      grouped[bName][uNum].push(r);
-    });
+        // Group by building
+        const grouped = {};
+        records.forEach((r) => {
+          const bName = r.buildings?.name || "Unknown Building";
+          if (!grouped[bName]) grouped[bName] = {};
+          const uNum = r.units?.unit_number || r.unit_id;
+          if (!grouped[bName][uNum]) grouped[bName][uNum] = [];
+          grouped[bName][uNum].push(r);
+        });
 
-    container.innerHTML = Object.entries(grouped).map(([bName, units]) => `
+        container.innerHTML = Object.entries(grouped)
+          .map(
+            ([bName, units]) => `
       <div class="building-section">
         <div class="building-section-header">
           <div class="building-section-name">🏢 ${bName}</div>
@@ -398,33 +495,39 @@
             ${Object.values(units).flat().length} record(s)
           </div>
         </div>
-        ${Object.entries(units).map(([uNum, recs]) => `
+        ${Object.entries(units)
+          .map(
+            ([uNum, recs]) => `
           <div class="unit-group">
             <div class="unit-group-header">
               <div class="unit-group-title">Unit ${uNum}</div>
               <div style="font-size:0.8rem;color:var(--text-muted)">
-                ${recs.filter(r => r.status === 'active').length} active /
-                ${recs.filter(r => r.status === 'resolved').length} resolved
+                ${recs.filter((r) => r.status === "active").length} active /
+                ${recs.filter((r) => r.status === "resolved").length} resolved
               </div>
             </div>
-            ${recs.map(r => renderBounceCard(r)).join('')}
+            ${recs.map((r) => renderBounceCard(r)).join("")}
           </div>
-        `).join('')}
+        `,
+          )
+          .join("")}
       </div>
-    `).join('');
-  }
+    `,
+          )
+          .join("");
+      }
 
-  function renderBounceCard(r) {
-    const isResolved = r.status === 'resolved';
-    return `
-      <div class="bounce-card ${isResolved ? 'resolved' : ''}">
+      function renderBounceCard(r) {
+        const isResolved = r.status === "resolved";
+        return `
+      <div class="bounce-card ${isResolved ? "resolved" : ""}">
         <div class="bounce-card-header">
           <div class="bounce-card-left">
-            <div class="bounce-unit-num">Unit ${r.units?.unit_number || '—'}</div>
-            <span class="badge ${isResolved ? 'badge-green' : 'badge-red'}">
-              ${isResolved ? 'Resolved' : 'Active'}
+            <div class="bounce-unit-num">Unit ${r.units?.unit_number || "—"}</div>
+            <span class="badge ${isResolved ? "badge-green" : "badge-red"}">
+              ${isResolved ? "Resolved" : "Active"}
             </span>
-            <div class="bounce-tenant">👤 ${r.tenant_name || '—'}</div>
+            <div class="bounce-tenant">👤 ${r.tenant_name || "—"}</div>
           </div>
           <div style="display:flex;gap:8px;align-items:center">
             <span style="font-size:0.78rem;color:var(--text-muted)">
@@ -438,35 +541,52 @@
             <div class="bounce-detail-label">Date of Bounce</div>
             <div class="bounce-detail-value">${formatDate(r.date_of_bounce)}</div>
           </div>
-          ${r.units?.size ? `
+          ${
+            r.units?.size
+              ? `
             <div>
               <div class="bounce-detail-label">Unit Size</div>
               <div class="bounce-detail-value">${r.units.size}</div>
-            </div>` : ''}
-          ${r.rent ? `
+            </div>`
+              : ""
+          }
+          ${
+            r.rent
+              ? `
             <div>
               <div class="bounce-detail-label">Rent</div>
               <div class="bounce-detail-value">${formatCurrency(r.rent)}</div>
-            </div>` : ''}
-          ${r.deposit ? `
+            </div>`
+              : ""
+          }
+          ${
+            r.deposit
+              ? `
             <div>
               <div class="bounce-detail-label">Security Deposit</div>
               <div class="bounce-detail-value">${formatCurrency(r.deposit)}</div>
-            </div>` : ''}
+            </div>`
+              : ""
+          }
         </div>
 
-        ${r.remarks ? `
+        ${
+          r.remarks
+            ? `
           <div class="bounce-remarks">
             <strong>Remarks:</strong> ${r.remarks}
-          </div>` : ''}
+          </div>`
+            : ""
+        }
 
         <div class="bounce-actions">
-          ${!isResolved
-            ? `<button class="btn btn-green btn-sm"
+          ${
+            !isResolved
+              ? `<button class="btn btn-green btn-sm"
                 onclick="toggleStatus('${r.id}', 'resolved')">
                 ✅ Mark Resolved
               </button>`
-            : `<button class="btn btn-outline btn-sm"
+              : `<button class="btn btn-outline btn-sm"
                 onclick="toggleStatus('${r.id}', 'active')">
                 🔄 Mark Active
               </button>`
@@ -481,173 +601,212 @@
           </button>
         </div>
       </div>`;
-  }
+      }
 
-  // ── Toggle Status ────────────────────────────────────────────────
-  window.toggleStatus = async function(id, newStatus) {
-    const { error } = await supabase
-      .from('bounce_checks')
-      .update({ status: newStatus })
-      .eq('id', id);
+      // ── Toggle Status ────────────────────────────────────────────────
+      window.toggleStatus = async function (id, newStatus) {
+        const { error } = await supabase
+          .from("bounce_checks")
+          .update({ status: newStatus })
+          .eq("id", id);
 
-    if (error) { showToast('Error updating status.', 'error'); return; }
-    showToast(newStatus === 'resolved' ? 'Marked as resolved!' : 'Marked as active.');
-    loadBounceChecks();
-  };
+        if (error) {
+          showToast("Error updating status.", "error");
+          return;
+        }
+        showToast(
+          newStatus === "resolved"
+            ? "Marked as resolved!"
+            : "Marked as active.",
+        );
+        loadBounceChecks();
+      };
 
-  // ── Delete ───────────────────────────────────────────────────────
-  window.deleteBounce = async function(id) {
-    const ok = await showConfirm('Delete this bounce check record? This cannot be undone.');
-    if (!ok) return;
+      // ── Delete ───────────────────────────────────────────────────────
+      window.deleteBounce = async function (id) {
+        const ok = await showConfirm(
+          "Delete this bounce check record? This cannot be undone.",
+        );
+        if (!ok) return;
 
-    const { error } = await supabase.from('bounce_checks').delete().eq('id', id);
-    if (error) { showToast('Error deleting record.', 'error'); return; }
-    showToast('Record deleted.');
-    loadBounceChecks();
-  };
+        const { error } = await supabase
+          .from("bounce_checks")
+          .delete()
+          .eq("id", id);
+        if (error) {
+          showToast("Error deleting record.", "error");
+          return;
+        }
+        showToast("Record deleted.");
+        loadBounceChecks();
+      };
 
-  // ── Open Add Modal ───────────────────────────────────────────────
-  window.openAddBounce = function() {
-    editingId = null;
-    document.getElementById('bounce-modal-title').textContent = 'Add Bounce Check';
-    document.getElementById('bounce-save-btn').textContent    = 'Save Record';
-    clearBounceForm();
-    populateBuildingDropdown();
-    openModal('modal-bounce');
-  };
+      // ── Open Add Modal ───────────────────────────────────────────────
+      window.openAddBounce = function () {
+        editingId = null;
+        document.getElementById("bounce-modal-title").textContent =
+          "Add Bounce Check";
+        document.getElementById("bounce-save-btn").textContent = "Save Record";
+        clearBounceForm();
+        populateBuildingDropdown();
+        openModal("modal-bounce");
+      };
 
-  // ── Open Edit Modal ──────────────────────────────────────────────
-  window.openEditBounce = async function(id) {
-    const record = allRecords.find(r => r.id === id);
-    if (!record) return;
+      // ── Open Edit Modal ──────────────────────────────────────────────
+      window.openEditBounce = async function (id) {
+        const record = allRecords.find((r) => r.id === id);
+        if (!record) return;
 
-    editingId = id;
-    document.getElementById('bounce-modal-title').textContent = 'Edit Bounce Check';
-    document.getElementById('bounce-save-btn').textContent    = 'Save Changes';
+        editingId = id;
+        document.getElementById("bounce-modal-title").textContent =
+          "Edit Bounce Check";
+        document.getElementById("bounce-save-btn").textContent = "Save Changes";
 
-    await populateBuildingDropdown();
-    document.getElementById('b-building').value = record.building_id;
-    await loadUnitsForBuilding();
-    document.getElementById('b-unit').value    = record.unit_id;
-    document.getElementById('b-tenant').value  = record.tenant_name  || '';
-    document.getElementById('b-size').value    = record.units?.size  || '';
-    document.getElementById('b-date').value    = record.date_of_bounce || '';
-    document.getElementById('b-rent').value    = record.rent    || '';
-    document.getElementById('b-deposit').value = record.deposit || '';
-    document.getElementById('b-remarks').value = record.remarks || '';
+        await populateBuildingDropdown();
+        document.getElementById("b-building").value = record.building_id;
+        await loadUnitsForBuilding();
+        document.getElementById("b-unit").value = record.unit_id;
+        document.getElementById("b-tenant").value = record.tenant_name || "";
+        document.getElementById("b-size").value = record.units?.size || "";
+        document.getElementById("b-date").value = record.date_of_bounce || "";
+        document.getElementById("b-rent").value = record.rent || "";
+        document.getElementById("b-deposit").value = record.deposit || "";
+        document.getElementById("b-remarks").value = record.remarks || "";
 
-    openModal('modal-bounce');
-  };
+        openModal("modal-bounce");
+      };
 
-  function clearBounceForm() {
-    ['b-building','b-unit','b-tenant','b-size','b-date',
-     'b-rent','b-deposit','b-remarks'].forEach(id => {
-      document.getElementById(id).value = '';
-    });
-  }
+      function clearBounceForm() {
+        [
+          "b-building",
+          "b-unit",
+          "b-tenant",
+          "b-size",
+          "b-date",
+          "b-rent",
+          "b-deposit",
+          "b-remarks",
+        ].forEach((id) => {
+          document.getElementById(id).value = "";
+        });
+      }
 
-  async function populateBuildingDropdown() {
-    const sel = document.getElementById('b-building');
-    sel.innerHTML = '<option value="">Select Building</option>' +
-      allBuildings.map(b => `<option value="${b.id}">${b.name}</option>`).join('');
-  }
+      async function populateBuildingDropdown() {
+        const sel = document.getElementById("b-building");
+        sel.innerHTML =
+          '<option value="">Select Building</option>' +
+          allBuildings
+            .map((b) => `<option value="${b.id}">${b.name}</option>`)
+            .join("");
+      }
 
-  // ── Load Units for Selected Building ─────────────────────────────
-  window.loadUnitsForBuilding = async function() {
-    const buildingId = document.getElementById('b-building').value;
-    const unitSel    = document.getElementById('b-unit');
+      // ── Load Units for Selected Building ─────────────────────────────
+      window.loadUnitsForBuilding = async function () {
+        const buildingId = document.getElementById("b-building").value;
+        const unitSel = document.getElementById("b-unit");
 
-    if (!buildingId) {
-      unitSel.innerHTML = '<option value="">Select Unit</option>';
-      return;
-    }
+        if (!buildingId) {
+          unitSel.innerHTML = '<option value="">Select Unit</option>';
+          return;
+        }
 
-    const { data: units } = await supabase
-      .from('units')
-      .select('id, unit_number, tenant_name, size, rent, deposit, floors(name)')
-      .eq('building_id', buildingId)
-      .order('unit_number');
+        const { data: units } = await supabase
+          .from("units")
+          .select(
+            "id, unit_number, tenant_name, size, rent, deposit, floors(name)",
+          )
+          .eq("building_id", buildingId)
+          .order("unit_number");
 
-    allUnits = units || [];
-    unitSel.innerHTML = '<option value="">Select Unit</option>' +
-      allUnits.map(u => `
+        allUnits = units || [];
+        unitSel.innerHTML =
+          '<option value="">Select Unit</option>' +
+          allUnits
+            .map(
+              (u) => `
         <option value="${u.id}">
-          ${u.unit_number}${u.floors?.name ? ' — Floor ' + u.floors.name : ''}
-          ${u.tenant_name ? ' (' + u.tenant_name + ')' : ' (Vacant)'}
-        </option>`).join('');
-  };
+          ${u.unit_number}${u.floors?.name ? " — Floor " + u.floors.name : ""}
+          ${u.tenant_name ? " (" + u.tenant_name + ")" : " (Vacant)"}
+        </option>`,
+            )
+            .join("");
+      };
 
-  // ── Auto-fill from Unit ──────────────────────────────────────────
-  window.autoFillUnit = function() {
-    const unitId = document.getElementById('b-unit').value;
-    const unit   = allUnits.find(u => u.id === unitId);
-    if (!unit) return;
+      // ── Auto-fill from Unit ──────────────────────────────────────────
+      window.autoFillUnit = function () {
+        const unitId = document.getElementById("b-unit").value;
+        const unit = allUnits.find((u) => u.id === unitId);
+        if (!unit) return;
 
-    document.getElementById('b-tenant').value  = unit.tenant_name || '';
-    document.getElementById('b-size').value    = unit.size        || '';
-    document.getElementById('b-rent').value    = unit.rent        || '';
-    document.getElementById('b-deposit').value = unit.deposit     || '';
-  };
+        document.getElementById("b-tenant").value = unit.tenant_name || "";
+        document.getElementById("b-size").value = unit.size || "";
+        document.getElementById("b-rent").value = unit.rent || "";
+        document.getElementById("b-deposit").value = unit.deposit || "";
+      };
 
-  // ── Save Bounce Check ────────────────────────────────────────────
-  window.saveBounce = async function() {
-    const buildingId = document.getElementById('b-building').value;
-    const unitId     = document.getElementById('b-unit').value;
-    const date       = document.getElementById('b-date').value;
+      // ── Save Bounce Check ────────────────────────────────────────────
+      window.saveBounce = async function () {
+        const buildingId = document.getElementById("b-building").value;
+        const unitId = document.getElementById("b-unit").value;
+        const date = document.getElementById("b-date").value;
 
-    if (!buildingId || !unitId || !date) {
-      showToast('Building, Unit, and Date of Bounce are required.', 'error');
-      return;
-    }
+        if (!buildingId || !unitId || !date) {
+          showToast(
+            "Building, Unit, and Date of Bounce are required.",
+            "error",
+          );
+          return;
+        }
 
-    const payload = {
-      building_id:    buildingId,
-      unit_id:        unitId,
-      tenant_name:    document.getElementById('b-tenant').value.trim()  || null,
-      date_of_bounce: date,
-      rent:           parseFloat(document.getElementById('b-rent').value)    || 0,
-      deposit:        parseFloat(document.getElementById('b-deposit').value) || 0,
-      remarks:        document.getElementById('b-remarks').value.trim()  || null,
-      status:         'active',
-    };
+        const payload = {
+          building_id: buildingId,
+          unit_id: unitId,
+          tenant_name: document.getElementById("b-tenant").value.trim() || null,
+          date_of_bounce: date,
+          rent: parseFloat(document.getElementById("b-rent").value) || 0,
+          deposit: parseFloat(document.getElementById("b-deposit").value) || 0,
+          remarks: document.getElementById("b-remarks").value.trim() || null,
+          status: "active",
+        };
 
-    let error;
-    if (editingId) {
-      ({ error } = await supabase.from('bounce_checks')
-        .update(payload).eq('id', editingId));
-    } else {
-      ({ error } = await supabase.from('bounce_checks').insert(payload));
-    }
+        let error;
+        if (editingId) {
+          ({ error } = await supabase
+            .from("bounce_checks")
+            .update(payload)
+            .eq("id", editingId));
+        } else {
+          ({ error } = await supabase.from("bounce_checks").insert(payload));
+        }
 
-    if (error) {
-      showToast('Error saving record.', 'error');
-      console.error(error);
-      return;
-    }
+        if (error) {
+          showToast("Error saving record.", "error");
+          console.error(error);
+          return;
+        }
 
-    closeModal('modal-bounce');
-    showToast(editingId ? 'Record updated!' : 'Bounce check recorded!');
-    loadBounceChecks();
-  };
+        closeModal("modal-bounce");
+        showToast(editingId ? "Record updated!" : "Bounce check recorded!");
+        loadBounceChecks();
+      };
 
-  // ── Modal Helpers ────────────────────────────────────────────────
-  window.openModal = function(id) {
-    document.getElementById(id).style.display = 'flex';
-  };
+      // ── Modal Helpers ────────────────────────────────────────────────
+      window.openModal = function (id) {
+        document.getElementById(id).style.display = "flex";
+      };
 
-  window.closeModal = function(id) {
-    document.getElementById(id).style.display = 'none';
-  };
+      window.closeModal = function (id) {
+        document.getElementById(id).style.display = "none";
+      };
 
-  document.querySelectorAll('.modal-overlay').forEach(overlay => {
-    overlay.addEventListener('click', e => {
-      if (e.target === overlay) overlay.style.display = 'none';
-    });
-  });
+      document.querySelectorAll(".modal-overlay").forEach((overlay) => {
+        overlay.addEventListener("click", (e) => {
+          if (e.target === overlay) overlay.style.display = "none";
+        });
+      });
 
-  // ── Init ─────────────────────────────────────────────────────────
-  loadBounceChecks();
-</script>
-
-</body>
+      // ── Init ─────────────────────────────────────────────────────────
+      loadBounceChecks();
+    </script>
+  </body>
 </html>

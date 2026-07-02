@@ -1,306 +1,349 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>ASRE — Vacancy List</title>
-  <link rel="stylesheet" href="css/main.css" />
-  <style>
-    .vacancy-card {
-      background: var(--bg-card);
-      border: 1px solid var(--border);
-      border-left: 4px solid var(--warning);
-      border-radius: var(--radius);
-      padding: 20px;
-      margin-bottom: 12px;
-      transition: var(--transition);
-      animation: slideUp 0.3s ease forwards;
-    }
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ASRE — Vacancy List</title>
+    <link rel="stylesheet" href="css/main.css" />
+    <style>
+      .vacancy-card {
+        background: var(--bg-card);
+        border: 1px solid var(--border);
+        border-left: 4px solid var(--warning);
+        border-radius: var(--radius);
+        padding: 20px;
+        margin-bottom: 12px;
+        transition: var(--transition);
+        animation: slideUp 0.3s ease forwards;
+      }
 
-    .vacancy-card:hover {
-      border-left-color: var(--green);
-      box-shadow: var(--shadow);
-    }
+      .vacancy-card:hover {
+        border-left-color: var(--green);
+        box-shadow: var(--shadow);
+      }
 
-    .vacancy-card-header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      margin-bottom: 14px;
-    }
+      .vacancy-card-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 14px;
+      }
 
-    .vacancy-card-title {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
+      .vacancy-card-title {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
 
-    .vacancy-unit-num {
-      font-size: 1.05rem;
-      font-weight: 700;
-      color: var(--white);
-    }
+      .vacancy-unit-num {
+        font-size: 1.05rem;
+        font-weight: 700;
+        color: var(--white);
+      }
 
-    .vacancy-floor-label {
-      font-size: 0.78rem;
-      color: var(--text-muted);
-      background: var(--bg);
-      padding: 2px 8px;
-      border-radius: 4px;
-      border: 1px solid var(--border);
-    }
+      .vacancy-floor-label {
+        font-size: 0.78rem;
+        color: var(--text-muted);
+        background: var(--bg);
+        padding: 2px 8px;
+        border-radius: 4px;
+        border: 1px solid var(--border);
+      }
 
-    .vacancy-details {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-      gap: 12px;
-    }
+      .vacancy-details {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+        gap: 12px;
+      }
 
-    .vacancy-detail {
-      font-size: 0.82rem;
-    }
+      .vacancy-detail {
+        font-size: 0.82rem;
+      }
 
-    .vacancy-detail-label {
-      color: var(--text-muted);
-      font-size: 0.72rem;
-      text-transform: uppercase;
-      letter-spacing: 0.3px;
-      margin-bottom: 3px;
-    }
+      .vacancy-detail-label {
+        color: var(--text-muted);
+        font-size: 0.72rem;
+        text-transform: uppercase;
+        letter-spacing: 0.3px;
+        margin-bottom: 3px;
+      }
 
-    .vacancy-detail-value {
-      color: var(--text);
-      font-weight: 500;
-    }
+      .vacancy-detail-value {
+        color: var(--text);
+        font-weight: 500;
+      }
 
-    .vacancy-remarks {
-      margin-top: 12px;
-      padding-top: 12px;
-      border-top: 1px solid var(--border);
-      font-size: 0.82rem;
-      color: var(--text-muted);
-    }
+      .vacancy-remarks {
+        margin-top: 12px;
+        padding-top: 12px;
+        border-top: 1px solid var(--border);
+        font-size: 0.82rem;
+        color: var(--text-muted);
+      }
 
-    .building-section {
-      margin-bottom: 36px;
-    }
+      .building-section {
+        margin-bottom: 36px;
+      }
 
-    .building-section-header {
-      background: rgba(42,85,144,0.15);
-      border: 1px solid var(--blue);
-      border-radius: var(--radius-sm);
-      padding: 14px 18px;
-      margin-bottom: 14px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-    }
+      .building-section-header {
+        background: rgba(42, 85, 144, 0.15);
+        border: 1px solid var(--blue);
+        border-radius: var(--radius-sm);
+        padding: 14px 18px;
+        margin-bottom: 14px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+      }
 
-    .building-section-name {
-      font-size: 1rem;
-      font-weight: 700;
-      color: var(--blue-light);
-    }
+      .building-section-name {
+        font-size: 1rem;
+        font-weight: 700;
+        color: var(--blue-light);
+      }
 
-    .building-section-count {
-      font-size: 0.82rem;
-      color: var(--text-muted);
-    }
+      .building-section-count {
+        font-size: 0.82rem;
+        color: var(--text-muted);
+      }
 
-    .summary-bar {
-      display: flex;
-      gap: 20px;
-      background: var(--bg-card);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      padding: 16px 24px;
-      margin-bottom: 28px;
-      flex-wrap: wrap;
-    }
+      .summary-bar {
+        display: flex;
+        gap: 20px;
+        background: var(--bg-card);
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        padding: 16px 24px;
+        margin-bottom: 28px;
+        flex-wrap: wrap;
+      }
 
-    .summary-item {
-      display: flex;
-      flex-direction: column;
-      gap: 4px;
-    }
+      .summary-item {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+      }
 
-    .summary-item-num {
-      font-size: 1.6rem;
-      font-weight: 800;
-      color: var(--warning);
-    }
+      .summary-item-num {
+        font-size: 1.6rem;
+        font-weight: 800;
+        color: var(--warning);
+      }
 
-    .summary-item-label {
-      font-size: 0.75rem;
-      color: var(--text-muted);
-      text-transform: uppercase;
-      letter-spacing: 0.4px;
-    }
+      .summary-item-label {
+        font-size: 0.75rem;
+        color: var(--text-muted);
+        text-transform: uppercase;
+        letter-spacing: 0.4px;
+      }
 
-    .filter-bar {
-      display: flex;
-      gap: 12px;
-      margin-bottom: 24px;
-      flex-wrap: wrap;
-      align-items: center;
-    }
+      .filter-bar {
+        display: flex;
+        gap: 12px;
+        margin-bottom: 24px;
+        flex-wrap: wrap;
+        align-items: center;
+      }
 
-    .filter-bar select {
-      min-width: 200px;
-    }
+      .filter-bar select {
+        min-width: 200px;
+      }
 
-    .search-input {
-      flex: 1;
-      min-width: 200px;
-    }
-  </style>
-</head>
-<body>
+      .search-input {
+        flex: 1;
+        min-width: 200px;
+      }
+    </style>
+  </head>
+  <body>
+    <nav id="main-nav"></nav>
 
-<nav id="main-nav"></nav>
+    <div class="page-wrapper">
+      <div class="container">
+        <div class="page-header">
+          <div>
+            <div class="page-title">Vacancy <span>List</span></div>
+            <div class="page-subtitle">
+              Units with no tenant assigned — updated in real time
+            </div>
+          </div>
+          <a href="properties.html" class="btn btn-outline"> + Add Unit </a>
+        </div>
 
-<div class="page-wrapper">
-  <div class="container">
+        <!-- Summary Bar -->
+        <div class="summary-bar" id="summary-bar">
+          <div class="summary-item">
+            <div class="summary-item-num" id="s-total">—</div>
+            <div class="summary-item-label">Total Vacant</div>
+          </div>
+          <div class="summary-item">
+            <div
+              class="summary-item-num"
+              id="s-buildings"
+              style="color: var(--blue-light)"
+            >
+              —
+            </div>
+            <div class="summary-item-label">Buildings Affected</div>
+          </div>
+          <div class="summary-item">
+            <div
+              class="summary-item-num"
+              id="s-apartment"
+              style="color: var(--green)"
+            >
+              —
+            </div>
+            <div class="summary-item-label">Apartments</div>
+          </div>
+          <div class="summary-item">
+            <div
+              class="summary-item-num"
+              id="s-villa"
+              style="color: var(--green)"
+            >
+              —
+            </div>
+            <div class="summary-item-label">Villas</div>
+          </div>
+        </div>
 
-    <div class="page-header">
-      <div>
-        <div class="page-title">Vacancy <span>List</span></div>
-        <div class="page-subtitle">Units with no tenant assigned — updated in real time</div>
+        <!-- Filter Bar -->
+        <div class="filter-bar">
+          <input
+            type="text"
+            class="form-control search-input"
+            id="search-input"
+            placeholder="🔍  Search by unit number..."
+            oninput="applyFilters()"
+          />
+          <select
+            class="form-control"
+            id="filter-building"
+            onchange="applyFilters()"
+          >
+            <option value="">All Buildings</option>
+          </select>
+        </div>
+
+        <!-- Vacancy List -->
+        <div id="vacancy-container">
+          <div class="loading-state">
+            <div class="spinner"></div>
+            <p>Loading vacant units...</p>
+          </div>
+        </div>
       </div>
-      <a href="properties.html" class="btn btn-outline">
-        + Add Unit
-      </a>
     </div>
 
-    <!-- Summary Bar -->
-    <div class="summary-bar" id="summary-bar">
-      <div class="summary-item">
-        <div class="summary-item-num" id="s-total">—</div>
-        <div class="summary-item-label">Total Vacant</div>
-      </div>
-      <div class="summary-item">
-        <div class="summary-item-num" id="s-buildings" style="color:var(--blue-light)">—</div>
-        <div class="summary-item-label">Buildings Affected</div>
-      </div>
-      <div class="summary-item">
-        <div class="summary-item-num" id="s-apartment" style="color:var(--green)">—</div>
-        <div class="summary-item-label">Apartments</div>
-      </div>
-      <div class="summary-item">
-        <div class="summary-item-num" id="s-villa" style="color:var(--green)">—</div>
-        <div class="summary-item-label">Villas</div>
-      </div>
-    </div>
+    <script type="module">
+      import { requireAuth } from "./js/auth.js";
+      import {
+        renderNav,
+        showToast,
+        formatCurrency,
+        formatDate,
+      } from "./js/shared.js";
+      import { supabase } from "./js/supabase.js";
 
-    <!-- Filter Bar -->
-    <div class="filter-bar">
-      <input type="text" class="form-control search-input" id="search-input"
-        placeholder="🔍  Search by unit number..." oninput="applyFilters()" />
-      <select class="form-control" id="filter-building" onchange="applyFilters()">
-        <option value="">All Buildings</option>
-      </select>
-    </div>
+      const session = requireAuth();
+      if (!session) throw new Error("Not authenticated");
+      renderNav("vacancy");
 
-    <!-- Vacancy List -->
-    <div id="vacancy-container">
-      <div class="loading-state">
-        <div class="spinner"></div>
-        <p>Loading vacant units...</p>
-      </div>
-    </div>
+      let allVacant = [];
+      let allBuildings = [];
 
-  </div>
-</div>
+      async function loadVacancy() {
+        // Fetch all buildings
+        const { data: buildings } = await supabase
+          .from("buildings")
+          .select("*")
+          .order("name");
 
-<script type="module">
-  import { requireAuth } from './js/auth.js';
-  import { renderNav, showToast, formatCurrency, formatDate } from './js/shared.js';
-  import { supabase } from './js/supabase.js';
+        allBuildings = buildings || [];
 
-  const session = requireAuth();
-  if (!session) throw new Error('Not authenticated');
-  renderNav('vacancy');
+        // Populate building filter
+        const filterSel = document.getElementById("filter-building");
+        filterSel.innerHTML =
+          '<option value="">All Buildings</option>' +
+          allBuildings
+            .map((b) => `<option value="${b.id}">${b.name}</option>`)
+            .join("");
 
-  let allVacant   = [];
-  let allBuildings = [];
-
-  async function loadVacancy() {
-    // Fetch all buildings
-    const { data: buildings } = await supabase
-      .from('buildings')
-      .select('*')
-      .order('name');
-
-    allBuildings = buildings || [];
-
-    // Populate building filter
-    const filterSel = document.getElementById('filter-building');
-    filterSel.innerHTML = '<option value="">All Buildings</option>' +
-      allBuildings.map(b => `<option value="${b.id}">${b.name}</option>`).join('');
-
-    // Fetch vacant units with floor info
-    const { data: units, error } = await supabase
-      .from('units')
-      .select(`
+        // Fetch vacant units with floor info
+        const { data: units, error } = await supabase
+          .from("units")
+          .select(
+            `
         *,
         floors(name),
         buildings(name, type)
-      `)
-      .or('tenant_name.is.null,tenant_name.eq.')
-      .order('unit_number');
+      `,
+          )
+          .or("tenant_name.is.null,tenant_name.eq.")
+          .order("unit_number");
 
-    if (error) {
-      console.error(error);
-      document.getElementById('vacancy-container').innerHTML =
-        '<p style="color:var(--danger)">Error loading vacancy data.</p>';
-      return;
-    }
+        if (error) {
+          console.error(error);
+          document.getElementById("vacancy-container").innerHTML =
+            '<p style="color:var(--danger)">Error loading vacancy data.</p>';
+          return;
+        }
 
-    // Filter to truly vacant (tenant_name null or empty)
-    allVacant = (units || []).filter(u =>
-      !u.tenant_name || u.tenant_name.trim() === ''
-    );
+        // Filter to truly vacant (tenant_name null or empty)
+        allVacant = (units || []).filter(
+          (u) => !u.tenant_name || u.tenant_name.trim() === "",
+        );
 
-    updateSummary();
-    applyFilters();
-  }
+        updateSummary();
+        applyFilters();
+      }
 
-  function updateSummary() {
-    const buildingsAffected = new Set(allVacant.map(u => u.building_id)).size;
-    const apartments = allVacant.filter(u => u.buildings?.type === 'apartment').length;
-    const villas     = allVacant.filter(u => u.buildings?.type === 'villa').length;
+      function updateSummary() {
+        const buildingsAffected = new Set(allVacant.map((u) => u.building_id))
+          .size;
+        const apartments = allVacant.filter(
+          (u) => u.buildings?.type === "apartment",
+        ).length;
+        const villas = allVacant.filter(
+          (u) => u.buildings?.type === "villa",
+        ).length;
 
-    document.getElementById('s-total').textContent     = allVacant.length;
-    document.getElementById('s-buildings').textContent = buildingsAffected;
-    document.getElementById('s-apartment').textContent = apartments;
-    document.getElementById('s-villa').textContent     = villas;
-  }
+        document.getElementById("s-total").textContent = allVacant.length;
+        document.getElementById("s-buildings").textContent = buildingsAffected;
+        document.getElementById("s-apartment").textContent = apartments;
+        document.getElementById("s-villa").textContent = villas;
+      }
 
-  window.applyFilters = function() {
-    const search   = document.getElementById('search-input').value.toLowerCase().trim();
-    const buildingF = document.getElementById('filter-building').value;
+      window.applyFilters = function () {
+        const search = document
+          .getElementById("search-input")
+          .value.toLowerCase()
+          .trim();
+        const buildingF = document.getElementById("filter-building").value;
 
-    let filtered = allVacant;
+        let filtered = allVacant;
 
-    if (buildingF) {
-      filtered = filtered.filter(u => u.building_id === buildingF);
-    }
+        if (buildingF) {
+          filtered = filtered.filter((u) => u.building_id === buildingF);
+        }
 
-    if (search) {
-      filtered = filtered.filter(u =>
-        u.unit_number?.toLowerCase().includes(search) ||
-        u.view?.toLowerCase().includes(search)
-      );
-    }
+        if (search) {
+          filtered = filtered.filter(
+            (u) =>
+              u.unit_number?.toLowerCase().includes(search) ||
+              u.view?.toLowerCase().includes(search),
+          );
+        }
 
-    renderVacancy(filtered);
-  };
+        renderVacancy(filtered);
+      };
 
-  function renderVacancy(units) {
-    const container = document.getElementById('vacancy-container');
+      function renderVacancy(units) {
+        const container = document.getElementById("vacancy-container");
 
-    if (units.length === 0) {
-      container.innerHTML = `
+        if (units.length === 0) {
+          container.innerHTML = `
         <div class="empty-state">
           <div class="empty-state-icon">✅</div>
           <div class="empty-state-title">No Vacant Units</div>
@@ -308,31 +351,35 @@
             All units are currently occupied or no units match your filter.
           </div>
         </div>`;
-      return;
-    }
+          return;
+        }
 
-    // Group by building
-    const grouped = {};
-    units.forEach(u => {
-      const bName = u.buildings?.name || 'Unknown Building';
-      if (!grouped[bName]) grouped[bName] = [];
-      grouped[bName].push(u);
-    });
+        // Group by building
+        const grouped = {};
+        units.forEach((u) => {
+          const bName = u.buildings?.name || "Unknown Building";
+          if (!grouped[bName]) grouped[bName] = [];
+          grouped[bName].push(u);
+        });
 
-    container.innerHTML = Object.entries(grouped).map(([bName, bUnits]) => `
+        container.innerHTML = Object.entries(grouped)
+          .map(
+            ([bName, bUnits]) => `
       <div class="building-section">
         <div class="building-section-header">
           <div class="building-section-name">🏢 ${bName}</div>
-          <div class="building-section-count">${bUnits.length} vacant unit${bUnits.length !== 1 ? 's' : ''}</div>
+          <div class="building-section-count">${bUnits.length} vacant unit${bUnits.length !== 1 ? "s" : ""}</div>
         </div>
-        ${bUnits.map(u => renderVacancyCard(u)).join('')}
+        ${bUnits.map((u) => renderVacancyCard(u)).join("")}
       </div>
-    `).join('');
-  }
+    `,
+          )
+          .join("");
+      }
 
-  function renderVacancyCard(u) {
-    const floorName = u.floors?.name || '—';
-    return `
+      function renderVacancyCard(u) {
+        const floorName = u.floors?.name || "—";
+        return `
       <div class="vacancy-card">
         <div class="vacancy-card-header">
           <div class="vacancy-card-title">
@@ -342,51 +389,82 @@
           </div>
         </div>
         <div class="vacancy-details">
-          ${u.size ? `
+          ${
+            u.size
+              ? `
             <div class="vacancy-detail">
               <div class="vacancy-detail-label">Size</div>
               <div class="vacancy-detail-value">${u.size}</div>
-            </div>` : ''}
-          ${u.expected_rent ? `
+            </div>`
+              : ""
+          }
+          ${
+            u.expected_rent
+              ? `
             <div class="vacancy-detail">
               <div class="vacancy-detail-label">Expected Rent</div>
               <div class="vacancy-detail-value">${formatCurrency(u.expected_rent)}</div>
-            </div>` : ''}
-          ${u.rent ? `
+            </div>`
+              : ""
+          }
+          ${
+            u.rent
+              ? `
             <div class="vacancy-detail">
               <div class="vacancy-detail-label">Previous Rent</div>
               <div class="vacancy-detail-value">${formatCurrency(u.rent)}</div>
-            </div>` : ''}
-          ${u.deposit ? `
+            </div>`
+              : ""
+          }
+          ${
+            u.deposit
+              ? `
             <div class="vacancy-detail">
               <div class="vacancy-detail-label">Security Deposit</div>
               <div class="vacancy-detail-value">${formatCurrency(u.deposit)}</div>
-            </div>` : ''}
-          ${u.view ? `
+            </div>`
+              : ""
+          }
+          ${
+            u.view
+              ? `
             <div class="vacancy-detail">
               <div class="vacancy-detail-label">View</div>
               <div class="vacancy-detail-value">${u.view}</div>
-            </div>` : ''}
-          ${u.parking_number ? `
+            </div>`
+              : ""
+          }
+          ${
+            u.parking_number
+              ? `
             <div class="vacancy-detail">
               <div class="vacancy-detail-label">Parking</div>
               <div class="vacancy-detail-value">${u.parking_number}</div>
-            </div>` : ''}
-          ${u.extra_parking && u.extra_parking !== 'N/A' ? `
+            </div>`
+              : ""
+          }
+          ${
+            u.extra_parking && u.extra_parking !== "N/A"
+              ? `
             <div class="vacancy-detail">
               <div class="vacancy-detail-label">Extra Parking</div>
               <div class="vacancy-detail-value">${u.extra_parking}</div>
-            </div>` : ''}
+            </div>`
+              : ""
+          }
         </div>
-        ${u.remarks ? `
+        ${
+          u.remarks
+            ? `
           <div class="vacancy-remarks">
             <strong>Remarks:</strong> ${u.remarks}
-          </div>` : ''}
+          </div>`
+            : ""
+        }
       </div>`;
-  }
+      }
 
-  loadVacancy();
-</script>
-
-</body>
+      loadVacancy();
+    </script>
+  </body>
 </html>

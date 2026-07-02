@@ -1,488 +1,666 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>ASRE — Our Properties</title>
-  <link rel="stylesheet" href="css/main.css" />
-  <style>
-    .unit-card {
-      background: var(--bg);
-      border: 1px solid var(--border);
-      border-radius: var(--radius-sm);
-      padding: 16px;
-      margin-bottom: 10px;
-      transition: var(--transition);
-    }
-    .unit-card:hover { border-color: var(--blue-light); }
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ASRE — Our Properties</title>
+    <link rel="stylesheet" href="css/main.css" />
+    <style>
+      .unit-card {
+        background: var(--bg);
+        border: 1px solid var(--border);
+        border-radius: var(--radius-sm);
+        padding: 16px;
+        margin-bottom: 10px;
+        transition: var(--transition);
+      }
+      .unit-card:hover {
+        border-color: var(--blue-light);
+      }
 
-    .unit-card-header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      margin-bottom: 10px;
-    }
+      .unit-card-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 10px;
+      }
 
-    .unit-number {
-      font-size: 1rem;
-      font-weight: 700;
-      color: var(--white);
-    }
+      .unit-number {
+        font-size: 1rem;
+        font-weight: 700;
+        color: var(--white);
+      }
 
-    .unit-actions { display: flex; gap: 8px; }
+      .unit-actions {
+        display: flex;
+        gap: 8px;
+      }
 
-    .unit-details {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
-      gap: 8px;
-    }
+      .unit-details {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+        gap: 8px;
+      }
 
-    .unit-detail {
-      font-size: 0.8rem;
-    }
+      .unit-detail {
+        font-size: 0.8rem;
+      }
 
-    .unit-detail-label {
-      color: var(--text-muted);
-      font-size: 0.72rem;
-      text-transform: uppercase;
-      letter-spacing: 0.3px;
-      margin-bottom: 2px;
-    }
+      .unit-detail-label {
+        color: var(--text-muted);
+        font-size: 0.72rem;
+        text-transform: uppercase;
+        letter-spacing: 0.3px;
+        margin-bottom: 2px;
+      }
 
-    .unit-detail-value {
-      color: var(--text);
-      font-weight: 500;
-    }
+      .unit-detail-value {
+        color: var(--text);
+        font-weight: 500;
+      }
 
-    .add-floor-form {
-      background: var(--bg);
-      border: 1px dashed var(--border);
-      border-radius: var(--radius-sm);
-      padding: 16px;
-      margin-bottom: 16px;
-    }
+      .add-floor-form {
+        background: var(--bg);
+        border: 1px dashed var(--border);
+        border-radius: var(--radius-sm);
+        padding: 16px;
+        margin-bottom: 16px;
+      }
 
-    .building-detail-header {
-      background: var(--bg-card);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      padding: 24px;
-      margin-bottom: 24px;
-      display: flex;
-      align-items: flex-start;
-      justify-content: space-between;
-      gap: 20px;
-    }
+      .building-detail-header {
+        background: var(--bg-card);
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        padding: 24px;
+        margin-bottom: 24px;
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        gap: 20px;
+      }
 
-    .building-detail-info h2 {
-      font-size: 1.4rem;
-      font-weight: 700;
-      color: var(--white);
-      margin-bottom: 4px;
-    }
+      .building-detail-info h2 {
+        font-size: 1.4rem;
+        font-weight: 700;
+        color: var(--white);
+        margin-bottom: 4px;
+      }
 
-    .building-detail-info p {
-      color: var(--text-muted);
-      font-size: 0.88rem;
-    }
+      .building-detail-info p {
+        color: var(--text-muted);
+        font-size: 0.88rem;
+      }
 
-    .building-detail-stats {
-      display: flex;
-      gap: 24px;
-      flex-shrink: 0;
-    }
+      .building-detail-stats {
+        display: flex;
+        gap: 24px;
+        flex-shrink: 0;
+      }
 
-    .detail-stat {
-      text-align: center;
-    }
+      .detail-stat {
+        text-align: center;
+      }
 
-    .detail-stat-num {
-      font-size: 1.6rem;
-      font-weight: 800;
-      color: var(--green);
-    }
+      .detail-stat-num {
+        font-size: 1.6rem;
+        font-weight: 800;
+        color: var(--green);
+      }
 
-    .detail-stat-label {
-      font-size: 0.72rem;
-      color: var(--text-muted);
-      text-transform: uppercase;
-    }
+      .detail-stat-label {
+        font-size: 0.72rem;
+        color: var(--text-muted);
+        text-transform: uppercase;
+      }
 
-    .no-floors {
-      text-align: center;
-      padding: 48px;
-      color: var(--text-muted);
-      border: 1px dashed var(--border);
-      border-radius: var(--radius);
-    }
+      .no-floors {
+        text-align: center;
+        padding: 48px;
+        color: var(--text-muted);
+        border: 1px dashed var(--border);
+        border-radius: var(--radius);
+      }
 
-    .floor-actions { display: flex; gap: 8px; }
+      .floor-actions {
+        display: flex;
+        gap: 8px;
+      }
 
-    .view-toggle {
-      display: flex;
-      gap: 8px;
-      margin-bottom: 24px;
-    }
+      .view-toggle {
+        display: flex;
+        gap: 8px;
+        margin-bottom: 24px;
+      }
 
-    .view-btn {
-      padding: 8px 20px;
-      border-radius: var(--radius-sm);
-      border: 1px solid var(--border);
-      background: transparent;
-      color: var(--text-muted);
-      cursor: pointer;
-      font-size: 0.85rem;
-      font-weight: 600;
-      transition: var(--transition);
-    }
+      .view-btn {
+        padding: 8px 20px;
+        border-radius: var(--radius-sm);
+        border: 1px solid var(--border);
+        background: transparent;
+        color: var(--text-muted);
+        cursor: pointer;
+        font-size: 0.85rem;
+        font-weight: 600;
+        transition: var(--transition);
+      }
 
-    .view-btn.active {
-      background: var(--blue);
-      border-color: var(--blue);
-      color: var(--white);
-    }
-  </style>
-</head>
-<body>
+      .view-btn.active {
+        background: var(--blue);
+        border-color: var(--blue);
+        color: var(--white);
+      }
+    </style>
+  </head>
+  <body>
+    <nav id="main-nav"></nav>
 
-<nav id="main-nav"></nav>
+    <div class="page-wrapper">
+      <div class="container">
+        <!-- ── List View ─────────────────────────────────────────── -->
+        <div id="view-list">
+          <div class="page-header">
+            <div>
+              <div class="page-title">Our <span>Properties</span></div>
+              <div class="page-subtitle">
+                Manage all buildings, floors, and units
+              </div>
+            </div>
+            <button class="btn btn-green" onclick="openCreateBuilding()">
+              + Create Building
+            </button>
+          </div>
 
-<div class="page-wrapper">
-  <div class="container">
-
-    <!-- ── List View ─────────────────────────────────────────── -->
-    <div id="view-list">
-      <div class="page-header">
-        <div>
-          <div class="page-title">Our <span>Properties</span></div>
-          <div class="page-subtitle">Manage all buildings, floors, and units</div>
+          <div class="card-grid" id="buildings-grid">
+            <div class="loading-state">
+              <div class="spinner"></div>
+              <p>Loading properties...</p>
+            </div>
+          </div>
         </div>
-        <button class="btn btn-green" onclick="openCreateBuilding()">
-          + Create Building
-        </button>
-      </div>
 
-      <div class="card-grid" id="buildings-grid">
-        <div class="loading-state">
-          <div class="spinner"></div>
-          <p>Loading properties...</p>
+        <!-- ── Detail View ───────────────────────────────────────── -->
+        <div id="view-detail" style="display: none">
+          <div class="breadcrumb">
+            <a href="#" onclick="showListView()">Our Properties</a>
+            <span class="breadcrumb-sep">›</span>
+            <span id="detail-breadcrumb">Building</span>
+          </div>
+
+          <div class="building-detail-header" id="detail-header"></div>
+
+          <div class="section-header">
+            <div class="section-title" id="detail-section-title">
+              Floors & Units
+            </div>
+            <div style="display: flex; gap: 10px">
+              <button class="btn btn-outline btn-sm" onclick="openAddFloor()">
+                + Add Floor
+              </button>
+              <button class="btn btn-green btn-sm" onclick="openAddUnit()">
+                + Add Unit
+              </button>
+            </div>
+          </div>
+
+          <div id="floors-container"></div>
         </div>
       </div>
     </div>
 
-    <!-- ── Detail View ───────────────────────────────────────── -->
-    <div id="view-detail" style="display:none">
-      <div class="breadcrumb">
-        <a href="#" onclick="showListView()">Our Properties</a>
-        <span class="breadcrumb-sep">›</span>
-        <span id="detail-breadcrumb">Building</span>
-      </div>
-
-      <div class="building-detail-header" id="detail-header"></div>
-
-      <div class="section-header">
-        <div class="section-title" id="detail-section-title">Floors & Units</div>
-        <div style="display:flex; gap:10px;">
-          <button class="btn btn-outline btn-sm" onclick="openAddFloor()">
-            + Add Floor
+    <!-- ── Create Building Modal ──────────────────────────────────── -->
+    <div class="modal-overlay" id="modal-create-building" style="display: none">
+      <div class="modal">
+        <div class="modal-header">
+          <div class="modal-title">Create New Building</div>
+          <button
+            class="modal-close"
+            onclick="closeModal('modal-create-building')"
+          >
+            ×
           </button>
-          <button class="btn btn-green btn-sm" onclick="openAddUnit()">
-            + Add Unit
+        </div>
+        <div class="modal-body">
+          <div class="form-group">
+            <label class="form-label">Building Name *</label>
+            <input
+              type="text"
+              id="cb-name"
+              class="form-control"
+              placeholder="e.g. Al Sheebani Tower 1"
+            />
+          </div>
+          <div class="form-group">
+            <label class="form-label">Address *</label>
+            <input
+              type="text"
+              id="cb-address"
+              class="form-control"
+              placeholder="Full address"
+            />
+          </div>
+          <div class="form-group">
+            <label class="form-label">Building Type *</label>
+            <select id="cb-type" class="form-control">
+              <option value="apartment">Apartment</option>
+              <option value="villa">Villa</option>
+            </select>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button
+            class="btn btn-outline"
+            onclick="closeModal('modal-create-building')"
+          >
+            Cancel
+          </button>
+          <button class="btn btn-green" onclick="saveBuilding()">
+            Save Building
           </button>
         </div>
       </div>
-
-      <div id="floors-container"></div>
     </div>
 
-  </div>
-</div>
-
-<!-- ── Create Building Modal ──────────────────────────────────── -->
-<div class="modal-overlay" id="modal-create-building" style="display:none">
-  <div class="modal">
-    <div class="modal-header">
-      <div class="modal-title">Create New Building</div>
-      <button class="modal-close" onclick="closeModal('modal-create-building')">×</button>
-    </div>
-    <div class="modal-body">
-      <div class="form-group">
-        <label class="form-label">Building Name *</label>
-        <input type="text" id="cb-name" class="form-control" placeholder="e.g. Al Sheebani Tower 1" />
-      </div>
-      <div class="form-group">
-        <label class="form-label">Address *</label>
-        <input type="text" id="cb-address" class="form-control" placeholder="Full address" />
-      </div>
-      <div class="form-group">
-        <label class="form-label">Building Type *</label>
-        <select id="cb-type" class="form-control">
-          <option value="apartment">Apartment</option>
-          <option value="villa">Villa</option>
-        </select>
-      </div>
-    </div>
-    <div class="modal-footer">
-      <button class="btn btn-outline" onclick="closeModal('modal-create-building')">Cancel</button>
-      <button class="btn btn-green" onclick="saveBuilding()">Save Building</button>
-    </div>
-  </div>
-</div>
-
-<!-- ── Edit Building Modal ────────────────────────────────────── -->
-<div class="modal-overlay" id="modal-edit-building" style="display:none">
-  <div class="modal">
-    <div class="modal-header">
-      <div class="modal-title">Edit Building</div>
-      <button class="modal-close" onclick="closeModal('modal-edit-building')">×</button>
-    </div>
-    <div class="modal-body">
-      <div class="form-group">
-        <label class="form-label">Building Name *</label>
-        <input type="text" id="eb-name" class="form-control" />
-      </div>
-      <div class="form-group">
-        <label class="form-label">Address *</label>
-        <input type="text" id="eb-address" class="form-control" />
-      </div>
-      <div class="form-group">
-        <label class="form-label">Building Type *</label>
-        <select id="eb-type" class="form-control">
-          <option value="apartment">Apartment</option>
-          <option value="villa">Villa</option>
-        </select>
+    <!-- ── Edit Building Modal ────────────────────────────────────── -->
+    <div class="modal-overlay" id="modal-edit-building" style="display: none">
+      <div class="modal">
+        <div class="modal-header">
+          <div class="modal-title">Edit Building</div>
+          <button
+            class="modal-close"
+            onclick="closeModal('modal-edit-building')"
+          >
+            ×
+          </button>
+        </div>
+        <div class="modal-body">
+          <div class="form-group">
+            <label class="form-label">Building Name *</label>
+            <input type="text" id="eb-name" class="form-control" />
+          </div>
+          <div class="form-group">
+            <label class="form-label">Address *</label>
+            <input type="text" id="eb-address" class="form-control" />
+          </div>
+          <div class="form-group">
+            <label class="form-label">Building Type *</label>
+            <select id="eb-type" class="form-control">
+              <option value="apartment">Apartment</option>
+              <option value="villa">Villa</option>
+            </select>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button
+            class="btn btn-outline"
+            onclick="closeModal('modal-edit-building')"
+          >
+            Cancel
+          </button>
+          <button class="btn btn-green" onclick="updateBuilding()">
+            Save Changes
+          </button>
+        </div>
       </div>
     </div>
-    <div class="modal-footer">
-      <button class="btn btn-outline" onclick="closeModal('modal-edit-building')">Cancel</button>
-      <button class="btn btn-green" onclick="updateBuilding()">Save Changes</button>
+
+    <!-- ── Add Floor Modal ────────────────────────────────────────── -->
+    <div class="modal-overlay" id="modal-add-floor" style="display: none">
+      <div class="modal">
+        <div class="modal-header">
+          <div class="modal-title">Add Floor</div>
+          <button class="modal-close" onclick="closeModal('modal-add-floor')">
+            ×
+          </button>
+        </div>
+        <div class="modal-body">
+          <div class="form-group">
+            <label class="form-label">Floor Name *</label>
+            <input
+              type="text"
+              id="af-name"
+              class="form-control"
+              placeholder="e.g. Ground, 1, 2, Mezzanine"
+            />
+          </div>
+          <div class="form-group">
+            <label class="form-label">Sort Order</label>
+            <input
+              type="number"
+              id="af-order"
+              class="form-control"
+              placeholder="e.g. 0 for Ground, 1 for First..."
+              value="0"
+            />
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button
+            class="btn btn-outline"
+            onclick="closeModal('modal-add-floor')"
+          >
+            Cancel
+          </button>
+          <button class="btn btn-green" onclick="saveFloor()">Add Floor</button>
+        </div>
+      </div>
     </div>
-  </div>
-</div>
 
-<!-- ── Add Floor Modal ────────────────────────────────────────── -->
-<div class="modal-overlay" id="modal-add-floor" style="display:none">
-  <div class="modal">
-    <div class="modal-header">
-      <div class="modal-title">Add Floor</div>
-      <button class="modal-close" onclick="closeModal('modal-add-floor')">×</button>
+    <!-- ── Add / Edit Unit Modal ──────────────────────────────────── -->
+    <div class="modal-overlay" id="modal-unit" style="display: none">
+      <div class="modal modal-lg">
+        <div class="modal-header">
+          <div class="modal-title" id="unit-modal-title">Add Unit</div>
+          <button class="modal-close" onclick="closeModal('modal-unit')">
+            ×
+          </button>
+        </div>
+        <div class="modal-body">
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Floor *</label>
+              <select id="u-floor" class="form-control" id="u-floor"></select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Unit Number *</label>
+              <input
+                type="text"
+                id="u-number"
+                class="form-control"
+                placeholder="e.g. 101, G-01"
+              />
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Size</label>
+              <input
+                type="text"
+                id="u-size"
+                class="form-control"
+                placeholder="e.g. 850 sqft"
+              />
+            </div>
+            <div class="form-group">
+              <label class="form-label">View</label>
+              <input
+                type="text"
+                id="u-view"
+                class="form-control"
+                placeholder="e.g. Road, Canal, Burj Khalifa"
+              />
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Rent (AED)</label>
+              <input
+                type="number"
+                id="u-rent"
+                class="form-control"
+                placeholder="0.00"
+              />
+            </div>
+            <div class="form-group">
+              <label class="form-label">Expected Rent (AED)</label>
+              <input
+                type="number"
+                id="u-expected-rent"
+                class="form-control"
+                placeholder="0.00"
+              />
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Security Deposit (AED)</label>
+              <input
+                type="number"
+                id="u-deposit"
+                class="form-control"
+                placeholder="0.00"
+              />
+            </div>
+            <div class="form-group">
+              <label class="form-label">Number of Cheques</label>
+              <input
+                type="number"
+                id="u-checks"
+                class="form-control"
+                placeholder="e.g. 4"
+              />
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Start Date</label>
+              <input type="date" id="u-start" class="form-control" />
+            </div>
+            <div class="form-group">
+              <label class="form-label">End Date</label>
+              <input type="date" id="u-end" class="form-control" />
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Year Days</label>
+              <input
+                type="number"
+                id="u-yeardays"
+                class="form-control"
+                value="365"
+              />
+            </div>
+            <div class="form-group">
+              <label class="form-label">Parking Number</label>
+              <input
+                type="text"
+                id="u-parking"
+                class="form-control"
+                placeholder="e.g. B1-45"
+              />
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Extra Parking</label>
+            <div class="radio-group">
+              <label class="radio-label">
+                <input
+                  type="radio"
+                  name="extra-parking"
+                  value="no"
+                  checked
+                  onchange="toggleExtraParking(false)"
+                />
+                No
+              </label>
+              <label class="radio-label">
+                <input
+                  type="radio"
+                  name="extra-parking"
+                  value="yes"
+                  onchange="toggleExtraParking(true)"
+                />
+                Yes
+              </label>
+            </div>
+            <input
+              type="text"
+              id="u-extra-parking"
+              class="form-control"
+              placeholder="Extra parking details"
+              style="margin-top: 10px; display: none"
+            />
+          </div>
+
+          <div
+            style="
+              border-top: 1px solid var(--border);
+              margin: 20px 0;
+              padding-top: 20px;
+            "
+          >
+            <div
+              class="section-title"
+              style="margin-bottom: 16px; font-size: 0.95rem"
+            >
+              Tenant Details
+              <span
+                style="
+                  font-size: 0.75rem;
+                  color: var(--text-muted);
+                  font-weight: 400;
+                  margin-left: 8px;
+                "
+              >
+                (Leave blank if unit is vacant)
+              </span>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Tenant Name</label>
+              <input
+                type="text"
+                id="u-tenant"
+                class="form-control"
+                placeholder="Full name"
+              />
+            </div>
+            <div class="form-group">
+              <label class="form-label">Tenant Email</label>
+              <input
+                type="email"
+                id="u-email"
+                class="form-control"
+                placeholder="email@example.com"
+              />
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Remarks</label>
+            <textarea
+              id="u-remarks"
+              class="form-control"
+              rows="3"
+              placeholder="Any additional notes..."
+            ></textarea>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button class="btn btn-outline" onclick="closeModal('modal-unit')">
+            Cancel
+          </button>
+          <button class="btn btn-green" id="unit-save-btn" onclick="saveUnit()">
+            Save Unit
+          </button>
+        </div>
+      </div>
     </div>
-    <div class="modal-body">
-      <div class="form-group">
-        <label class="form-label">Floor Name *</label>
-        <input type="text" id="af-name" class="form-control"
-          placeholder="e.g. Ground, 1, 2, Mezzanine" />
-      </div>
-      <div class="form-group">
-        <label class="form-label">Sort Order</label>
-        <input type="number" id="af-order" class="form-control"
-          placeholder="e.g. 0 for Ground, 1 for First..." value="0" />
-      </div>
-    </div>
-    <div class="modal-footer">
-      <button class="btn btn-outline" onclick="closeModal('modal-add-floor')">Cancel</button>
-      <button class="btn btn-green" onclick="saveFloor()">Add Floor</button>
-    </div>
-  </div>
-</div>
 
-<!-- ── Add / Edit Unit Modal ──────────────────────────────────── -->
-<div class="modal-overlay" id="modal-unit" style="display:none">
-  <div class="modal modal-lg">
-    <div class="modal-header">
-      <div class="modal-title" id="unit-modal-title">Add Unit</div>
-      <button class="modal-close" onclick="closeModal('modal-unit')">×</button>
-    </div>
-    <div class="modal-body">
+    <script type="module">
+      import { requireAuth } from "./js/auth.js";
+      import {
+        renderNav,
+        showToast,
+        showConfirm,
+        formatCurrency,
+        formatDate,
+      } from "./js/shared.js";
+      import { supabase } from "./js/supabase.js";
 
-      <div class="form-row">
-        <div class="form-group">
-          <label class="form-label">Floor *</label>
-          <select id="u-floor" class="form-control" id="u-floor"></select>
-        </div>
-        <div class="form-group">
-          <label class="form-label">Unit Number *</label>
-          <input type="text" id="u-number" class="form-control" placeholder="e.g. 101, G-01" />
-        </div>
-      </div>
+      const session = requireAuth();
+      if (!session) throw new Error("Not authenticated");
+      renderNav("properties");
 
-      <div class="form-row">
-        <div class="form-group">
-          <label class="form-label">Size</label>
-          <input type="text" id="u-size" class="form-control" placeholder="e.g. 850 sqft" />
-        </div>
-        <div class="form-group">
-          <label class="form-label">View</label>
-          <input type="text" id="u-view" class="form-control" placeholder="e.g. Road, Canal, Burj Khalifa" />
-        </div>
-      </div>
+      // ── State ────────────────────────────────────────────────────────
+      let buildings = [];
+      let currentBuilding = null;
+      let currentFloors = [];
+      let editingBuildingId = null;
+      let editingUnitId = null;
 
-      <div class="form-row">
-        <div class="form-group">
-          <label class="form-label">Rent (AED)</label>
-          <input type="number" id="u-rent" class="form-control" placeholder="0.00" />
-        </div>
-        <div class="form-group">
-          <label class="form-label">Expected Rent (AED)</label>
-          <input type="number" id="u-expected-rent" class="form-control" placeholder="0.00" />
-        </div>
-      </div>
+      // ── Load Buildings ───────────────────────────────────────────────
+      async function loadBuildings() {
+        const grid = document.getElementById("buildings-grid");
+        grid.innerHTML =
+          '<div class="loading-state"><div class="spinner"></div><p>Loading...</p></div>';
 
-      <div class="form-row">
-        <div class="form-group">
-          <label class="form-label">Security Deposit (AED)</label>
-          <input type="number" id="u-deposit" class="form-control" placeholder="0.00" />
-        </div>
-        <div class="form-group">
-          <label class="form-label">Number of Cheques</label>
-          <input type="number" id="u-checks" class="form-control" placeholder="e.g. 4" />
-        </div>
-      </div>
+        const { data, error } = await supabase
+          .from("buildings")
+          .select("*")
+          .order("name");
 
-      <div class="form-row">
-        <div class="form-group">
-          <label class="form-label">Start Date</label>
-          <input type="date" id="u-start" class="form-control" />
-        </div>
-        <div class="form-group">
-          <label class="form-label">End Date</label>
-          <input type="date" id="u-end" class="form-control" />
-        </div>
-      </div>
+        if (error) {
+          grid.innerHTML =
+            '<p style="color:var(--danger)">Error loading buildings.</p>';
+          return;
+        }
 
-      <div class="form-row">
-        <div class="form-group">
-          <label class="form-label">Year Days</label>
-          <input type="number" id="u-yeardays" class="form-control" value="365" />
-        </div>
-        <div class="form-group">
-          <label class="form-label">Parking Number</label>
-          <input type="text" id="u-parking" class="form-control" placeholder="e.g. B1-45" />
-        </div>
-      </div>
+        buildings = data || [];
 
-      <div class="form-group">
-        <label class="form-label">Extra Parking</label>
-        <div class="radio-group">
-          <label class="radio-label">
-            <input type="radio" name="extra-parking" value="no" checked
-              onchange="toggleExtraParking(false)" /> No
-          </label>
-          <label class="radio-label">
-            <input type="radio" name="extra-parking" value="yes"
-              onchange="toggleExtraParking(true)" /> Yes
-          </label>
-        </div>
-        <input type="text" id="u-extra-parking" class="form-control"
-          placeholder="Extra parking details" style="margin-top:10px; display:none" />
-      </div>
-
-      <div style="border-top: 1px solid var(--border); margin: 20px 0; padding-top: 20px;">
-        <div class="section-title" style="margin-bottom:16px; font-size:0.95rem;">
-          Tenant Details
-          <span style="font-size:0.75rem; color:var(--text-muted); font-weight:400; margin-left:8px;">
-            (Leave blank if unit is vacant)
-          </span>
-        </div>
-      </div>
-
-      <div class="form-row">
-        <div class="form-group">
-          <label class="form-label">Tenant Name</label>
-          <input type="text" id="u-tenant" class="form-control" placeholder="Full name" />
-        </div>
-        <div class="form-group">
-          <label class="form-label">Tenant Email</label>
-          <input type="email" id="u-email" class="form-control" placeholder="email@example.com" />
-        </div>
-      </div>
-
-      <div class="form-group">
-        <label class="form-label">Remarks</label>
-        <textarea id="u-remarks" class="form-control" rows="3"
-          placeholder="Any additional notes..."></textarea>
-      </div>
-
-    </div>
-    <div class="modal-footer">
-      <button class="btn btn-outline" onclick="closeModal('modal-unit')">Cancel</button>
-      <button class="btn btn-green" id="unit-save-btn" onclick="saveUnit()">Save Unit</button>
-    </div>
-  </div>
-</div>
-
-<script type="module">
-  import { requireAuth }  from './js/auth.js';
-  import { renderNav, showToast, showConfirm, formatCurrency, formatDate } from './js/shared.js';
-  import { supabase }     from './js/supabase.js';
-
-  const session = requireAuth();
-  if (!session) throw new Error('Not authenticated');
-  renderNav('properties');
-
-  // ── State ────────────────────────────────────────────────────────
-  let buildings    = [];
-  let currentBuilding = null;
-  let currentFloors   = [];
-  let editingBuildingId = null;
-  let editingUnitId     = null;
-
-  // ── Load Buildings ───────────────────────────────────────────────
-  async function loadBuildings() {
-    const grid = document.getElementById('buildings-grid');
-    grid.innerHTML = '<div class="loading-state"><div class="spinner"></div><p>Loading...</p></div>';
-
-    const { data, error } = await supabase
-      .from('buildings')
-      .select('*')
-      .order('name');
-
-    if (error) {
-      grid.innerHTML = '<p style="color:var(--danger)">Error loading buildings.</p>';
-      return;
-    }
-
-    buildings = data || [];
-
-    if (buildings.length === 0) {
-      grid.innerHTML = `
+        if (buildings.length === 0) {
+          grid.innerHTML = `
         <div class="empty-state" style="grid-column:1/-1">
           <div class="empty-state-icon">🏢</div>
           <div class="empty-state-title">No Properties Yet</div>
           <div class="empty-state-text">Click "Create Building" to add your first property.</div>
         </div>`;
-      return;
-    }
+          return;
+        }
 
-    // Get stats for each building
-    const buildingIds = buildings.map(b => b.id);
+        // Get stats for each building
+        const buildingIds = buildings.map((b) => b.id);
 
-    const [unitsRes, bounceRes, maintRes] = await Promise.all([
-      supabase.from('units').select('id, building_id, tenant_name, end_date').in('building_id', buildingIds),
-      supabase.from('bounce_checks').select('id, building_id, status').in('building_id', buildingIds),
-      supabase.from('maintenance_requests').select('id, building_id, status').in('building_id', buildingIds),
-    ]);
+        const [unitsRes, bounceRes, maintRes] = await Promise.all([
+          supabase
+            .from("units")
+            .select("id, building_id, tenant_name, end_date")
+            .in("building_id", buildingIds),
+          supabase
+            .from("bounce_checks")
+            .select("id, building_id, status")
+            .in("building_id", buildingIds),
+          supabase
+            .from("maintenance_requests")
+            .select("id, building_id, status")
+            .in("building_id", buildingIds),
+        ]);
 
-    const allUnits  = unitsRes.data  || [];
-    const allBounce = bounceRes.data || [];
-    const allMaint  = maintRes.data  || [];
+        const allUnits = unitsRes.data || [];
+        const allBounce = bounceRes.data || [];
+        const allMaint = maintRes.data || [];
 
-    const today = new Date();
-    today.setHours(0,0,0,0);
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
 
-    grid.innerHTML = buildings.map(b => {
-      const units    = allUnits.filter(u => u.building_id === b.id);
-      const occupied = units.filter(u => u.tenant_name && u.tenant_name.trim() !== '');
-      const vacant   = units.length - occupied.length;
-      const upcoming = occupied.filter(u => {
-        if (!u.end_date) return false;
-        const diff = Math.ceil((new Date(u.end_date) - today) / 86400000);
-        return diff >= 0 && diff <= 90;
-      }).length;
-      const bounces  = allBounce.filter(x => x.building_id === b.id && x.status === 'active').length;
-      const maint    = allMaint.filter(x => x.building_id === b.id && x.status === 'open').length;
+        grid.innerHTML = buildings
+          .map((b) => {
+            const units = allUnits.filter((u) => u.building_id === b.id);
+            const occupied = units.filter(
+              (u) => u.tenant_name && u.tenant_name.trim() !== "",
+            );
+            const vacant = units.length - occupied.length;
+            const upcoming = occupied.filter((u) => {
+              if (!u.end_date) return false;
+              const diff = Math.ceil((new Date(u.end_date) - today) / 86400000);
+              return diff >= 0 && diff <= 90;
+            }).length;
+            const bounces = allBounce.filter(
+              (x) => x.building_id === b.id && x.status === "active",
+            ).length;
+            const maint = allMaint.filter(
+              (x) => x.building_id === b.id && x.status === "open",
+            ).length;
 
-      return `
+            return `
         <div class="building-card" onclick="openBuilding('${b.id}')">
           <div class="building-card-name">${b.name}</div>
           <div class="building-card-address">📍 ${b.address}</div>
@@ -524,44 +702,60 @@
             </button>
           </div>
         </div>`;
-    }).join('');
-  }
+          })
+          .join("");
+      }
 
-  // ── Open Building Detail ─────────────────────────────────────────
-  async function openBuilding(id) {
-    currentBuilding = buildings.find(b => b.id === id);
-    if (!currentBuilding) return;
+      // ── Open Building Detail ─────────────────────────────────────────
+      async function openBuilding(id) {
+        currentBuilding = buildings.find((b) => b.id === id);
+        if (!currentBuilding) return;
 
-    document.getElementById('view-list').style.display   = 'none';
-    document.getElementById('view-detail').style.display = 'block';
-    document.getElementById('detail-breadcrumb').textContent = currentBuilding.name;
+        document.getElementById("view-list").style.display = "none";
+        document.getElementById("view-detail").style.display = "block";
+        document.getElementById("detail-breadcrumb").textContent =
+          currentBuilding.name;
 
-    await loadBuildingDetail();
-  }
+        await loadBuildingDetail();
+      }
 
-  async function loadBuildingDetail() {
-    const b = currentBuilding;
+      async function loadBuildingDetail() {
+        const b = currentBuilding;
 
-    // Load floors and units
-    const [floorsRes, unitsRes, bounceRes, maintRes] = await Promise.all([
-      supabase.from('floors').select('*').eq('building_id', b.id).order('sort_order'),
-      supabase.from('units').select('*').eq('building_id', b.id),
-      supabase.from('bounce_checks').select('id,status').eq('building_id', b.id),
-      supabase.from('maintenance_requests').select('id,status').eq('building_id', b.id),
-    ]);
+        // Load floors and units
+        const [floorsRes, unitsRes, bounceRes, maintRes] = await Promise.all([
+          supabase
+            .from("floors")
+            .select("*")
+            .eq("building_id", b.id)
+            .order("sort_order"),
+          supabase.from("units").select("*").eq("building_id", b.id),
+          supabase
+            .from("bounce_checks")
+            .select("id,status")
+            .eq("building_id", b.id),
+          supabase
+            .from("maintenance_requests")
+            .select("id,status")
+            .eq("building_id", b.id),
+        ]);
 
-    currentFloors = floorsRes.data || [];
-    const units   = unitsRes.data  || [];
-    const bounces = bounceRes.data || [];
-    const maint   = maintRes.data  || [];
+        currentFloors = floorsRes.data || [];
+        const units = unitsRes.data || [];
+        const bounces = bounceRes.data || [];
+        const maint = maintRes.data || [];
 
-    const occupied = units.filter(u => u.tenant_name && u.tenant_name.trim() !== '').length;
-    const vacant   = units.length - occupied;
-    const activeBounce = bounces.filter(x => x.status === 'active').length;
-    const openMaint    = maint.filter(x => x.status === 'open').length;
+        const occupied = units.filter(
+          (u) => u.tenant_name && u.tenant_name.trim() !== "",
+        ).length;
+        const vacant = units.length - occupied;
+        const activeBounce = bounces.filter(
+          (x) => x.status === "active",
+        ).length;
+        const openMaint = maint.filter((x) => x.status === "open").length;
 
-    // Header
-    document.getElementById('detail-header').innerHTML = `
+        // Header
+        document.getElementById("detail-header").innerHTML = `
       <div class="building-detail-info">
         <h2>${b.name}</h2>
         <p>📍 ${b.address}</p>
@@ -590,22 +784,23 @@
         </div>
       </div>`;
 
-    // Floors & Units
-    const container = document.getElementById('floors-container');
+        // Floors & Units
+        const container = document.getElementById("floors-container");
 
-    if (currentFloors.length === 0) {
-      container.innerHTML = `
+        if (currentFloors.length === 0) {
+          container.innerHTML = `
         <div class="no-floors">
           <div style="font-size:2rem;margin-bottom:12px">🏗️</div>
           <p style="font-weight:600;color:var(--text-dark);margin-bottom:6px">No floors added yet</p>
           <p style="font-size:0.85rem">Click "Add Floor" to get started.</p>
         </div>`;
-      return;
-    }
+          return;
+        }
 
-    container.innerHTML = currentFloors.map(floor => {
-      const floorUnits = units.filter(u => u.floor_id === floor.id);
-      return `
+        container.innerHTML = currentFloors
+          .map((floor) => {
+            const floorUnits = units.filter((u) => u.floor_id === floor.id);
+            return `
         <div class="floor-section">
           <div class="floor-header">
             <div class="floor-name">Floor: ${floor.name}</div>
@@ -616,24 +811,26 @@
                 onclick="deleteFloor('${floor.id}', '${floor.name}')">🗑️</button>
             </div>
           </div>
-          ${floorUnits.length === 0
-            ? `<p style="color:var(--text-muted);font-size:0.85rem;padding:12px 0">
+          ${
+            floorUnits.length === 0
+              ? `<p style="color:var(--text-muted);font-size:0.85rem;padding:12px 0">
                 No units on this floor yet.</p>`
-            : floorUnits.map(u => renderUnitCard(u)).join('')
+              : floorUnits.map((u) => renderUnitCard(u)).join("")
           }
         </div>`;
-    }).join('');
-  }
+          })
+          .join("");
+      }
 
-  function renderUnitCard(u) {
-    const isVacant = !u.tenant_name || u.tenant_name.trim() === '';
-    return `
+      function renderUnitCard(u) {
+        const isVacant = !u.tenant_name || u.tenant_name.trim() === "";
+        return `
       <div class="unit-card">
         <div class="unit-card-header">
           <div style="display:flex;align-items:center;gap:12px">
             <div class="unit-number">Unit ${u.unit_number}</div>
-            <span class="badge ${isVacant ? 'badge-orange' : 'badge-green'}">
-              ${isVacant ? 'Vacant' : 'Occupied'}
+            <span class="badge ${isVacant ? "badge-orange" : "badge-green"}">
+              ${isVacant ? "Vacant" : "Occupied"}
             </span>
           </div>
           <div class="unit-actions">
@@ -642,315 +839,412 @@
           </div>
         </div>
         <div class="unit-details">
-          ${u.tenant_name ? `
+          ${
+            u.tenant_name
+              ? `
             <div class="unit-detail">
               <div class="unit-detail-label">Tenant</div>
               <div class="unit-detail-value">${u.tenant_name}</div>
-            </div>` : ''}
-          ${u.size ? `
+            </div>`
+              : ""
+          }
+          ${
+            u.size
+              ? `
             <div class="unit-detail">
               <div class="unit-detail-label">Size</div>
               <div class="unit-detail-value">${u.size}</div>
-            </div>` : ''}
-          ${u.rent ? `
+            </div>`
+              : ""
+          }
+          ${
+            u.rent
+              ? `
             <div class="unit-detail">
               <div class="unit-detail-label">Rent</div>
               <div class="unit-detail-value">${formatCurrency(u.rent)}</div>
-            </div>` : ''}
-          ${u.deposit ? `
+            </div>`
+              : ""
+          }
+          ${
+            u.deposit
+              ? `
             <div class="unit-detail">
               <div class="unit-detail-label">Deposit</div>
               <div class="unit-detail-value">${formatCurrency(u.deposit)}</div>
-            </div>` : ''}
-          ${u.end_date ? `
+            </div>`
+              : ""
+          }
+          ${
+            u.end_date
+              ? `
             <div class="unit-detail">
               <div class="unit-detail-label">Lease End</div>
               <div class="unit-detail-value">${formatDate(u.end_date)}</div>
-            </div>` : ''}
-          ${u.parking_number ? `
+            </div>`
+              : ""
+          }
+          ${
+            u.parking_number
+              ? `
             <div class="unit-detail">
               <div class="unit-detail-label">Parking</div>
               <div class="unit-detail-value">${u.parking_number}</div>
-            </div>` : ''}
-          ${u.view ? `
+            </div>`
+              : ""
+          }
+          ${
+            u.view
+              ? `
             <div class="unit-detail">
               <div class="unit-detail-label">View</div>
               <div class="unit-detail-value">${u.view}</div>
-            </div>` : ''}
-          ${u.num_checks ? `
+            </div>`
+              : ""
+          }
+          ${
+            u.num_checks
+              ? `
             <div class="unit-detail">
               <div class="unit-detail-label">Cheques</div>
               <div class="unit-detail-value">${u.num_checks}</div>
-            </div>` : ''}
+            </div>`
+              : ""
+          }
         </div>
-        ${u.remarks ? `
+        ${
+          u.remarks
+            ? `
           <div style="margin-top:10px;padding-top:10px;border-top:1px solid var(--border)">
             <div class="unit-detail-label">Remarks</div>
             <div style="font-size:0.82rem;color:var(--text-muted);margin-top:2px">${u.remarks}</div>
-          </div>` : ''}
+          </div>`
+            : ""
+        }
       </div>`;
-  }
+      }
 
-  // ── Show / Hide Views ────────────────────────────────────────────
-  window.showListView = function() {
-    document.getElementById('view-list').style.display   = 'block';
-    document.getElementById('view-detail').style.display = 'none';
-    currentBuilding = null;
-    loadBuildings();
-  };
+      // ── Show / Hide Views ────────────────────────────────────────────
+      window.showListView = function () {
+        document.getElementById("view-list").style.display = "block";
+        document.getElementById("view-detail").style.display = "none";
+        currentBuilding = null;
+        loadBuildings();
+      };
 
-  // ── Create Building ──────────────────────────────────────────────
-  window.openCreateBuilding = function() {
-    document.getElementById('cb-name').value    = '';
-    document.getElementById('cb-address').value = '';
-    document.getElementById('cb-type').value    = 'apartment';
-    openModal('modal-create-building');
-  };
+      // ── Create Building ──────────────────────────────────────────────
+      window.openCreateBuilding = function () {
+        document.getElementById("cb-name").value = "";
+        document.getElementById("cb-address").value = "";
+        document.getElementById("cb-type").value = "apartment";
+        openModal("modal-create-building");
+      };
 
-  window.saveBuilding = async function() {
-    const name    = document.getElementById('cb-name').value.trim();
-    const address = document.getElementById('cb-address').value.trim();
-    const type    = document.getElementById('cb-type').value;
+      window.saveBuilding = async function () {
+        const name = document.getElementById("cb-name").value.trim();
+        const address = document.getElementById("cb-address").value.trim();
+        const type = document.getElementById("cb-type").value;
 
-    if (!name || !address) {
-      showToast('Please fill in all required fields.', 'error'); return;
-    }
+        if (!name || !address) {
+          showToast("Please fill in all required fields.", "error");
+          return;
+        }
 
-    const { error } = await supabase.from('buildings').insert({ name, address, type });
-    if (error) { showToast('Error creating building.', 'error'); return; }
+        const { error } = await supabase
+          .from("buildings")
+          .insert({ name, address, type });
+        if (error) {
+          showToast("Error creating building.", "error");
+          return;
+        }
 
-    closeModal('modal-create-building');
-    showToast('Building created successfully!');
-    loadBuildings();
-  };
+        closeModal("modal-create-building");
+        showToast("Building created successfully!");
+        loadBuildings();
+      };
 
-  // ── Edit Building ────────────────────────────────────────────────
-  window.openEditBuilding = function(id) {
-    const b = buildings.find(x => x.id === id);
-    if (!b) return;
-    editingBuildingId = id;
-    document.getElementById('eb-name').value    = b.name;
-    document.getElementById('eb-address').value = b.address;
-    document.getElementById('eb-type').value    = b.type;
-    openModal('modal-edit-building');
-  };
+      // ── Edit Building ────────────────────────────────────────────────
+      window.openEditBuilding = function (id) {
+        const b = buildings.find((x) => x.id === id);
+        if (!b) return;
+        editingBuildingId = id;
+        document.getElementById("eb-name").value = b.name;
+        document.getElementById("eb-address").value = b.address;
+        document.getElementById("eb-type").value = b.type;
+        openModal("modal-edit-building");
+      };
 
-  window.updateBuilding = async function() {
-    const name    = document.getElementById('eb-name').value.trim();
-    const address = document.getElementById('eb-address').value.trim();
-    const type    = document.getElementById('eb-type').value;
+      window.updateBuilding = async function () {
+        const name = document.getElementById("eb-name").value.trim();
+        const address = document.getElementById("eb-address").value.trim();
+        const type = document.getElementById("eb-type").value;
 
-    if (!name || !address) {
-      showToast('Please fill in all required fields.', 'error'); return;
-    }
+        if (!name || !address) {
+          showToast("Please fill in all required fields.", "error");
+          return;
+        }
 
-    const { error } = await supabase.from('buildings')
-      .update({ name, address, type })
-      .eq('id', editingBuildingId);
+        const { error } = await supabase
+          .from("buildings")
+          .update({ name, address, type })
+          .eq("id", editingBuildingId);
 
-    if (error) { showToast('Error updating building.', 'error'); return; }
+        if (error) {
+          showToast("Error updating building.", "error");
+          return;
+        }
 
-    closeModal('modal-edit-building');
-    showToast('Building updated successfully!');
-    loadBuildings();
-  };
+        closeModal("modal-edit-building");
+        showToast("Building updated successfully!");
+        loadBuildings();
+      };
 
-  // ── Delete Building ──────────────────────────────────────────────
-  window.deleteBuilding = async function(id, name) {
-    const ok = await showConfirm(
-      `Delete "${name}"? This will permanently delete all floors, units, and related records.`
-    );
-    if (!ok) return;
+      // ── Delete Building ──────────────────────────────────────────────
+      window.deleteBuilding = async function (id, name) {
+        const ok = await showConfirm(
+          `Delete "${name}"? This will permanently delete all floors, units, and related records.`,
+        );
+        if (!ok) return;
 
-    const { error } = await supabase.from('buildings').delete().eq('id', id);
-    if (error) { showToast('Error deleting building.', 'error'); return; }
+        const { error } = await supabase
+          .from("buildings")
+          .delete()
+          .eq("id", id);
+        if (error) {
+          showToast("Error deleting building.", "error");
+          return;
+        }
 
-    showToast('Building deleted.');
-    loadBuildings();
-  };
+        showToast("Building deleted.");
+        loadBuildings();
+      };
 
-  // ── Add Floor ────────────────────────────────────────────────────
-  window.openAddFloor = function() {
-    document.getElementById('af-name').value  = '';
-    document.getElementById('af-order').value = currentFloors.length;
-    openModal('modal-add-floor');
-  };
+      // ── Add Floor ────────────────────────────────────────────────────
+      window.openAddFloor = function () {
+        document.getElementById("af-name").value = "";
+        document.getElementById("af-order").value = currentFloors.length;
+        openModal("modal-add-floor");
+      };
 
-  window.saveFloor = async function() {
-    const name  = document.getElementById('af-name').value.trim();
-    const order = parseInt(document.getElementById('af-order').value) || 0;
+      window.saveFloor = async function () {
+        const name = document.getElementById("af-name").value.trim();
+        const order = parseInt(document.getElementById("af-order").value) || 0;
 
-    if (!name) { showToast('Please enter a floor name.', 'error'); return; }
+        if (!name) {
+          showToast("Please enter a floor name.", "error");
+          return;
+        }
 
-    const { error } = await supabase.from('floors').insert({
-      building_id: currentBuilding.id,
-      name,
-      sort_order: order
-    });
+        const { error } = await supabase.from("floors").insert({
+          building_id: currentBuilding.id,
+          name,
+          sort_order: order,
+        });
 
-    if (error) { showToast('Error adding floor.', 'error'); return; }
+        if (error) {
+          showToast("Error adding floor.", "error");
+          return;
+        }
 
-    closeModal('modal-add-floor');
-    showToast('Floor added!');
-    loadBuildingDetail();
-  };
+        closeModal("modal-add-floor");
+        showToast("Floor added!");
+        loadBuildingDetail();
+      };
 
-  // ── Delete Floor ─────────────────────────────────────────────────
-  window.deleteFloor = async function(id, name) {
-    const ok = await showConfirm(
-      `Delete floor "${name}"? All units on this floor will also be deleted.`
-    );
-    if (!ok) return;
+      // ── Delete Floor ─────────────────────────────────────────────────
+      window.deleteFloor = async function (id, name) {
+        const ok = await showConfirm(
+          `Delete floor "${name}"? All units on this floor will also be deleted.`,
+        );
+        if (!ok) return;
 
-    const { error } = await supabase.from('floors').delete().eq('id', id);
-    if (error) { showToast('Error deleting floor.', 'error'); return; }
+        const { error } = await supabase.from("floors").delete().eq("id", id);
+        if (error) {
+          showToast("Error deleting floor.", "error");
+          return;
+        }
 
-    showToast('Floor deleted.');
-    loadBuildingDetail();
-  };
+        showToast("Floor deleted.");
+        loadBuildingDetail();
+      };
 
-  // ── Add Unit ─────────────────────────────────────────────────────
-  window.openAddUnit = function() {
-    openUnitModal(null, null);
-  };
+      // ── Add Unit ─────────────────────────────────────────────────────
+      window.openAddUnit = function () {
+        openUnitModal(null, null);
+      };
 
-  window.openAddUnitForFloor = function(floorId) {
-    openUnitModal(null, floorId);
-  };
+      window.openAddUnitForFloor = function (floorId) {
+        openUnitModal(null, floorId);
+      };
 
-  window.openEditUnit = async function(id) {
-    const { data, error } = await supabase
-      .from('units').select('*').eq('id', id).single();
-    if (error || !data) { showToast('Error loading unit.', 'error'); return; }
-    openUnitModal(data, data.floor_id);
-  };
+      window.openEditUnit = async function (id) {
+        const { data, error } = await supabase
+          .from("units")
+          .select("*")
+          .eq("id", id)
+          .single();
+        if (error || !data) {
+          showToast("Error loading unit.", "error");
+          return;
+        }
+        openUnitModal(data, data.floor_id);
+      };
 
-  function openUnitModal(unit, floorId) {
-    editingUnitId = unit ? unit.id : null;
+      function openUnitModal(unit, floorId) {
+        editingUnitId = unit ? unit.id : null;
 
-    document.getElementById('unit-modal-title').textContent =
-      unit ? 'Edit Unit' : 'Add Unit';
-    document.getElementById('unit-save-btn').textContent =
-      unit ? 'Save Changes' : 'Save Unit';
+        document.getElementById("unit-modal-title").textContent = unit
+          ? "Edit Unit"
+          : "Add Unit";
+        document.getElementById("unit-save-btn").textContent = unit
+          ? "Save Changes"
+          : "Save Unit";
 
-    // Populate floor dropdown
-    const floorSel = document.getElementById('u-floor');
-    floorSel.innerHTML = currentFloors.map(f =>
-      `<option value="${f.id}" ${f.id === (floorId || '') ? 'selected' : ''}>${f.name}</option>`
-    ).join('');
+        // Populate floor dropdown
+        const floorSel = document.getElementById("u-floor");
+        floorSel.innerHTML = currentFloors
+          .map(
+            (f) =>
+              `<option value="${f.id}" ${f.id === (floorId || "") ? "selected" : ""}>${f.name}</option>`,
+          )
+          .join("");
 
-    // Fill fields
-    document.getElementById('u-number').value        = unit?.unit_number    || '';
-    document.getElementById('u-size').value           = unit?.size           || '';
-    document.getElementById('u-view').value           = unit?.view           || '';
-    document.getElementById('u-rent').value           = unit?.rent           || '';
-    document.getElementById('u-expected-rent').value  = unit?.expected_rent  || '';
-    document.getElementById('u-deposit').value        = unit?.deposit        || '';
-    document.getElementById('u-checks').value         = unit?.num_checks     || '';
-    document.getElementById('u-start').value          = unit?.start_date     || '';
-    document.getElementById('u-end').value            = unit?.end_date       || '';
-    document.getElementById('u-yeardays').value       = unit?.year_days      || 365;
-    document.getElementById('u-parking').value        = unit?.parking_number || '';
-    document.getElementById('u-tenant').value         = unit?.tenant_name    || '';
-    document.getElementById('u-email').value          = unit?.tenant_email   || '';
-    document.getElementById('u-remarks').value        = unit?.remarks        || '';
+        // Fill fields
+        document.getElementById("u-number").value = unit?.unit_number || "";
+        document.getElementById("u-size").value = unit?.size || "";
+        document.getElementById("u-view").value = unit?.view || "";
+        document.getElementById("u-rent").value = unit?.rent || "";
+        document.getElementById("u-expected-rent").value =
+          unit?.expected_rent || "";
+        document.getElementById("u-deposit").value = unit?.deposit || "";
+        document.getElementById("u-checks").value = unit?.num_checks || "";
+        document.getElementById("u-start").value = unit?.start_date || "";
+        document.getElementById("u-end").value = unit?.end_date || "";
+        document.getElementById("u-yeardays").value = unit?.year_days || 365;
+        document.getElementById("u-parking").value = unit?.parking_number || "";
+        document.getElementById("u-tenant").value = unit?.tenant_name || "";
+        document.getElementById("u-email").value = unit?.tenant_email || "";
+        document.getElementById("u-remarks").value = unit?.remarks || "";
 
-    // Extra parking
-    const hasExtra = unit?.extra_parking && unit.extra_parking !== 'N/A';
-    document.querySelector('input[name="extra-parking"][value="no"]').checked  = !hasExtra;
-    document.querySelector('input[name="extra-parking"][value="yes"]').checked = hasExtra;
-    const epField = document.getElementById('u-extra-parking');
-    epField.style.display = hasExtra ? 'block' : 'none';
-    epField.value = hasExtra ? (unit?.extra_parking || '') : '';
+        // Extra parking
+        const hasExtra = unit?.extra_parking && unit.extra_parking !== "N/A";
+        document.querySelector(
+          'input[name="extra-parking"][value="no"]',
+        ).checked = !hasExtra;
+        document.querySelector(
+          'input[name="extra-parking"][value="yes"]',
+        ).checked = hasExtra;
+        const epField = document.getElementById("u-extra-parking");
+        epField.style.display = hasExtra ? "block" : "none";
+        epField.value = hasExtra ? unit?.extra_parking || "" : "";
 
-    openModal('modal-unit');
-  }
+        openModal("modal-unit");
+      }
 
-  window.toggleExtraParking = function(show) {
-    document.getElementById('u-extra-parking').style.display = show ? 'block' : 'none';
-  };
+      window.toggleExtraParking = function (show) {
+        document.getElementById("u-extra-parking").style.display = show
+          ? "block"
+          : "none";
+      };
 
-  window.saveUnit = async function() {
-    const floorId = document.getElementById('u-floor').value;
-    const number  = document.getElementById('u-number').value.trim();
+      window.saveUnit = async function () {
+        const floorId = document.getElementById("u-floor").value;
+        const number = document.getElementById("u-number").value.trim();
 
-    if (!floorId || !number) {
-      showToast('Floor and Unit Number are required.', 'error'); return;
-    }
+        if (!floorId || !number) {
+          showToast("Floor and Unit Number are required.", "error");
+          return;
+        }
 
-    const extraParkingYes = document.querySelector('input[name="extra-parking"][value="yes"]').checked;
-    const extraParking = extraParkingYes
-      ? document.getElementById('u-extra-parking').value.trim() || 'Yes'
-      : 'N/A';
+        const extraParkingYes = document.querySelector(
+          'input[name="extra-parking"][value="yes"]',
+        ).checked;
+        const extraParking = extraParkingYes
+          ? document.getElementById("u-extra-parking").value.trim() || "Yes"
+          : "N/A";
 
-    const payload = {
-      building_id:    currentBuilding.id,
-      floor_id:       floorId,
-      unit_number:    number,
-      size:           document.getElementById('u-size').value.trim()          || null,
-      view:           document.getElementById('u-view').value.trim()          || null,
-      rent:           parseFloat(document.getElementById('u-rent').value)     || 0,
-      expected_rent:  parseFloat(document.getElementById('u-expected-rent').value) || 0,
-      deposit:        parseFloat(document.getElementById('u-deposit').value)  || 0,
-      num_checks:     parseInt(document.getElementById('u-checks').value)     || 0,
-      start_date:     document.getElementById('u-start').value                || null,
-      end_date:       document.getElementById('u-end').value                  || null,
-      year_days:      parseInt(document.getElementById('u-yeardays').value)   || 365,
-      parking_number: document.getElementById('u-parking').value.trim()       || null,
-      extra_parking:  extraParking,
-      tenant_name:    document.getElementById('u-tenant').value.trim()        || null,
-      tenant_email:   document.getElementById('u-email').value.trim()         || null,
-      remarks:        document.getElementById('u-remarks').value.trim()        || null,
-    };
+        const payload = {
+          building_id: currentBuilding.id,
+          floor_id: floorId,
+          unit_number: number,
+          size: document.getElementById("u-size").value.trim() || null,
+          view: document.getElementById("u-view").value.trim() || null,
+          rent: parseFloat(document.getElementById("u-rent").value) || 0,
+          expected_rent:
+            parseFloat(document.getElementById("u-expected-rent").value) || 0,
+          deposit: parseFloat(document.getElementById("u-deposit").value) || 0,
+          num_checks: parseInt(document.getElementById("u-checks").value) || 0,
+          start_date: document.getElementById("u-start").value || null,
+          end_date: document.getElementById("u-end").value || null,
+          year_days:
+            parseInt(document.getElementById("u-yeardays").value) || 365,
+          parking_number:
+            document.getElementById("u-parking").value.trim() || null,
+          extra_parking: extraParking,
+          tenant_name: document.getElementById("u-tenant").value.trim() || null,
+          tenant_email: document.getElementById("u-email").value.trim() || null,
+          remarks: document.getElementById("u-remarks").value.trim() || null,
+        };
 
-    let error;
-    if (editingUnitId) {
-      ({ error } = await supabase.from('units').update(payload).eq('id', editingUnitId));
-    } else {
-      ({ error } = await supabase.from('units').insert(payload));
-    }
+        let error;
+        if (editingUnitId) {
+          ({ error } = await supabase
+            .from("units")
+            .update(payload)
+            .eq("id", editingUnitId));
+        } else {
+          ({ error } = await supabase.from("units").insert(payload));
+        }
 
-    if (error) { showToast('Error saving unit.', 'error'); console.error(error); return; }
+        if (error) {
+          showToast("Error saving unit.", "error");
+          console.error(error);
+          return;
+        }
 
-    closeModal('modal-unit');
-    showToast(editingUnitId ? 'Unit updated!' : 'Unit added!');
-    loadBuildingDetail();
-  };
+        closeModal("modal-unit");
+        showToast(editingUnitId ? "Unit updated!" : "Unit added!");
+        loadBuildingDetail();
+      };
 
-  // ── Delete Unit ──────────────────────────────────────────────────
-  window.deleteUnit = async function(id, number) {
-    const ok = await showConfirm(`Delete Unit ${number}? This cannot be undone.`);
-    if (!ok) return;
+      // ── Delete Unit ──────────────────────────────────────────────────
+      window.deleteUnit = async function (id, number) {
+        const ok = await showConfirm(
+          `Delete Unit ${number}? This cannot be undone.`,
+        );
+        if (!ok) return;
 
-    const { error } = await supabase.from('units').delete().eq('id', id);
-    if (error) { showToast('Error deleting unit.', 'error'); return; }
+        const { error } = await supabase.from("units").delete().eq("id", id);
+        if (error) {
+          showToast("Error deleting unit.", "error");
+          return;
+        }
 
-    showToast('Unit deleted.');
-    loadBuildingDetail();
-  };
+        showToast("Unit deleted.");
+        loadBuildingDetail();
+      };
 
-  // ── Open Building from detail view ──────────────────────────────
-  window.openBuilding = openBuilding;
+      // ── Open Building from detail view ──────────────────────────────
+      window.openBuilding = openBuilding;
 
-  // ── Modal helpers ────────────────────────────────────────────────
-  window.openModal = function(id) {
-    document.getElementById(id).style.display = 'flex';
-  };
+      // ── Modal helpers ────────────────────────────────────────────────
+      window.openModal = function (id) {
+        document.getElementById(id).style.display = "flex";
+      };
 
-  window.closeModal = function(id) {
-    document.getElementById(id).style.display = 'none';
-  };
+      window.closeModal = function (id) {
+        document.getElementById(id).style.display = "none";
+      };
 
-  // Close modal on overlay click
-  document.querySelectorAll('.modal-overlay').forEach(overlay => {
-    overlay.addEventListener('click', e => {
-      if (e.target === overlay) overlay.style.display = 'none';
-    });
-  });
+      // Close modal on overlay click
+      document.querySelectorAll(".modal-overlay").forEach((overlay) => {
+        overlay.addEventListener("click", (e) => {
+          if (e.target === overlay) overlay.style.display = "none";
+        });
+      });
 
-  // ── Init ─────────────────────────────────────────────────────────
-  loadBuildings();
-</script>
-
-</body>
+      // ── Init ─────────────────────────────────────────────────────────
+      loadBuildings();
+    </script>
+  </body>
 </html>

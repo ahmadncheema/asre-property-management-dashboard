@@ -1,712 +1,830 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>ASRE — Invoice Generator</title>
-  <link rel="stylesheet" href="css/main.css" />
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-  <style>
-    .invoice-types {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-      gap: 12px;
-      margin-bottom: 32px;
-    }
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ASRE — Invoice Generator</title>
+    <link rel="stylesheet" href="css/main.css" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <style>
+      .invoice-types {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+        gap: 12px;
+        margin-bottom: 32px;
+      }
 
-    .invoice-type-btn {
-      background: var(--bg-card);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      padding: 16px;
-      cursor: pointer;
-      transition: var(--transition);
-      text-align: center;
-      color: var(--text);
-      font-family: inherit;
-    }
+      .invoice-type-btn {
+        background: var(--bg-card);
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        padding: 16px;
+        cursor: pointer;
+        transition: var(--transition);
+        text-align: center;
+        color: var(--text);
+        font-family: inherit;
+      }
 
-    .invoice-type-btn:hover {
-      border-color: var(--blue-light);
-      background: var(--bg-hover);
-    }
+      .invoice-type-btn:hover {
+        border-color: var(--blue-light);
+        background: var(--bg-hover);
+      }
 
-    .invoice-type-btn.active {
-      border-color: var(--green);
-      background: rgba(62,173,130,0.1);
-      color: var(--white);
-    }
+      .invoice-type-btn.active {
+        border-color: var(--green);
+        background: rgba(62, 173, 130, 0.1);
+        color: var(--white);
+      }
 
-    .invoice-type-btn .type-code {
-      font-size: 0.72rem;
-      font-weight: 700;
-      letter-spacing: 1px;
-      color: var(--green);
-      margin-bottom: 6px;
-    }
+      .invoice-type-btn .type-code {
+        font-size: 0.72rem;
+        font-weight: 700;
+        letter-spacing: 1px;
+        color: var(--green);
+        margin-bottom: 6px;
+      }
 
-    .invoice-type-btn .type-name {
-      font-size: 0.88rem;
-      font-weight: 600;
-    }
+      .invoice-type-btn .type-name {
+        font-size: 0.88rem;
+        font-weight: 600;
+      }
 
-    .invoice-builder {
-      display: grid;
-      grid-template-columns: 1fr 380px;
-      gap: 24px;
-      align-items: start;
-    }
+      .invoice-builder {
+        display: grid;
+        grid-template-columns: 1fr 380px;
+        gap: 24px;
+        align-items: start;
+      }
 
-    @media (max-width: 1024px) {
-      .invoice-builder { grid-template-columns: 1fr; }
-    }
+      @media (max-width: 1024px) {
+        .invoice-builder {
+          grid-template-columns: 1fr;
+        }
+      }
 
-    .invoice-section {
-      background: var(--bg-card);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      padding: 24px;
-      margin-bottom: 20px;
-    }
+      .invoice-section {
+        background: var(--bg-card);
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        padding: 24px;
+        margin-bottom: 20px;
+      }
 
-    .invoice-section-title {
-      font-size: 0.85rem;
-      font-weight: 700;
-      color: var(--text-muted);
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-      margin-bottom: 16px;
-      padding-bottom: 10px;
-      border-bottom: 1px solid var(--border);
-    }
+      .invoice-section-title {
+        font-size: 0.85rem;
+        font-weight: 700;
+        color: var(--text-muted);
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        margin-bottom: 16px;
+        padding-bottom: 10px;
+        border-bottom: 1px solid var(--border);
+      }
 
-    .tenant-info-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 12px;
-    }
+      .tenant-info-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 12px;
+      }
 
-    .tenant-info-item label {
-      font-size: 0.72rem;
-      color: var(--text-muted);
-      text-transform: uppercase;
-      letter-spacing: 0.3px;
-      display: block;
-      margin-bottom: 3px;
-    }
+      .tenant-info-item label {
+        font-size: 0.72rem;
+        color: var(--text-muted);
+        text-transform: uppercase;
+        letter-spacing: 0.3px;
+        display: block;
+        margin-bottom: 3px;
+      }
 
-    .tenant-info-item span {
-      font-size: 0.9rem;
-      color: var(--white);
-      font-weight: 500;
-    }
+      .tenant-info-item span {
+        font-size: 0.9rem;
+        color: var(--white);
+        font-weight: 500;
+      }
 
-    /* Line Items */
-    .line-items-table {
-      width: 100%;
-      border-collapse: collapse;
-      margin-bottom: 16px;
-    }
+      /* Line Items */
+      .line-items-table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-bottom: 16px;
+      }
 
-    .line-items-table th {
-      background: var(--blue);
-      color: var(--white);
-      font-size: 0.75rem;
-      font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: 0.4px;
-      padding: 10px 12px;
-      text-align: left;
-    }
+      .line-items-table th {
+        background: var(--blue);
+        color: var(--white);
+        font-size: 0.75rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.4px;
+        padding: 10px 12px;
+        text-align: left;
+      }
 
-    .line-items-table td {
-      padding: 8px 12px;
-      border-bottom: 1px solid var(--border);
-      vertical-align: middle;
-    }
+      .line-items-table td {
+        padding: 8px 12px;
+        border-bottom: 1px solid var(--border);
+        vertical-align: middle;
+      }
 
-    .line-items-table td input {
-      background: var(--bg-input);
-      border: 1px solid var(--border);
-      border-radius: 6px;
-      color: var(--text);
-      padding: 6px 10px;
-      width: 100%;
-      font-family: inherit;
-      font-size: 0.85rem;
-      outline: none;
-    }
+      .line-items-table td input {
+        background: var(--bg-input);
+        border: 1px solid var(--border);
+        border-radius: 6px;
+        color: var(--text);
+        padding: 6px 10px;
+        width: 100%;
+        font-family: inherit;
+        font-size: 0.85rem;
+        outline: none;
+      }
 
-    .line-items-table td input:focus {
-      border-color: var(--blue-light);
-    }
+      .line-items-table td input:focus {
+        border-color: var(--blue-light);
+      }
 
-    .line-items-table .col-desc { width: 40%; }
-    .line-items-table .col-qty  { width: 10%; }
-    .line-items-table .col-rate { width: 18%; }
-    .line-items-table .col-vat  { width: 12%; }
-    .line-items-table .col-total{ width: 15%; }
-    .line-items-table .col-del  { width: 5%; }
+      .line-items-table .col-desc {
+        width: 40%;
+      }
+      .line-items-table .col-qty {
+        width: 10%;
+      }
+      .line-items-table .col-rate {
+        width: 18%;
+      }
+      .line-items-table .col-vat {
+        width: 12%;
+      }
+      .line-items-table .col-total {
+        width: 15%;
+      }
+      .line-items-table .col-del {
+        width: 5%;
+      }
 
-    .line-total {
-      font-weight: 600;
-      color: var(--green);
-      font-size: 0.88rem;
-    }
+      .line-total {
+        font-weight: 600;
+        color: var(--green);
+        font-size: 0.88rem;
+      }
 
-    .del-btn {
-      background: transparent;
-      border: none;
-      color: var(--danger);
-      cursor: pointer;
-      font-size: 1rem;
-      padding: 4px 8px;
-      border-radius: 4px;
-      transition: var(--transition);
-    }
+      .del-btn {
+        background: transparent;
+        border: none;
+        color: var(--danger);
+        cursor: pointer;
+        font-size: 1rem;
+        padding: 4px 8px;
+        border-radius: 4px;
+        transition: var(--transition);
+      }
 
-    .del-btn:hover { background: rgba(229,83,83,0.1); }
+      .del-btn:hover {
+        background: rgba(229, 83, 83, 0.1);
+      }
 
-    /* Totals */
-    .invoice-totals {
-      background: var(--bg-card);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      padding: 20px 24px;
-      position: sticky;
-      top: 84px;
-    }
+      /* Totals */
+      .invoice-totals {
+        background: var(--bg-card);
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        padding: 20px 24px;
+        position: sticky;
+        top: 84px;
+      }
 
-    .totals-title {
-      font-size: 0.85rem;
-      font-weight: 700;
-      color: var(--text-muted);
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-      margin-bottom: 16px;
-      padding-bottom: 10px;
-      border-bottom: 1px solid var(--border);
-    }
+      .totals-title {
+        font-size: 0.85rem;
+        font-weight: 700;
+        color: var(--text-muted);
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        margin-bottom: 16px;
+        padding-bottom: 10px;
+        border-bottom: 1px solid var(--border);
+      }
 
-    .totals-row {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 8px 0;
-      font-size: 0.9rem;
-      border-bottom: 1px solid rgba(255,255,255,0.04);
-    }
+      .totals-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 8px 0;
+        font-size: 0.9rem;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+      }
 
-    .totals-row.grand-total {
-      border-top: 2px solid var(--green);
-      border-bottom: none;
-      padding-top: 14px;
-      margin-top: 6px;
-      font-size: 1.1rem;
-      font-weight: 800;
-      color: var(--white);
-    }
+      .totals-row.grand-total {
+        border-top: 2px solid var(--green);
+        border-bottom: none;
+        padding-top: 14px;
+        margin-top: 6px;
+        font-size: 1.1rem;
+        font-weight: 800;
+        color: var(--white);
+      }
 
-    .totals-row label { color: var(--text-muted); }
-    .totals-row span  { font-weight: 600; color: var(--text); }
-    .totals-row.grand-total span { color: var(--green); font-size: 1.2rem; }
+      .totals-row label {
+        color: var(--text-muted);
+      }
+      .totals-row span {
+        font-weight: 600;
+        color: var(--text);
+      }
+      .totals-row.grand-total span {
+        color: var(--green);
+        font-size: 1.2rem;
+      }
 
-    .invoice-number-display {
-      background: rgba(62,173,130,0.1);
-      border: 1px solid var(--green);
-      border-radius: var(--radius-sm);
-      padding: 12px 16px;
-      text-align: center;
-      margin-bottom: 16px;
-    }
+      .invoice-number-display {
+        background: rgba(62, 173, 130, 0.1);
+        border: 1px solid var(--green);
+        border-radius: var(--radius-sm);
+        padding: 12px 16px;
+        text-align: center;
+        margin-bottom: 16px;
+      }
 
-    .invoice-number-display .inv-label {
-      font-size: 0.72rem;
-      color: var(--text-muted);
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-      margin-bottom: 4px;
-    }
+      .invoice-number-display .inv-label {
+        font-size: 0.72rem;
+        color: var(--text-muted);
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        margin-bottom: 4px;
+      }
 
-    .invoice-number-display .inv-num {
-      font-size: 1rem;
-      font-weight: 800;
-      color: var(--green);
-      letter-spacing: 1px;
-    }
+      .invoice-number-display .inv-num {
+        font-size: 1rem;
+        font-weight: 800;
+        color: var(--green);
+        letter-spacing: 1px;
+      }
 
-    /* Invoice History */
-    .history-section {
-      margin-top: 48px;
-      padding-top: 32px;
-      border-top: 1px solid var(--border);
-    }
+      /* Invoice History */
+      .history-section {
+        margin-top: 48px;
+        padding-top: 32px;
+        border-top: 1px solid var(--border);
+      }
 
-    .inv-type-badge {
-      font-size: 0.7rem;
-      font-weight: 700;
-      letter-spacing: 0.5px;
-      padding: 3px 8px;
-      border-radius: 4px;
-      background: rgba(42,85,144,0.2);
-      color: #6fa3e0;
-    }
+      .inv-type-badge {
+        font-size: 0.7rem;
+        font-weight: 700;
+        letter-spacing: 0.5px;
+        padding: 3px 8px;
+        border-radius: 4px;
+        background: rgba(42, 85, 144, 0.2);
+        color: #6fa3e0;
+      }
 
-    /* Rates modal */
-    .rates-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 12px;
-    }
-  </style>
-</head>
-<body>
+      /* Rates modal */
+      .rates-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 12px;
+      }
+    </style>
+  </head>
+  <body>
+    <nav id="main-nav"></nav>
 
-<nav id="main-nav"></nav>
-
-<div class="page-wrapper">
-  <div class="container">
-
-    <div class="page-header">
-      <div>
-        <div class="page-title">Invoice <span>Generator</span></div>
-        <div class="page-subtitle">Generate VAT-compliant PDF invoices for all fee types</div>
-      </div>
-      <div style="display:flex;gap:10px;">
-        <button class="btn btn-outline" onclick="openRatesModal()">
-          ⚙️ Default Rates
-        </button>
-        <button class="btn btn-outline" onclick="exportQBRange()">
-          📊 Export to QuickBooks
-        </button>
-      </div>
-    </div>
-
-    <!-- Invoice Type Selector -->
-    <div class="invoice-section">
-      <div class="invoice-section-title">Select Invoice Type</div>
-      <div class="invoice-types" id="invoice-types"></div>
-    </div>
-
-    <!-- Invoice Builder -->
-    <div class="invoice-builder" id="invoice-builder" style="display:none">
-
-      <!-- Left: Form -->
-      <div>
-
-        <!-- Unit Selector -->
-        <div class="invoice-section">
-          <div class="invoice-section-title">Select Property & Unit</div>
-          <div class="form-row">
-            <div class="form-group">
-              <label class="form-label">Building *</label>
-              <select id="i-building" class="form-control"
-                onchange="loadInvoiceFloors()">
-                <option value="">Select Building</option>
-              </select>
-            </div>
-            <div class="form-group">
-              <label class="form-label">Floor *</label>
-              <select id="i-floor" class="form-control"
-                onchange="loadInvoiceUnits()">
-                <option value="">Select Floor</option>
-              </select>
+    <div class="page-wrapper">
+      <div class="container">
+        <div class="page-header">
+          <div>
+            <div class="page-title">Invoice <span>Generator</span></div>
+            <div class="page-subtitle">
+              Generate VAT-compliant PDF invoices for all fee types
             </div>
           </div>
-          <div class="form-group">
-            <label class="form-label">Unit *</label>
-            <select id="i-unit" class="form-control"
-              onchange="loadTenantDetails()">
-              <option value="">Select Unit</option>
-            </select>
+          <div style="display: flex; gap: 10px">
+            <button class="btn btn-outline" onclick="openRatesModal()">
+              ⚙️ Default Rates
+            </button>
+            <button class="btn btn-outline" onclick="exportQBRange()">
+              📊 Export to QuickBooks
+            </button>
           </div>
         </div>
 
-        <!-- Tenant Info -->
-        <div class="invoice-section" id="tenant-info-section"
-          style="display:none">
-          <div class="invoice-section-title">Tenant Details</div>
-          <div class="tenant-info-grid" id="tenant-info-grid"></div>
+        <!-- Invoice Type Selector -->
+        <div class="invoice-section">
+          <div class="invoice-section-title">Select Invoice Type</div>
+          <div class="invoice-types" id="invoice-types"></div>
         </div>
 
-        <!-- Line Items -->
-        <div class="invoice-section">
-          <div class="invoice-section-title">Line Items</div>
-          <div style="overflow-x:auto">
-            <table class="line-items-table">
-              <thead>
-                <tr>
-                  <th class="col-desc">Description</th>
-                  <th class="col-qty">Qty</th>
-                  <th class="col-rate">Rate (AED)</th>
-                  <th class="col-vat">VAT 5%</th>
-                  <th class="col-total">Total (AED)</th>
-                  <th class="col-del"></th>
-                </tr>
-              </thead>
-              <tbody id="line-items-body"></tbody>
-            </table>
+        <!-- Invoice Builder -->
+        <div class="invoice-builder" id="invoice-builder" style="display: none">
+          <!-- Left: Form -->
+          <div>
+            <!-- Unit Selector -->
+            <div class="invoice-section">
+              <div class="invoice-section-title">Select Property & Unit</div>
+              <div class="form-row">
+                <div class="form-group">
+                  <label class="form-label">Building *</label>
+                  <select
+                    id="i-building"
+                    class="form-control"
+                    onchange="loadInvoiceFloors()"
+                  >
+                    <option value="">Select Building</option>
+                  </select>
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Floor *</label>
+                  <select
+                    id="i-floor"
+                    class="form-control"
+                    onchange="loadInvoiceUnits()"
+                  >
+                    <option value="">Select Floor</option>
+                  </select>
+                </div>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Unit *</label>
+                <select
+                  id="i-unit"
+                  class="form-control"
+                  onchange="loadTenantDetails()"
+                >
+                  <option value="">Select Unit</option>
+                </select>
+              </div>
+            </div>
+
+            <!-- Tenant Info -->
+            <div
+              class="invoice-section"
+              id="tenant-info-section"
+              style="display: none"
+            >
+              <div class="invoice-section-title">Tenant Details</div>
+              <div class="tenant-info-grid" id="tenant-info-grid"></div>
+            </div>
+
+            <!-- Line Items -->
+            <div class="invoice-section">
+              <div class="invoice-section-title">Line Items</div>
+              <div style="overflow-x: auto">
+                <table class="line-items-table">
+                  <thead>
+                    <tr>
+                      <th class="col-desc">Description</th>
+                      <th class="col-qty">Qty</th>
+                      <th class="col-rate">Rate (AED)</th>
+                      <th class="col-vat">VAT 5%</th>
+                      <th class="col-total">Total (AED)</th>
+                      <th class="col-del"></th>
+                    </tr>
+                  </thead>
+                  <tbody id="line-items-body"></tbody>
+                </table>
+              </div>
+              <button class="btn btn-outline btn-sm" onclick="addLineItem()">
+                + Add Line Item
+              </button>
+            </div>
+
+            <!-- Invoice Notes -->
+            <div class="invoice-section">
+              <div class="invoice-section-title">Additional Notes</div>
+              <textarea
+                id="i-notes"
+                class="form-control"
+                rows="3"
+                placeholder="Any additional notes to include on the invoice..."
+              ></textarea>
+            </div>
           </div>
-          <button class="btn btn-outline btn-sm" onclick="addLineItem()">
-            + Add Line Item
+
+          <!-- Right: Totals & Actions -->
+          <div>
+            <div class="invoice-totals">
+              <!-- Invoice Number -->
+              <div class="invoice-number-display">
+                <div class="inv-label">Invoice Number</div>
+                <div class="inv-num" id="invoice-number-display">—</div>
+              </div>
+
+              <!-- Invoice Date -->
+              <div class="form-group">
+                <label class="form-label">Invoice Date</label>
+                <input type="date" id="i-date" class="form-control" />
+              </div>
+
+              <div class="totals-title">Invoice Summary</div>
+
+              <div class="totals-row">
+                <label>Subtotal</label>
+                <span id="t-subtotal">AED 0.00</span>
+              </div>
+              <div class="totals-row">
+                <label>VAT (5%)</label>
+                <span id="t-vat">AED 0.00</span>
+              </div>
+              <div class="totals-row grand-total">
+                <label>Grand Total</label>
+                <span id="t-total">AED 0.00</span>
+              </div>
+
+              <div
+                style="
+                  margin-top: 24px;
+                  display: flex;
+                  flex-direction: column;
+                  gap: 10px;
+                "
+              >
+                <button
+                  class="btn btn-green"
+                  style="width: 100%"
+                  onclick="generateInvoice()"
+                >
+                  📄 Generate & Download PDF
+                </button>
+                <button
+                  class="btn btn-outline"
+                  style="width: 100%"
+                  onclick="exportSingleQB()"
+                >
+                  📊 Export to QuickBooks CSV
+                </button>
+                <button
+                  class="btn btn-outline"
+                  style="width: 100%"
+                  onclick="resetInvoiceForm()"
+                >
+                  🔄 Reset Form
+                </button>
+              </div>
+
+              <div
+                style="
+                  margin-top: 16px;
+                  padding-top: 16px;
+                  border-top: 1px solid var(--border);
+                  font-size: 0.78rem;
+                  color: var(--text-muted);
+                  line-height: 1.6;
+                "
+              >
+                💡 VAT is calculated at <strong>5%</strong> on each line
+                item.<br />
+                Due date is same as invoice date (due on receipt).
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Invoice History -->
+        <div class="history-section">
+          <div class="section-header">
+            <div class="section-title">Invoice History</div>
+            <div style="display: flex; gap: 10px">
+              <select
+                class="form-control"
+                id="hist-filter-type"
+                onchange="loadHistory()"
+                style="min-width: 180px"
+              >
+                <option value="">All Types</option>
+                <option value="renewal">Renewal Fee</option>
+                <option value="ejari">Ejari Fee</option>
+                <option value="maintenance">Maintenance Quotation</option>
+                <option value="checkhold">Check Hold Fee</option>
+                <option value="bouncedpenalty">Bounced Check Penalty</option>
+                <option value="checkswap">Check Swap Fee</option>
+                <option value="commission">Commission</option>
+                <option value="checkreceived">Check Received</option>
+                <option value="acknowledgement">Acknowledgement</option>
+              </select>
+              <button class="btn btn-outline btn-sm" onclick="loadHistory()">
+                🔄 Refresh
+              </button>
+            </div>
+          </div>
+          <div id="history-container">
+            <div class="loading-state">
+              <div class="spinner"></div>
+              <p>Loading invoice history...</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── Default Rates Modal ─────────────────────────────────────── -->
+    <div class="modal-overlay" id="modal-rates" style="display: none">
+      <div class="modal modal-lg">
+        <div class="modal-header">
+          <div class="modal-title">Default Rates</div>
+          <button class="modal-close" onclick="closeModal('modal-rates')">
+            ×
           </button>
         </div>
-
-        <!-- Invoice Notes -->
-        <div class="invoice-section">
-          <div class="invoice-section-title">Additional Notes</div>
-          <textarea id="i-notes" class="form-control" rows="3"
-            placeholder="Any additional notes to include on the invoice..."></textarea>
+        <div class="modal-body">
+          <p
+            style="
+              color: var(--text-muted);
+              font-size: 0.85rem;
+              margin-bottom: 20px;
+            "
+          >
+            Set default rates for each invoice type. These will pre-fill when
+            you select an invoice type but can be overridden per invoice.
+          </p>
+          <div id="rates-form"></div>
         </div>
-
-      </div>
-
-      <!-- Right: Totals & Actions -->
-      <div>
-        <div class="invoice-totals">
-
-          <!-- Invoice Number -->
-          <div class="invoice-number-display">
-            <div class="inv-label">Invoice Number</div>
-            <div class="inv-num" id="invoice-number-display">—</div>
-          </div>
-
-          <!-- Invoice Date -->
-          <div class="form-group">
-            <label class="form-label">Invoice Date</label>
-            <input type="date" id="i-date" class="form-control" />
-          </div>
-
-          <div class="totals-title">Invoice Summary</div>
-
-          <div class="totals-row">
-            <label>Subtotal</label>
-            <span id="t-subtotal">AED 0.00</span>
-          </div>
-          <div class="totals-row">
-            <label>VAT (5%)</label>
-            <span id="t-vat">AED 0.00</span>
-          </div>
-          <div class="totals-row grand-total">
-            <label>Grand Total</label>
-            <span id="t-total">AED 0.00</span>
-          </div>
-
-          <div style="margin-top:24px;display:flex;flex-direction:column;gap:10px">
-            <button class="btn btn-green" style="width:100%"
-              onclick="generateInvoice()">
-              📄 Generate & Download PDF
-            </button>
-            <button class="btn btn-outline" style="width:100%"
-              onclick="exportSingleQB()">
-              📊 Export to QuickBooks CSV
-            </button>
-            <button class="btn btn-outline" style="width:100%"
-              onclick="resetInvoiceForm()">
-              🔄 Reset Form
-            </button>
-          </div>
-
-          <div style="margin-top:16px;padding-top:16px;
-            border-top:1px solid var(--border);font-size:0.78rem;
-            color:var(--text-muted);line-height:1.6">
-            💡 VAT is calculated at <strong>5%</strong> on each line item.<br>
-            Due date is same as invoice date (due on receipt).
-          </div>
-
+        <div class="modal-footer">
+          <button class="btn btn-outline" onclick="closeModal('modal-rates')">
+            Cancel
+          </button>
+          <button class="btn btn-green" onclick="saveRates()">
+            Save Rates
+          </button>
         </div>
       </div>
     </div>
 
-    <!-- Invoice History -->
-    <div class="history-section">
-      <div class="section-header">
-        <div class="section-title">Invoice History</div>
-        <div style="display:flex;gap:10px">
-          <select class="form-control" id="hist-filter-type"
-            onchange="loadHistory()" style="min-width:180px">
-            <option value="">All Types</option>
-            <option value="renewal">Renewal Fee</option>
-            <option value="ejari">Ejari Fee</option>
-            <option value="maintenance">Maintenance Quotation</option>
-            <option value="checkhold">Check Hold Fee</option>
-            <option value="bouncedpenalty">Bounced Check Penalty</option>
-            <option value="checkswap">Check Swap Fee</option>
-            <option value="commission">Commission</option>
-            <option value="checkreceived">Check Received</option>
-            <option value="acknowledgement">Acknowledgement</option>
-          </select>
-          <button class="btn btn-outline btn-sm"
-            onclick="loadHistory()">🔄 Refresh</button>
+    <!-- ── QB Date Range Modal ─────────────────────────────────────── -->
+    <div class="modal-overlay" id="modal-qb-range" style="display: none">
+      <div class="modal">
+        <div class="modal-header">
+          <div class="modal-title">Export to QuickBooks CSV</div>
+          <button class="modal-close" onclick="closeModal('modal-qb-range')">
+            ×
+          </button>
         </div>
-      </div>
-      <div id="history-container">
-        <div class="loading-state">
-          <div class="spinner"></div>
-          <p>Loading invoice history...</p>
+        <div class="modal-body">
+          <p
+            style="
+              color: var(--text-muted);
+              font-size: 0.85rem;
+              margin-bottom: 20px;
+            "
+          >
+            Select a date range to export all invoices within that period as a
+            QuickBooks-compatible CSV file.
+          </p>
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">From Date</label>
+              <input type="date" id="qb-from" class="form-control" />
+            </div>
+            <div class="form-group">
+              <label class="form-label">To Date</label>
+              <input type="date" id="qb-to" class="form-control" />
+            </div>
+          </div>
         </div>
-      </div>
-    </div>
-
-  </div>
-</div>
-
-<!-- ── Default Rates Modal ─────────────────────────────────────── -->
-<div class="modal-overlay" id="modal-rates" style="display:none">
-  <div class="modal modal-lg">
-    <div class="modal-header">
-      <div class="modal-title">Default Rates</div>
-      <button class="modal-close" onclick="closeModal('modal-rates')">×</button>
-    </div>
-    <div class="modal-body">
-      <p style="color:var(--text-muted);font-size:0.85rem;margin-bottom:20px">
-        Set default rates for each invoice type. These will pre-fill when
-        you select an invoice type but can be overridden per invoice.
-      </p>
-      <div id="rates-form"></div>
-    </div>
-    <div class="modal-footer">
-      <button class="btn btn-outline"
-        onclick="closeModal('modal-rates')">Cancel</button>
-      <button class="btn btn-green" onclick="saveRates()">Save Rates</button>
-    </div>
-  </div>
-</div>
-
-<!-- ── QB Date Range Modal ─────────────────────────────────────── -->
-<div class="modal-overlay" id="modal-qb-range" style="display:none">
-  <div class="modal">
-    <div class="modal-header">
-      <div class="modal-title">Export to QuickBooks CSV</div>
-      <button class="modal-close"
-        onclick="closeModal('modal-qb-range')">×</button>
-    </div>
-    <div class="modal-body">
-      <p style="color:var(--text-muted);font-size:0.85rem;margin-bottom:20px">
-        Select a date range to export all invoices within that period
-        as a QuickBooks-compatible CSV file.
-      </p>
-      <div class="form-row">
-        <div class="form-group">
-          <label class="form-label">From Date</label>
-          <input type="date" id="qb-from" class="form-control" />
-        </div>
-        <div class="form-group">
-          <label class="form-label">To Date</label>
-          <input type="date" id="qb-to" class="form-control" />
+        <div class="modal-footer">
+          <button
+            class="btn btn-outline"
+            onclick="closeModal('modal-qb-range')"
+          >
+            Cancel
+          </button>
+          <button class="btn btn-green" onclick="downloadQBCSV()">
+            Download CSV
+          </button>
         </div>
       </div>
     </div>
-    <div class="modal-footer">
-      <button class="btn btn-outline"
-        onclick="closeModal('modal-qb-range')">Cancel</button>
-      <button class="btn btn-green"
-        onclick="downloadQBCSV()">Download CSV</button>
-    </div>
-  </div>
-</div>
 
-<script type="module">
-  import { requireAuth } from './js/auth.js';
-  import { renderNav, showToast, showConfirm,
-           formatCurrency, formatDate } from './js/shared.js';
-  import { supabase } from './js/supabase.js';
+    <script type="module">
+      import { requireAuth } from "./js/auth.js";
+      import {
+        renderNav,
+        showToast,
+        showConfirm,
+        formatCurrency,
+        formatDate,
+      } from "./js/shared.js";
+      import { supabase } from "./js/supabase.js";
 
-  const session = requireAuth();
-  if (!session) throw new Error('Not authenticated');
-  renderNav('invoices');
+      const session = requireAuth();
+      if (!session) throw new Error("Not authenticated");
+      renderNav("invoices");
 
-  // ── Invoice Types ────────────────────────────────────────────────
-  const INVOICE_TYPES = [
-    { type: 'renewal',        code: 'ASRE-RE', label: 'Renewal Fee'            },
-    { type: 'ejari',          code: 'ASRE-EJ', label: 'Ejari Fee'              },
-    { type: 'maintenance',    code: 'ASRE-MQ', label: 'Maintenance Quotation'  },
-    { type: 'checkhold',      code: 'ASRE-CH', label: 'Check Hold Fee'         },
-    { type: 'bouncedpenalty', code: 'ASRE-BP', label: 'Bounced Check Penalty'  },
-    { type: 'checkswap',      code: 'ASRE-CS', label: 'Check Swap Fee'         },
-    { type: 'commission',     code: 'ASRE-CM', label: 'Commission'             },
-    { type: 'checkreceived',  code: 'ASRE-CR', label: 'Check Received'         },
-    { type: 'acknowledgement',code: 'ASRE-AC', label: 'Acknowledgement'        },
-  ];
+      // ── Invoice Types ────────────────────────────────────────────────
+      const INVOICE_TYPES = [
+        { type: "renewal", code: "ASRE-RE", label: "Renewal Fee" },
+        { type: "ejari", code: "ASRE-EJ", label: "Ejari Fee" },
+        {
+          type: "maintenance",
+          code: "ASRE-MQ",
+          label: "Maintenance Quotation",
+        },
+        { type: "checkhold", code: "ASRE-CH", label: "Check Hold Fee" },
+        {
+          type: "bouncedpenalty",
+          code: "ASRE-BP",
+          label: "Bounced Check Penalty",
+        },
+        { type: "checkswap", code: "ASRE-CS", label: "Check Swap Fee" },
+        { type: "commission", code: "ASRE-CM", label: "Commission" },
+        { type: "checkreceived", code: "ASRE-CR", label: "Check Received" },
+        { type: "acknowledgement", code: "ASRE-AC", label: "Acknowledgement" },
+      ];
 
-  let selectedType    = null;
-  let selectedUnit    = null;
-  let allBuildings    = [];
-  let invoiceRates    = {};
-  let lineItems       = [];
-  let lastInvoiceId   = null;
+      let selectedType = null;
+      let selectedUnit = null;
+      let allBuildings = [];
+      let invoiceRates = {};
+      let lineItems = [];
+      let lastInvoiceId = null;
 
-  // ── Init ─────────────────────────────────────────────────────────
-  async function init() {
-    await loadBuildings();
-    await loadRates();
-    renderInvoiceTypes();
-    setTodayDate();
-    loadHistory();
-  }
+      // ── Init ─────────────────────────────────────────────────────────
+      async function init() {
+        await loadBuildings();
+        await loadRates();
+        renderInvoiceTypes();
+        setTodayDate();
+        loadHistory();
+      }
 
-  function setTodayDate() {
-    const today = new Date().toISOString().split('T')[0];
-    document.getElementById('i-date').value = today;
-  }
+      function setTodayDate() {
+        const today = new Date().toISOString().split("T")[0];
+        document.getElementById("i-date").value = today;
+      }
 
-  async function loadBuildings() {
-    const { data } = await supabase
-      .from('buildings').select('*').order('name');
-    allBuildings = data || [];
+      async function loadBuildings() {
+        const { data } = await supabase
+          .from("buildings")
+          .select("*")
+          .order("name");
+        allBuildings = data || [];
 
-    const sel = document.getElementById('i-building');
-    sel.innerHTML = '<option value="">Select Building</option>' +
-      allBuildings.map(b =>
-        `<option value="${b.id}">${b.name}</option>`
-      ).join('');
-  }
+        const sel = document.getElementById("i-building");
+        sel.innerHTML =
+          '<option value="">Select Building</option>' +
+          allBuildings
+            .map((b) => `<option value="${b.id}">${b.name}</option>`)
+            .join("");
+      }
 
-  async function loadRates() {
-    const { data } = await supabase
-      .from('invoice_rates').select('*');
-    invoiceRates = {};
-    (data || []).forEach(r => {
-      invoiceRates[r.type] = { rate: r.default_rate, label: r.label, id: r.id };
-    });
-  }
+      async function loadRates() {
+        const { data } = await supabase.from("invoice_rates").select("*");
+        invoiceRates = {};
+        (data || []).forEach((r) => {
+          invoiceRates[r.type] = {
+            rate: r.default_rate,
+            label: r.label,
+            id: r.id,
+          };
+        });
+      }
 
-  // ── Render Invoice Type Buttons ──────────────────────────────────
-  function renderInvoiceTypes() {
-    const container = document.getElementById('invoice-types');
-    container.innerHTML = INVOICE_TYPES.map(t => `
+      // ── Render Invoice Type Buttons ──────────────────────────────────
+      function renderInvoiceTypes() {
+        const container = document.getElementById("invoice-types");
+        container.innerHTML = INVOICE_TYPES.map(
+          (t) => `
       <button class="invoice-type-btn" onclick="selectType('${t.type}')">
         <div class="type-code">${t.code}</div>
         <div class="type-name">${t.label}</div>
       </button>
-    `).join('');
-  }
+    `,
+        ).join("");
+      }
 
-  // ── Select Invoice Type ──────────────────────────────────────────
-  window.selectType = async function(type) {
-    selectedType = INVOICE_TYPES.find(t => t.type === type);
+      // ── Select Invoice Type ──────────────────────────────────────────
+      window.selectType = async function (type) {
+        selectedType = INVOICE_TYPES.find((t) => t.type === type);
 
-    // Update UI
-    document.querySelectorAll('.invoice-type-btn').forEach(b => {
-      b.classList.remove('active');
-    });
-    event.currentTarget.classList.add('active');
+        // Update UI
+        document.querySelectorAll(".invoice-type-btn").forEach((b) => {
+          b.classList.remove("active");
+        });
+        event.currentTarget.classList.add("active");
 
-    // Show builder
-    document.getElementById('invoice-builder').style.display = 'grid';
+        // Show builder
+        document.getElementById("invoice-builder").style.display = "grid";
 
-    // Generate invoice number
-    await generateInvoiceNumber();
+        // Generate invoice number
+        await generateInvoiceNumber();
 
-    // Load default line item
-    const defaultRate = invoiceRates[type]?.rate || 0;
-    lineItems = [{
-      description: selectedType.label,
-      qty:  1,
-      rate: defaultRate,
-      vat:  defaultRate * 0.05,
-      total: defaultRate * 1.05
-    }];
+        // Load default line item
+        const defaultRate = invoiceRates[type]?.rate || 0;
+        lineItems = [
+          {
+            description: selectedType.label,
+            qty: 1,
+            rate: defaultRate,
+            vat: defaultRate * 0.05,
+            total: defaultRate * 1.05,
+          },
+        ];
 
-    renderLineItems();
-    updateTotals();
+        renderLineItems();
+        updateTotals();
 
-    // Special alerts
-    if (type === 'maintenance') {
-      checkMaintenanceRecords();
-    }
-    if (type === 'bouncedpenalty') {
-      checkBounceRecords();
-    }
-  };
+        // Special alerts
+        if (type === "maintenance") {
+          checkMaintenanceRecords();
+        }
+        if (type === "bouncedpenalty") {
+          checkBounceRecords();
+        }
+      };
 
-  // ── Generate Invoice Number ──────────────────────────────────────
-  async function generateInvoiceNumber() {
-    if (!selectedType) return;
-    const year = new Date().getFullYear();
-    const code = selectedType.code;
+      // ── Generate Invoice Number ──────────────────────────────────────
+      async function generateInvoiceNumber() {
+        if (!selectedType) return;
+        const year = new Date().getFullYear();
+        const code = selectedType.code;
 
-    // Count existing invoices of this type
-    const { count } = await supabase
-      .from('invoices')
-      .select('id', { count: 'exact', head: true })
-      .eq('type', selectedType.type);
+        // Count existing invoices of this type
+        const { count } = await supabase
+          .from("invoices")
+          .select("id", { count: "exact", head: true })
+          .eq("type", selectedType.type);
 
-    const num  = String((count || 0) + 1).padStart(3, '0');
-    const invNum = `${code}-${year}-${num}`;
+        const num = String((count || 0) + 1).padStart(3, "0");
+        const invNum = `${code}-${year}-${num}`;
 
-    document.getElementById('invoice-number-display').textContent = invNum;
-    return invNum;
-  }
+        document.getElementById("invoice-number-display").textContent = invNum;
+        return invNum;
+      }
 
-  // ── Load Floors ──────────────────────────────────────────────────
-  window.loadInvoiceFloors = async function() {
-    const buildingId = document.getElementById('i-building').value;
-    const floorSel   = document.getElementById('i-floor');
-    const unitSel    = document.getElementById('i-unit');
+      // ── Load Floors ──────────────────────────────────────────────────
+      window.loadInvoiceFloors = async function () {
+        const buildingId = document.getElementById("i-building").value;
+        const floorSel = document.getElementById("i-floor");
+        const unitSel = document.getElementById("i-unit");
 
-    floorSel.innerHTML = '<option value="">Select Floor</option>';
-    unitSel.innerHTML  = '<option value="">Select Unit</option>';
-    hideTenantInfo();
+        floorSel.innerHTML = '<option value="">Select Floor</option>';
+        unitSel.innerHTML = '<option value="">Select Unit</option>';
+        hideTenantInfo();
 
-    if (!buildingId) return;
+        if (!buildingId) return;
 
-    const { data: floors } = await supabase
-      .from('floors').select('*')
-      .eq('building_id', buildingId)
-      .order('sort_order');
+        const { data: floors } = await supabase
+          .from("floors")
+          .select("*")
+          .eq("building_id", buildingId)
+          .order("sort_order");
 
-    (floors || []).forEach(f => {
-      const opt = document.createElement('option');
-      opt.value = f.id; opt.textContent = f.name;
-      floorSel.appendChild(opt);
-    });
-  };
+        (floors || []).forEach((f) => {
+          const opt = document.createElement("option");
+          opt.value = f.id;
+          opt.textContent = f.name;
+          floorSel.appendChild(opt);
+        });
+      };
 
-  // ── Load Units ───────────────────────────────────────────────────
-  window.loadInvoiceUnits = async function() {
-    const floorId = document.getElementById('i-floor').value;
-    const unitSel = document.getElementById('i-unit');
+      // ── Load Units ───────────────────────────────────────────────────
+      window.loadInvoiceUnits = async function () {
+        const floorId = document.getElementById("i-floor").value;
+        const unitSel = document.getElementById("i-unit");
 
-    unitSel.innerHTML = '<option value="">Select Unit</option>';
-    hideTenantInfo();
+        unitSel.innerHTML = '<option value="">Select Unit</option>';
+        hideTenantInfo();
 
-    if (!floorId) return;
+        if (!floorId) return;
 
-    const { data: units } = await supabase
-      .from('units').select('*')
-      .eq('floor_id', floorId)
-      .order('unit_number');
+        const { data: units } = await supabase
+          .from("units")
+          .select("*")
+          .eq("floor_id", floorId)
+          .order("unit_number");
 
-    (units || []).forEach(u => {
-      const opt = document.createElement('option');
-      opt.value = u.id;
-      opt.textContent = `${u.unit_number}${u.tenant_name
-        ? ' — ' + u.tenant_name : ' (Vacant)'}`;
-      unitSel.appendChild(opt);
-    });
-  };
+        (units || []).forEach((u) => {
+          const opt = document.createElement("option");
+          opt.value = u.id;
+          opt.textContent = `${u.unit_number}${
+            u.tenant_name ? " — " + u.tenant_name : " (Vacant)"
+          }`;
+          unitSel.appendChild(opt);
+        });
+      };
 
-  // ── Load Tenant Details ──────────────────────────────────────────
-  window.loadTenantDetails = async function() {
-    const unitId = document.getElementById('i-unit').value;
-    if (!unitId) { hideTenantInfo(); return; }
+      // ── Load Tenant Details ──────────────────────────────────────────
+      window.loadTenantDetails = async function () {
+        const unitId = document.getElementById("i-unit").value;
+        if (!unitId) {
+          hideTenantInfo();
+          return;
+        }
 
-    const { data: unit } = await supabase
-      .from('units').select('*, floors(name), buildings(name)')
-      .eq('id', unitId).single();
+        const { data: unit } = await supabase
+          .from("units")
+          .select("*, floors(name), buildings(name)")
+          .eq("id", unitId)
+          .single();
 
-    if (!unit) return;
-    selectedUnit = unit;
+        if (!unit) return;
+        selectedUnit = unit;
 
-    const section = document.getElementById('tenant-info-section');
-    const grid    = document.getElementById('tenant-info-grid');
+        const section = document.getElementById("tenant-info-section");
+        const grid = document.getElementById("tenant-info-grid");
 
-    section.style.display = 'block';
-    grid.innerHTML = `
+        section.style.display = "block";
+        grid.innerHTML = `
       <div class="tenant-info-item">
         <label>Tenant Name</label>
-        <span>${unit.tenant_name || '— (Vacant)'}</span>
+        <span>${unit.tenant_name || "— (Vacant)"}</span>
       </div>
       <div class="tenant-info-item">
         <label>Unit Number</label>
@@ -714,15 +832,15 @@
       </div>
       <div class="tenant-info-item">
         <label>Building</label>
-        <span>${unit.buildings?.name || '—'}</span>
+        <span>${unit.buildings?.name || "—"}</span>
       </div>
       <div class="tenant-info-item">
         <label>Floor</label>
-        <span>${unit.floors?.name || '—'}</span>
+        <span>${unit.floors?.name || "—"}</span>
       </div>
       <div class="tenant-info-item">
         <label>Size</label>
-        <span>${unit.size || '—'}</span>
+        <span>${unit.size || "—"}</span>
       </div>
       <div class="tenant-info-item">
         <label>Rent</label>
@@ -738,74 +856,77 @@
       </div>
     `;
 
-    // Re-check special alerts with unit selected
-    if (selectedType?.type === 'maintenance')    checkMaintenanceRecords();
-    if (selectedType?.type === 'bouncedpenalty') checkBounceRecords();
-  };
+        // Re-check special alerts with unit selected
+        if (selectedType?.type === "maintenance") checkMaintenanceRecords();
+        if (selectedType?.type === "bouncedpenalty") checkBounceRecords();
+      };
 
-  function hideTenantInfo() {
-    document.getElementById('tenant-info-section').style.display = 'none';
-    selectedUnit = null;
-  }
+      function hideTenantInfo() {
+        document.getElementById("tenant-info-section").style.display = "none";
+        selectedUnit = null;
+      }
 
-  // ── Special Alerts ───────────────────────────────────────────────
-  async function checkMaintenanceRecords() {
-    if (!selectedUnit) return;
-    const { count } = await supabase
-      .from('maintenance_requests')
-      .select('id', { count: 'exact', head: true })
-      .eq('unit_id', selectedUnit.id)
-      .eq('status', 'open');
+      // ── Special Alerts ───────────────────────────────────────────────
+      async function checkMaintenanceRecords() {
+        if (!selectedUnit) return;
+        const { count } = await supabase
+          .from("maintenance_requests")
+          .select("id", { count: "exact", head: true })
+          .eq("unit_id", selectedUnit.id)
+          .eq("status", "open");
 
-    if (count === 0) {
-      showToast(
-        '⚠️ No open maintenance requests for this unit. You can still proceed.',
-        'warning'
-      );
-    }
-  }
+        if (count === 0) {
+          showToast(
+            "⚠️ No open maintenance requests for this unit. You can still proceed.",
+            "warning",
+          );
+        }
+      }
 
-  async function checkBounceRecords() {
-    if (!selectedUnit) return;
-    const { count } = await supabase
-      .from('bounce_checks')
-      .select('id', { count: 'exact', head: true })
-      .eq('unit_id', selectedUnit.id)
-      .eq('status', 'active');
+      async function checkBounceRecords() {
+        if (!selectedUnit) return;
+        const { count } = await supabase
+          .from("bounce_checks")
+          .select("id", { count: "exact", head: true })
+          .eq("unit_id", selectedUnit.id)
+          .eq("status", "active");
 
-    if (count === 0) {
-      showToast(
-        '⚠️ No active bounce check records for this unit. You can still proceed.',
-        'warning'
-      );
-    }
-  }
+        if (count === 0) {
+          showToast(
+            "⚠️ No active bounce check records for this unit. You can still proceed.",
+            "warning",
+          );
+        }
+      }
 
-  // ── Line Items ───────────────────────────────────────────────────
-  window.addLineItem = function() {
-    lineItems.push({ description: '', qty: 1, rate: 0, vat: 0, total: 0 });
-    renderLineItems();
-  };
+      // ── Line Items ───────────────────────────────────────────────────
+      window.addLineItem = function () {
+        lineItems.push({ description: "", qty: 1, rate: 0, vat: 0, total: 0 });
+        renderLineItems();
+      };
 
-  window.removeLineItem = function(index) {
-    lineItems.splice(index, 1);
-    renderLineItems();
-    updateTotals();
-  };
+      window.removeLineItem = function (index) {
+        lineItems.splice(index, 1);
+        renderLineItems();
+        updateTotals();
+      };
 
-  window.updateLineItem = function(index, field, value) {
-    lineItems[index][field] = field === 'description' ? value : parseFloat(value) || 0;
-    const item = lineItems[index];
-    const subtotal = item.qty * item.rate;
-    item.vat   = subtotal * 0.05;
-    item.total = subtotal + item.vat;
-    renderLineItems();
-    updateTotals();
-  };
+      window.updateLineItem = function (index, field, value) {
+        lineItems[index][field] =
+          field === "description" ? value : parseFloat(value) || 0;
+        const item = lineItems[index];
+        const subtotal = item.qty * item.rate;
+        item.vat = subtotal * 0.05;
+        item.total = subtotal + item.vat;
+        renderLineItems();
+        updateTotals();
+      };
 
-  function renderLineItems() {
-    const tbody = document.getElementById('line-items-body');
-    tbody.innerHTML = lineItems.map((item, i) => `
+      function renderLineItems() {
+        const tbody = document.getElementById("line-items-body");
+        tbody.innerHTML = lineItems
+          .map(
+            (item, i) => `
       <tr>
         <td class="col-desc">
           <input type="text" value="${item.description}"
@@ -832,437 +953,537 @@
           <button class="del-btn" onclick="removeLineItem(${i})">×</button>
         </td>
       </tr>
-    `).join('');
-  }
+    `,
+          )
+          .join("");
+      }
 
-  function updateTotals() {
-    const subtotal = lineItems.reduce((s, i) => s + (i.qty * i.rate), 0);
-    const vat      = subtotal * 0.05;
-    const total    = subtotal + vat;
+      function updateTotals() {
+        const subtotal = lineItems.reduce((s, i) => s + i.qty * i.rate, 0);
+        const vat = subtotal * 0.05;
+        const total = subtotal + vat;
 
-    document.getElementById('t-subtotal').textContent = formatCurrency(subtotal);
-    document.getElementById('t-vat').textContent      = formatCurrency(vat);
-    document.getElementById('t-total').textContent    = formatCurrency(total);
-  }
+        document.getElementById("t-subtotal").textContent =
+          formatCurrency(subtotal);
+        document.getElementById("t-vat").textContent = formatCurrency(vat);
+        document.getElementById("t-total").textContent = formatCurrency(total);
+      }
 
-  // ── Generate Invoice ─────────────────────────────────────────────
-  window.generateInvoice = async function() {
-    if (!selectedType) {
-      showToast('Please select an invoice type.', 'error'); return;
-    }
-    if (!selectedUnit) {
-      showToast('Please select a unit.', 'error'); return;
-    }
-    if (lineItems.length === 0) {
-      showToast('Please add at least one line item.', 'error'); return;
-    }
+      // ── Generate Invoice ─────────────────────────────────────────────
+      window.generateInvoice = async function () {
+        if (!selectedType) {
+          showToast("Please select an invoice type.", "error");
+          return;
+        }
+        if (!selectedUnit) {
+          showToast("Please select a unit.", "error");
+          return;
+        }
+        if (lineItems.length === 0) {
+          showToast("Please add at least one line item.", "error");
+          return;
+        }
 
-    const invNum   = document.getElementById('invoice-number-display').textContent;
-    const invDate  = document.getElementById('i-date').value;
-    const notes    = document.getElementById('i-notes').value.trim();
-    const subtotal = lineItems.reduce((s, i) => s + (i.qty * i.rate), 0);
-    const vat      = subtotal * 0.05;
-    const total    = subtotal + vat;
+        const invNum = document.getElementById(
+          "invoice-number-display",
+        ).textContent;
+        const invDate = document.getElementById("i-date").value;
+        const notes = document.getElementById("i-notes").value.trim();
+        const subtotal = lineItems.reduce((s, i) => s + i.qty * i.rate, 0);
+        const vat = subtotal * 0.05;
+        const total = subtotal + vat;
 
-    // Save to database
-    const { data: saved, error } = await supabase.from('invoices').insert({
-      invoice_number: invNum,
-      type:           selectedType.type,
-      unit_id:        selectedUnit.id,
-      building_id:    selectedUnit.building_id,
-      tenant_name:    selectedUnit.tenant_name || 'Vacant Unit',
-      amount:         subtotal,
-      vat_amount:     vat,
-      total:          total,
-      line_items:     lineItems,
-    }).select().single();
+        // Save to database
+        const { data: saved, error } = await supabase
+          .from("invoices")
+          .insert({
+            invoice_number: invNum,
+            type: selectedType.type,
+            unit_id: selectedUnit.id,
+            building_id: selectedUnit.building_id,
+            tenant_name: selectedUnit.tenant_name || "Vacant Unit",
+            amount: subtotal,
+            vat_amount: vat,
+            total: total,
+            line_items: lineItems,
+          })
+          .select()
+          .single();
 
-    if (error) {
-      showToast('Error saving invoice.', 'error');
-      console.error(error); return;
-    }
+        if (error) {
+          showToast("Error saving invoice.", "error");
+          console.error(error);
+          return;
+        }
 
-    lastInvoiceId = saved.id;
+        lastInvoiceId = saved.id;
 
-    // Generate PDF
-    generatePDF({
-      invNum, invDate, notes, subtotal, vat, total,
-      unit: selectedUnit, type: selectedType, items: lineItems
-    });
+        // Generate PDF
+        generatePDF({
+          invNum,
+          invDate,
+          notes,
+          subtotal,
+          vat,
+          total,
+          unit: selectedUnit,
+          type: selectedType,
+          items: lineItems,
+        });
 
-    showToast('Invoice generated and saved!');
-    loadHistory();
-    generateInvoiceNumber(); // Update to next number
-  };
+        showToast("Invoice generated and saved!");
+        loadHistory();
+        generateInvoiceNumber(); // Update to next number
+      };
 
-  // ── PDF Generation ───────────────────────────────────────────────
-  function generatePDF(data) {
-    const { jsPDF } = window.jspdf;
-    const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
+      // ── PDF Generation ───────────────────────────────────────────────
+      function generatePDF(data) {
+        const { jsPDF } = window.jspdf;
+        const doc = new jsPDF({
+          orientation: "portrait",
+          unit: "mm",
+          format: "a4",
+        });
 
-    const W = 210, H = 297;
-    const margin = 18;
+        const W = 210,
+          H = 297;
+        const margin = 18;
 
-    // Background
-    doc.setFillColor(15, 22, 35);
-    doc.rect(0, 0, W, H, 'F');
+        // Background
+        doc.setFillColor(15, 22, 35);
+        doc.rect(0, 0, W, H, "F");
 
-    // Header bar
-    doc.setFillColor(42, 85, 144);
-    doc.rect(0, 0, W, 42, 'F');
+        // Header bar
+        doc.setFillColor(42, 85, 144);
+        doc.rect(0, 0, W, 42, "F");
 
-    // Green accent line
-    doc.setFillColor(62, 173, 130);
-    doc.rect(0, 42, W, 2, 'F');
+        // Green accent line
+        doc.setFillColor(62, 173, 130);
+        doc.rect(0, 42, W, 2, "F");
 
-    // Company name
-    doc.setTextColor(255, 255, 255);
-    doc.setFontSize(18);
-    doc.setFont('helvetica', 'bold');
-    doc.text('AHMED AL SHEEBANI REAL ESTATE', margin, 18);
+        // Company name
+        doc.setTextColor(255, 255, 255);
+        doc.setFontSize(18);
+        doc.setFont("helvetica", "bold");
+        doc.text("AHMED AL SHEEBANI REAL ESTATE", margin, 18);
 
-    doc.setFontSize(9);
-    doc.setFont('helvetica', 'normal');
-    doc.setTextColor(180, 200, 220);
-    doc.text('Property Management Department', margin, 26);
-    doc.text('Dubai, United Arab Emirates', margin, 32);
+        doc.setFontSize(9);
+        doc.setFont("helvetica", "normal");
+        doc.setTextColor(180, 200, 220);
+        doc.text("Property Management Department", margin, 26);
+        doc.text("Dubai, United Arab Emirates", margin, 32);
 
-    // Invoice label (right)
-    doc.setTextColor(62, 173, 130);
-    doc.setFontSize(22);
-    doc.setFont('helvetica', 'bold');
-    doc.text('INVOICE', W - margin, 20, { align: 'right' });
+        // Invoice label (right)
+        doc.setTextColor(62, 173, 130);
+        doc.setFontSize(22);
+        doc.setFont("helvetica", "bold");
+        doc.text("INVOICE", W - margin, 20, { align: "right" });
 
-    doc.setFontSize(9);
-    doc.setFont('helvetica', 'normal');
-    doc.setTextColor(180, 200, 220);
-    doc.text(data.invNum, W - margin, 28, { align: 'right' });
-    doc.text(`Date: ${data.invDate}`, W - margin, 34, { align: 'right' });
-    doc.text(`Due: ${data.invDate} (On Receipt)`, W - margin, 40, { align: 'right' });
+        doc.setFontSize(9);
+        doc.setFont("helvetica", "normal");
+        doc.setTextColor(180, 200, 220);
+        doc.text(data.invNum, W - margin, 28, { align: "right" });
+        doc.text(`Date: ${data.invDate}`, W - margin, 34, { align: "right" });
+        doc.text(`Due: ${data.invDate} (On Receipt)`, W - margin, 40, {
+          align: "right",
+        });
 
-    // Invoice Type Banner
-    doc.setFillColor(22, 31, 46);
-    doc.rect(margin, 50, W - margin*2, 14, 'F');
-    doc.setTextColor(62, 173, 130);
-    doc.setFontSize(11);
-    doc.setFont('helvetica', 'bold');
-    doc.text(data.type.label.toUpperCase(), W/2, 59, { align: 'center' });
+        // Invoice Type Banner
+        doc.setFillColor(22, 31, 46);
+        doc.rect(margin, 50, W - margin * 2, 14, "F");
+        doc.setTextColor(62, 173, 130);
+        doc.setFontSize(11);
+        doc.setFont("helvetica", "bold");
+        doc.text(data.type.label.toUpperCase(), W / 2, 59, { align: "center" });
 
-    // Tenant Info Box
-    let y = 74;
-    doc.setFillColor(22, 31, 46);
-    doc.rect(margin, y, W - margin*2, 44, 'F');
+        // Tenant Info Box
+        let y = 74;
+        doc.setFillColor(22, 31, 46);
+        doc.rect(margin, y, W - margin * 2, 44, "F");
 
-    doc.setTextColor(136, 150, 168);
-    doc.setFontSize(7.5);
-    doc.setFont('helvetica', 'bold');
-    doc.text('BILLED TO', margin + 4, y + 8);
-    doc.text('PROPERTY DETAILS', W/2 + 2, y + 8);
+        doc.setTextColor(136, 150, 168);
+        doc.setFontSize(7.5);
+        doc.setFont("helvetica", "bold");
+        doc.text("BILLED TO", margin + 4, y + 8);
+        doc.text("PROPERTY DETAILS", W / 2 + 2, y + 8);
 
-    doc.setDrawColor(42, 85, 144);
-    doc.line(W/2, y, W/2, y + 44);
+        doc.setDrawColor(42, 85, 144);
+        doc.line(W / 2, y, W / 2, y + 44);
 
-    doc.setTextColor(255, 255, 255);
-    doc.setFontSize(10);
-    doc.setFont('helvetica', 'bold');
-    doc.text(data.unit.tenant_name || 'Vacant Unit', margin + 4, y + 17);
+        doc.setTextColor(255, 255, 255);
+        doc.setFontSize(10);
+        doc.setFont("helvetica", "bold");
+        doc.text(data.unit.tenant_name || "Vacant Unit", margin + 4, y + 17);
 
-    doc.setFont('helvetica', 'normal');
-    doc.setFontSize(8.5);
-    doc.setTextColor(180, 200, 220);
-    doc.text(`Unit: ${data.unit.unit_number}`, margin + 4, y + 25);
-    doc.text(`Size: ${data.unit.size || '—'}`, margin + 4, y + 32);
-    if (data.unit.tenant_email) {
-      doc.text(data.unit.tenant_email, margin + 4, y + 39);
-    }
+        doc.setFont("helvetica", "normal");
+        doc.setFontSize(8.5);
+        doc.setTextColor(180, 200, 220);
+        doc.text(`Unit: ${data.unit.unit_number}`, margin + 4, y + 25);
+        doc.text(`Size: ${data.unit.size || "—"}`, margin + 4, y + 32);
+        if (data.unit.tenant_email) {
+          doc.text(data.unit.tenant_email, margin + 4, y + 39);
+        }
 
-    doc.setTextColor(255, 255, 255);
-    doc.setFont('helvetica', 'bold');
-    doc.setFontSize(9);
-    doc.text(data.unit.buildings?.name || '—', W/2 + 4, y + 17);
-    doc.setFont('helvetica', 'normal');
-    doc.setFontSize(8.5);
-    doc.setTextColor(180, 200, 220);
-    doc.text(`Floor: ${data.unit.floors?.name || '—'}`, W/2 + 4, y + 25);
-    doc.text(`Parking: ${data.unit.parking_number || '—'}`, W/2 + 4, y + 32);
+        doc.setTextColor(255, 255, 255);
+        doc.setFont("helvetica", "bold");
+        doc.setFontSize(9);
+        doc.text(data.unit.buildings?.name || "—", W / 2 + 4, y + 17);
+        doc.setFont("helvetica", "normal");
+        doc.setFontSize(8.5);
+        doc.setTextColor(180, 200, 220);
+        doc.text(`Floor: ${data.unit.floors?.name || "—"}`, W / 2 + 4, y + 25);
+        doc.text(
+          `Parking: ${data.unit.parking_number || "—"}`,
+          W / 2 + 4,
+          y + 32,
+        );
 
-    // Line Items Table
-    y += 52;
-    const colX    = [margin, margin+80, margin+115, margin+140, margin+162];
-    const colW    = [80, 35, 25, 22, 30];
-    const headers = ['Description', 'Qty', 'Rate (AED)', 'VAT', 'Total (AED)'];
+        // Line Items Table
+        y += 52;
+        const colX = [
+          margin,
+          margin + 80,
+          margin + 115,
+          margin + 140,
+          margin + 162,
+        ];
+        const colW = [80, 35, 25, 22, 30];
+        const headers = [
+          "Description",
+          "Qty",
+          "Rate (AED)",
+          "VAT",
+          "Total (AED)",
+        ];
 
-    // Table header
-    doc.setFillColor(42, 85, 144);
-    doc.rect(margin, y, W - margin*2, 10, 'F');
-    doc.setTextColor(255, 255, 255);
-    doc.setFontSize(8);
-    doc.setFont('helvetica', 'bold');
-    headers.forEach((h, i) => {
-      doc.text(h, colX[i] + 2, y + 7);
-    });
+        // Table header
+        doc.setFillColor(42, 85, 144);
+        doc.rect(margin, y, W - margin * 2, 10, "F");
+        doc.setTextColor(255, 255, 255);
+        doc.setFontSize(8);
+        doc.setFont("helvetica", "bold");
+        headers.forEach((h, i) => {
+          doc.text(h, colX[i] + 2, y + 7);
+        });
 
-    y += 10;
+        y += 10;
 
-    // Table rows
-    data.items.forEach((item, idx) => {
-      const rowColor = idx % 2 === 0 ? [22, 31, 46] : [26, 38, 58];
-      doc.setFillColor(...rowColor);
-      doc.rect(margin, y, W - margin*2, 9, 'F');
+        // Table rows
+        data.items.forEach((item, idx) => {
+          const rowColor = idx % 2 === 0 ? [22, 31, 46] : [26, 38, 58];
+          doc.setFillColor(...rowColor);
+          doc.rect(margin, y, W - margin * 2, 9, "F");
 
-      doc.setTextColor(220, 230, 240);
-      doc.setFontSize(8);
-      doc.setFont('helvetica', 'normal');
+          doc.setTextColor(220, 230, 240);
+          doc.setFontSize(8);
+          doc.setFont("helvetica", "normal");
 
-      const desc = doc.splitTextToSize(item.description, colW[0] - 4);
-      doc.text(desc[0], colX[0] + 2, y + 6);
-      doc.text(String(item.qty),                 colX[1] + 2, y + 6);
-      doc.text(item.rate.toFixed(2),             colX[2] + 2, y + 6);
-      doc.text(item.vat.toFixed(2),              colX[3] + 2, y + 6);
-      doc.setTextColor(62, 173, 130);
-      doc.text(item.total.toFixed(2),            colX[4] + 2, y + 6);
-      doc.setTextColor(220, 230, 240);
-      y += 9;
-    });
+          const desc = doc.splitTextToSize(item.description, colW[0] - 4);
+          doc.text(desc[0], colX[0] + 2, y + 6);
+          doc.text(String(item.qty), colX[1] + 2, y + 6);
+          doc.text(item.rate.toFixed(2), colX[2] + 2, y + 6);
+          doc.text(item.vat.toFixed(2), colX[3] + 2, y + 6);
+          doc.setTextColor(62, 173, 130);
+          doc.text(item.total.toFixed(2), colX[4] + 2, y + 6);
+          doc.setTextColor(220, 230, 240);
+          y += 9;
+        });
 
-    // Totals
-    y += 6;
-    doc.setFillColor(22, 31, 46);
-    doc.rect(W - margin - 70, y, 70, 38, 'F');
+        // Totals
+        y += 6;
+        doc.setFillColor(22, 31, 46);
+        doc.rect(W - margin - 70, y, 70, 38, "F");
 
-    doc.setFontSize(8.5);
-    doc.setFont('helvetica', 'normal');
-    doc.setTextColor(136, 150, 168);
-    doc.text('Subtotal:', W - margin - 68, y + 9);
-    doc.text('VAT (5%):', W - margin - 68, y + 18);
-    doc.setTextColor(255, 255, 255);
-    doc.setFont('helvetica', 'bold');
-    doc.text('TOTAL DUE:', W - margin - 68, y + 29);
+        doc.setFontSize(8.5);
+        doc.setFont("helvetica", "normal");
+        doc.setTextColor(136, 150, 168);
+        doc.text("Subtotal:", W - margin - 68, y + 9);
+        doc.text("VAT (5%):", W - margin - 68, y + 18);
+        doc.setTextColor(255, 255, 255);
+        doc.setFont("helvetica", "bold");
+        doc.text("TOTAL DUE:", W - margin - 68, y + 29);
 
-    doc.setFont('helvetica', 'normal');
-    doc.setTextColor(220, 230, 240);
-    doc.text(`AED ${data.subtotal.toFixed(2)}`, W - margin - 2, y + 9,  { align: 'right' });
-    doc.text(`AED ${data.vat.toFixed(2)}`,      W - margin - 2, y + 18, { align: 'right' });
-    doc.setFont('helvetica', 'bold');
-    doc.setTextColor(62, 173, 130);
-    doc.setFontSize(11);
-    doc.text(`AED ${data.total.toFixed(2)}`, W - margin - 2, y + 29, { align: 'right' });
+        doc.setFont("helvetica", "normal");
+        doc.setTextColor(220, 230, 240);
+        doc.text(`AED ${data.subtotal.toFixed(2)}`, W - margin - 2, y + 9, {
+          align: "right",
+        });
+        doc.text(`AED ${data.vat.toFixed(2)}`, W - margin - 2, y + 18, {
+          align: "right",
+        });
+        doc.setFont("helvetica", "bold");
+        doc.setTextColor(62, 173, 130);
+        doc.setFontSize(11);
+        doc.text(`AED ${data.total.toFixed(2)}`, W - margin - 2, y + 29, {
+          align: "right",
+        });
 
-    // Green accent line before footer
-    doc.setFillColor(62, 173, 130);
-    doc.rect(0, H - 24, W, 1, 'F');
+        // Green accent line before footer
+        doc.setFillColor(62, 173, 130);
+        doc.rect(0, H - 24, W, 1, "F");
 
-    // Footer
-    doc.setFillColor(22, 31, 46);
-    doc.rect(0, H - 23, W, 23, 'F');
-    doc.setTextColor(136, 150, 168);
-    doc.setFontSize(7.5);
-    doc.setFont('helvetica', 'normal');
-    doc.text('Ahmed Al Sheebani Real Estate — Property Management Department',
-      W/2, H - 14, { align: 'center' });
-    doc.text('Dubai, United Arab Emirates    |    Internal Document',
-      W/2, H - 8, { align: 'center' });
+        // Footer
+        doc.setFillColor(22, 31, 46);
+        doc.rect(0, H - 23, W, 23, "F");
+        doc.setTextColor(136, 150, 168);
+        doc.setFontSize(7.5);
+        doc.setFont("helvetica", "normal");
+        doc.text(
+          "Ahmed Al Sheebani Real Estate — Property Management Department",
+          W / 2,
+          H - 14,
+          { align: "center" },
+        );
+        doc.text(
+          "Dubai, United Arab Emirates    |    Internal Document",
+          W / 2,
+          H - 8,
+          { align: "center" },
+        );
 
-    // Notes
-    if (data.notes) {
-      doc.setTextColor(136, 150, 168);
-      doc.setFontSize(8);
-      doc.text('Notes: ' + data.notes, margin, y + 42);
-    }
+        // Notes
+        if (data.notes) {
+          doc.setTextColor(136, 150, 168);
+          doc.setFontSize(8);
+          doc.text("Notes: " + data.notes, margin, y + 42);
+        }
 
-    doc.save(`${data.invNum}.pdf`);
-  }
+        doc.save(`${data.invNum}.pdf`);
+      }
 
-  // ── QuickBooks CSV — Single Invoice ──────────────────────────────
-  window.exportSingleQB = function() {
-    if (!lastInvoiceId && !selectedUnit) {
-      showToast('Please generate an invoice first.', 'error'); return;
-    }
+      // ── QuickBooks CSV — Single Invoice ──────────────────────────────
+      window.exportSingleQB = function () {
+        if (!lastInvoiceId && !selectedUnit) {
+          showToast("Please generate an invoice first.", "error");
+          return;
+        }
 
-    const invNum  = document.getElementById('invoice-number-display').textContent;
-    const invDate = document.getElementById('i-date').value;
+        const invNum = document.getElementById(
+          "invoice-number-display",
+        ).textContent;
+        const invDate = document.getElementById("i-date").value;
 
-    const rows = [
-      ['InvoiceNo','Customer','InvoiceDate','DueDate',
-       'Description','Qty','UnitPrice','VAT','Amount','Currency']
-    ];
+        const rows = [
+          [
+            "InvoiceNo",
+            "Customer",
+            "InvoiceDate",
+            "DueDate",
+            "Description",
+            "Qty",
+            "UnitPrice",
+            "VAT",
+            "Amount",
+            "Currency",
+          ],
+        ];
 
-    lineItems.forEach(item => {
-      rows.push([
-        invNum,
-        selectedUnit?.tenant_name || 'Vacant Unit',
-        invDate, invDate,
-        item.description,
-        item.qty,
-        item.rate.toFixed(2),
-        item.vat.toFixed(2),
-        item.total.toFixed(2),
-        'AED'
-      ]);
-    });
-
-    downloadCSV(rows, `${invNum}_QB.csv`);
-    showToast('QuickBooks CSV downloaded!');
-  };
-
-  // ── QuickBooks CSV — Date Range ──────────────────────────────────
-  window.exportQBRange = function() {
-    const today = new Date().toISOString().split('T')[0];
-    const firstOfMonth = today.slice(0,8) + '01';
-    document.getElementById('qb-from').value = firstOfMonth;
-    document.getElementById('qb-to').value   = today;
-    openModal('modal-qb-range');
-  };
-
-  window.downloadQBCSV = async function() {
-    const from = document.getElementById('qb-from').value;
-    const to   = document.getElementById('qb-to').value;
-
-    if (!from || !to) {
-      showToast('Please select both dates.', 'error'); return;
-    }
-
-    const { data: invoices, error } = await supabase
-      .from('invoices')
-      .select('*')
-      .gte('created_at', from)
-      .lte('created_at', to + 'T23:59:59')
-      .order('created_at');
-
-    if (error || !invoices?.length) {
-      showToast('No invoices found in that date range.', 'warning');
-      closeModal('modal-qb-range'); return;
-    }
-
-    const rows = [
-      ['InvoiceNo','Customer','InvoiceDate','DueDate',
-       'Description','Qty','UnitPrice','VAT','Amount','Currency']
-    ];
-
-    invoices.forEach(inv => {
-      const items = Array.isArray(inv.line_items) ? inv.line_items : [];
-      const date  = inv.created_at?.split('T')[0] || '';
-      if (items.length === 0) {
-        rows.push([
-          inv.invoice_number, inv.tenant_name || '—',
-          date, date, inv.invoice_number,
-          1, inv.amount?.toFixed(2) || '0.00',
-          inv.vat_amount?.toFixed(2) || '0.00',
-          inv.total?.toFixed(2) || '0.00', 'AED'
-        ]);
-      } else {
-        items.forEach(item => {
+        lineItems.forEach((item) => {
           rows.push([
-            inv.invoice_number, inv.tenant_name || '—',
-            date, date, item.description || '—',
-            item.qty || 1,
-            (item.rate || 0).toFixed(2),
-            (item.vat  || 0).toFixed(2),
-            (item.total|| 0).toFixed(2), 'AED'
+            invNum,
+            selectedUnit?.tenant_name || "Vacant Unit",
+            invDate,
+            invDate,
+            item.description,
+            item.qty,
+            item.rate.toFixed(2),
+            item.vat.toFixed(2),
+            item.total.toFixed(2),
+            "AED",
           ]);
         });
+
+        downloadCSV(rows, `${invNum}_QB.csv`);
+        showToast("QuickBooks CSV downloaded!");
+      };
+
+      // ── QuickBooks CSV — Date Range ──────────────────────────────────
+      window.exportQBRange = function () {
+        const today = new Date().toISOString().split("T")[0];
+        const firstOfMonth = today.slice(0, 8) + "01";
+        document.getElementById("qb-from").value = firstOfMonth;
+        document.getElementById("qb-to").value = today;
+        openModal("modal-qb-range");
+      };
+
+      window.downloadQBCSV = async function () {
+        const from = document.getElementById("qb-from").value;
+        const to = document.getElementById("qb-to").value;
+
+        if (!from || !to) {
+          showToast("Please select both dates.", "error");
+          return;
+        }
+
+        const { data: invoices, error } = await supabase
+          .from("invoices")
+          .select("*")
+          .gte("created_at", from)
+          .lte("created_at", to + "T23:59:59")
+          .order("created_at");
+
+        if (error || !invoices?.length) {
+          showToast("No invoices found in that date range.", "warning");
+          closeModal("modal-qb-range");
+          return;
+        }
+
+        const rows = [
+          [
+            "InvoiceNo",
+            "Customer",
+            "InvoiceDate",
+            "DueDate",
+            "Description",
+            "Qty",
+            "UnitPrice",
+            "VAT",
+            "Amount",
+            "Currency",
+          ],
+        ];
+
+        invoices.forEach((inv) => {
+          const items = Array.isArray(inv.line_items) ? inv.line_items : [];
+          const date = inv.created_at?.split("T")[0] || "";
+          if (items.length === 0) {
+            rows.push([
+              inv.invoice_number,
+              inv.tenant_name || "—",
+              date,
+              date,
+              inv.invoice_number,
+              1,
+              inv.amount?.toFixed(2) || "0.00",
+              inv.vat_amount?.toFixed(2) || "0.00",
+              inv.total?.toFixed(2) || "0.00",
+              "AED",
+            ]);
+          } else {
+            items.forEach((item) => {
+              rows.push([
+                inv.invoice_number,
+                inv.tenant_name || "—",
+                date,
+                date,
+                item.description || "—",
+                item.qty || 1,
+                (item.rate || 0).toFixed(2),
+                (item.vat || 0).toFixed(2),
+                (item.total || 0).toFixed(2),
+                "AED",
+              ]);
+            });
+          }
+        });
+
+        downloadCSV(rows, `ASRE_QuickBooks_${from}_to_${to}.csv`);
+        showToast(`Exported ${invoices.length} invoice(s)!`);
+        closeModal("modal-qb-range");
+      };
+
+      function downloadCSV(rows, filename) {
+        const csv = rows
+          .map((r) =>
+            r.map((v) => `"${String(v).replace(/"/g, '""')}"`).join(","),
+          )
+          .join("\n");
+        const blob = new Blob([csv], { type: "text/csv" });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = filename;
+        a.click();
+        URL.revokeObjectURL(url);
       }
-    });
 
-    downloadCSV(rows,
-      `ASRE_QuickBooks_${from}_to_${to}.csv`);
-    showToast(`Exported ${invoices.length} invoice(s)!`);
-    closeModal('modal-qb-range');
-  };
-
-  function downloadCSV(rows, filename) {
-    const csv = rows.map(r =>
-      r.map(v => `"${String(v).replace(/"/g,'""')}"`).join(',')
-    ).join('\n');
-    const blob = new Blob([csv], { type: 'text/csv' });
-    const url  = URL.createObjectURL(blob);
-    const a    = document.createElement('a');
-    a.href = url; a.download = filename; a.click();
-    URL.revokeObjectURL(url);
-  }
-
-  // ── Default Rates Modal ──────────────────────────────────────────
-  window.openRatesModal = async function() {
-    await loadRates();
-    const form = document.getElementById('rates-form');
-    form.innerHTML = `
+      // ── Default Rates Modal ──────────────────────────────────────────
+      window.openRatesModal = async function () {
+        await loadRates();
+        const form = document.getElementById("rates-form");
+        form.innerHTML = `
       <div class="rates-grid">
-        ${INVOICE_TYPES.map(t => `
+        ${INVOICE_TYPES.map(
+          (t) => `
           <div class="form-group">
             <label class="form-label">${t.label} (${t.code})</label>
             <input type="number" class="form-control"
               id="rate-${t.type}"
               value="${invoiceRates[t.type]?.rate || 0}"
               step="0.01" min="0" placeholder="0.00" />
-          </div>`).join('')}
+          </div>`,
+        ).join("")}
       </div>`;
-    openModal('modal-rates');
-  };
+        openModal("modal-rates");
+      };
 
-  window.saveRates = async function() {
-    for (const t of INVOICE_TYPES) {
-      const val = parseFloat(
-        document.getElementById(`rate-${t.type}`).value
-      ) || 0;
-      await supabase.from('invoice_rates')
-        .update({ default_rate: val, updated_at: new Date().toISOString() })
-        .eq('type', t.type);
-    }
-    await loadRates();
-    closeModal('modal-rates');
-    showToast('Default rates saved!');
-  };
+      window.saveRates = async function () {
+        for (const t of INVOICE_TYPES) {
+          const val =
+            parseFloat(document.getElementById(`rate-${t.type}`).value) || 0;
+          await supabase
+            .from("invoice_rates")
+            .update({ default_rate: val, updated_at: new Date().toISOString() })
+            .eq("type", t.type);
+        }
+        await loadRates();
+        closeModal("modal-rates");
+        showToast("Default rates saved!");
+      };
 
-  // ── Reset Form ───────────────────────────────────────────────────
-  window.resetInvoiceForm = function() {
-    selectedType = null;
-    selectedUnit = null;
-    lineItems    = [];
-    lastInvoiceId = null;
+      // ── Reset Form ───────────────────────────────────────────────────
+      window.resetInvoiceForm = function () {
+        selectedType = null;
+        selectedUnit = null;
+        lineItems = [];
+        lastInvoiceId = null;
 
-    document.querySelectorAll('.invoice-type-btn')
-      .forEach(b => b.classList.remove('active'));
-    document.getElementById('invoice-builder').style.display = 'none';
-    document.getElementById('tenant-info-section').style.display = 'none';
-    document.getElementById('i-building').value = '';
-    document.getElementById('i-floor').innerHTML =
-      '<option value="">Select Floor</option>';
-    document.getElementById('i-unit').innerHTML  =
-      '<option value="">Select Unit</option>';
-    document.getElementById('i-notes').value = '';
-    document.getElementById('invoice-number-display').textContent = '—';
-    renderLineItems();
-    updateTotals();
-    setTodayDate();
-  };
+        document
+          .querySelectorAll(".invoice-type-btn")
+          .forEach((b) => b.classList.remove("active"));
+        document.getElementById("invoice-builder").style.display = "none";
+        document.getElementById("tenant-info-section").style.display = "none";
+        document.getElementById("i-building").value = "";
+        document.getElementById("i-floor").innerHTML =
+          '<option value="">Select Floor</option>';
+        document.getElementById("i-unit").innerHTML =
+          '<option value="">Select Unit</option>';
+        document.getElementById("i-notes").value = "";
+        document.getElementById("invoice-number-display").textContent = "—";
+        renderLineItems();
+        updateTotals();
+        setTodayDate();
+      };
 
-  // ── Invoice History ──────────────────────────────────────────────
-  async function loadHistory() {
-    const typeF = document.getElementById('hist-filter-type').value;
+      // ── Invoice History ──────────────────────────────────────────────
+      async function loadHistory() {
+        const typeF = document.getElementById("hist-filter-type").value;
 
-    let query = supabase
-      .from('invoices')
-      .select('*')
-      .order('created_at', { ascending: false })
-      .limit(50);
+        let query = supabase
+          .from("invoices")
+          .select("*")
+          .order("created_at", { ascending: false })
+          .limit(50);
 
-    if (typeF) query = query.eq('type', typeF);
+        if (typeF) query = query.eq("type", typeF);
 
-    const { data: invoices, error } = await query;
-    const container = document.getElementById('history-container');
+        const { data: invoices, error } = await query;
+        const container = document.getElementById("history-container");
 
-    if (error || !invoices?.length) {
-      container.innerHTML = `
+        if (error || !invoices?.length) {
+          container.innerHTML = `
         <div class="empty-state" style="padding:30px">
           <div class="empty-state-title">No invoices generated yet</div>
         </div>`;
-      return;
-    }
+          return;
+        }
 
-    const typeMap = {};
-    INVOICE_TYPES.forEach(t => { typeMap[t.type] = t; });
+        const typeMap = {};
+        INVOICE_TYPES.forEach((t) => {
+          typeMap[t.type] = t;
+        });
 
-    container.innerHTML = `
+        container.innerHTML = `
       <div class="table-wrapper">
         <table>
           <thead>
@@ -1278,7 +1499,9 @@
             </tr>
           </thead>
           <tbody>
-            ${invoices.map(inv => `
+            ${invoices
+              .map(
+                (inv) => `
               <tr>
                 <td style="font-weight:700;color:var(--green)">
                   ${inv.invoice_number}
@@ -1288,7 +1511,7 @@
                     ${typeMap[inv.type]?.code || inv.type}
                   </span>
                 </td>
-                <td>${inv.tenant_name || '—'}</td>
+                <td>${inv.tenant_name || "—"}</td>
                 <td>${formatCurrency(inv.amount)}</td>
                 <td>${formatCurrency(inv.vat_amount)}</td>
                 <td style="font-weight:700;color:var(--green)">
@@ -1301,44 +1524,47 @@
                     🗑️
                   </button>
                 </td>
-              </tr>`).join('')}
+              </tr>`,
+              )
+              .join("")}
           </tbody>
         </table>
       </div>`;
-  }
+      }
 
-  window.loadHistory = loadHistory;
+      window.loadHistory = loadHistory;
 
-  window.deleteInvoice = async function(id) {
-    const ok = await showConfirm(
-      'Delete this invoice record? This cannot be undone.'
-    );
-    if (!ok) return;
-    const { error } = await supabase
-      .from('invoices').delete().eq('id', id);
-    if (error) { showToast('Error deleting invoice.', 'error'); return; }
-    showToast('Invoice deleted.');
-    loadHistory();
-  };
+      window.deleteInvoice = async function (id) {
+        const ok = await showConfirm(
+          "Delete this invoice record? This cannot be undone.",
+        );
+        if (!ok) return;
+        const { error } = await supabase.from("invoices").delete().eq("id", id);
+        if (error) {
+          showToast("Error deleting invoice.", "error");
+          return;
+        }
+        showToast("Invoice deleted.");
+        loadHistory();
+      };
 
-  // ── Modal Helpers ────────────────────────────────────────────────
-  window.openModal = function(id) {
-    document.getElementById(id).style.display = 'flex';
-  };
+      // ── Modal Helpers ────────────────────────────────────────────────
+      window.openModal = function (id) {
+        document.getElementById(id).style.display = "flex";
+      };
 
-  window.closeModal = function(id) {
-    document.getElementById(id).style.display = 'none';
-  };
+      window.closeModal = function (id) {
+        document.getElementById(id).style.display = "none";
+      };
 
-  document.querySelectorAll('.modal-overlay').forEach(overlay => {
-    overlay.addEventListener('click', e => {
-      if (e.target === overlay) overlay.style.display = 'none';
-    });
-  });
+      document.querySelectorAll(".modal-overlay").forEach((overlay) => {
+        overlay.addEventListener("click", (e) => {
+          if (e.target === overlay) overlay.style.display = "none";
+        });
+      });
 
-  // ── Init ─────────────────────────────────────────────────────────
-  init();
-</script>
-
-</body>
+      // ── Init ─────────────────────────────────────────────────────────
+      init();
+    </script>
+  </body>
 </html>
