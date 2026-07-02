@@ -251,12 +251,12 @@ input, select, textarea, button {
 
 .stat-card-icon {
   width: 100%;
-  background: rgba(42,85,144,0.15);
+  background: rgba(0,0,0,0.35);
   display: flex;
   align-items: center;
   justify-content: center;
   padding: 20px;
-  border-bottom: 1px solid var(--border);
+  border-bottom: 1px solid rgba(255,255,255,0.05);
   min-height: 100px;
 }
 
