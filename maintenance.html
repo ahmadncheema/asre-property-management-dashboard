@@ -1,0 +1,821 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ASRE — Maintenance Tracker</title>
+  <link rel="stylesheet" href="css/main.css" />
+  <style>
+    .maint-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-left: 4px solid var(--warning);
+      border-radius: var(--radius);
+      padding: 20px;
+      margin-bottom: 12px;
+      transition: var(--transition);
+      animation: slideUp 0.3s ease forwards;
+    }
+
+    .maint-card.completed {
+      border-left-color: var(--green);
+      opacity: 0.72;
+    }
+
+    .maint-card:hover {
+      box-shadow: var(--shadow);
+      transform: translateY(-1px);
+    }
+
+    .maint-card-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 14px;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .maint-card-left {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .maint-unit-num {
+      font-size: 1.05rem;
+      font-weight: 700;
+      color: var(--white);
+    }
+
+    .maint-details {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      gap: 12px;
+      margin-bottom: 14px;
+    }
+
+    .maint-detail-label {
+      color: var(--text-muted);
+      font-size: 0.72rem;
+      text-transform: uppercase;
+      letter-spacing: 0.3px;
+      margin-bottom: 3px;
+    }
+
+    .maint-detail-value {
+      color: var(--text);
+      font-weight: 500;
+      font-size: 0.88rem;
+    }
+
+    .maint-complaint {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 12px;
+      font-size: 0.85rem;
+      color: var(--text);
+      margin-bottom: 12px;
+      line-height: 1.5;
+    }
+
+    .maint-actions {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      padding-top: 12px;
+      border-top: 1px solid var(--border);
+    }
+
+    .building-section {
+      margin-bottom: 36px;
+    }
+
+    .building-section-header {
+      background: rgba(42,85,144,0.15);
+      border: 1px solid var(--blue);
+      border-radius: var(--radius-sm);
+      padding: 14px 18px;
+      margin-bottom: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .building-section-name {
+      font-size: 1rem;
+      font-weight: 700;
+      color: var(--blue-light);
+    }
+
+    .unit-group {
+      margin-bottom: 24px;
+    }
+
+    .unit-group-header {
+      background: rgba(240,165,0,0.07);
+      border: 1px solid rgba(240,165,0,0.2);
+      border-radius: var(--radius-sm);
+      padding: 10px 16px;
+      margin-bottom: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .unit-group-title {
+      font-size: 0.9rem;
+      font-weight: 600;
+      color: var(--text);
+    }
+
+    .summary-bar {
+      display: flex;
+      gap: 20px;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 16px 24px;
+      margin-bottom: 28px;
+      flex-wrap: wrap;
+    }
+
+    .summary-item-num {
+      font-size: 1.6rem;
+      font-weight: 800;
+    }
+
+    .summary-item-label {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.4px;
+    }
+
+    .category-breakdown {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-bottom: 24px;
+    }
+
+    .category-pill {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 6px 16px;
+      font-size: 0.82rem;
+      cursor: pointer;
+      transition: var(--transition);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .category-pill:hover {
+      border-color: var(--blue-light);
+    }
+
+    .category-pill.active {
+      background: var(--blue);
+      border-color: var(--blue);
+      color: var(--white);
+    }
+
+    .category-pill .pill-count {
+      background: rgba(255,255,255,0.15);
+      border-radius: 10px;
+      padding: 1px 7px;
+      font-size: 0.75rem;
+      font-weight: 700;
+    }
+
+    .filter-bar {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 24px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+
+    .completed-section {
+      margin-top: 48px;
+      padding-top: 32px;
+      border-top: 1px solid var(--border);
+    }
+  </style>
+</head>
+<body>
+
+<nav id="main-nav"></nav>
+
+<div class="page-wrapper">
+  <div class="container">
+
+    <div class="page-header">
+      <div>
+        <div class="page-title">Maintenance <span>Tracker</span></div>
+        <div class="page-subtitle">Track and manage maintenance requests across all properties</div>
+      </div>
+      <button class="btn btn-green" onclick="openAddMaintenance()">
+        + Add Request
+      </button>
+    </div>
+
+    <!-- Summary Bar -->
+    <div class="summary-bar">
+      <div class="summary-item">
+        <div class="summary-item-num" style="color:var(--warning)" id="s-open">—</div>
+        <div class="summary-item-label">Open Requests</div>
+      </div>
+      <div class="summary-item">
+        <div class="summary-item-num" style="color:var(--green)" id="s-completed">—</div>
+        <div class="summary-item-label">Completed</div>
+      </div>
+      <div class="summary-item">
+        <div class="summary-item-num" style="color:var(--blue-light)" id="s-total">—</div>
+        <div class="summary-item-label">Total Records</div>
+      </div>
+      <div class="summary-item">
+        <div class="summary-item-num" style="color:var(--text-muted)" id="s-buildings">—</div>
+        <div class="summary-item-label">Buildings</div>
+      </div>
+    </div>
+
+    <!-- Category Pills -->
+    <div class="category-breakdown" id="category-pills"></div>
+
+    <!-- Filter Bar -->
+    <div class="filter-bar">
+      <input type="text" class="form-control" id="search-input"
+        placeholder="🔍  Search by unit, tenant, or complaint..."
+        oninput="applyFilters()" style="flex:1; min-width:200px" />
+      <select class="form-control" id="filter-building"
+        onchange="applyFilters()" style="min-width:200px">
+        <option value="">All Buildings</option>
+      </select>
+      <select class="form-control" id="filter-status"
+        onchange="applyFilters()" style="min-width:160px">
+        <option value="open">Open Only</option>
+        <option value="">All Records</option>
+        <option value="completed">Completed Only</option>
+      </select>
+    </div>
+
+    <!-- Maintenance List -->
+    <div id="maintenance-container">
+      <div class="loading-state">
+        <div class="spinner"></div>
+        <p>Loading maintenance requests...</p>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ── Add / Edit Maintenance Modal ───────────────────────────── -->
+<div class="modal-overlay" id="modal-maintenance" style="display:none">
+  <div class="modal modal-lg">
+    <div class="modal-header">
+      <div class="modal-title" id="maint-modal-title">Add Maintenance Request</div>
+      <button class="modal-close" onclick="closeModal('modal-maintenance')">×</button>
+    </div>
+    <div class="modal-body">
+
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Building *</label>
+          <select id="m-building" class="form-control"
+            onchange="loadFloorsForBuilding()">
+            <option value="">Select Building</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Floor *</label>
+          <select id="m-floor" class="form-control"
+            onchange="loadUnitsForFloor()">
+            <option value="">Select Floor</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Unit *</label>
+          <select id="m-unit" class="form-control">
+            <option value="">Select Unit</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Category *</label>
+          <select id="m-category" class="form-control">
+            <option value="">Select Category</option>
+            <option value="Electrical">Electrical</option>
+            <option value="Plumbing">Plumbing</option>
+            <option value="Air Conditioning">Air Conditioning</option>
+            <option value="Carpentry">Carpentry</option>
+            <option value="Painting">Painting</option>
+            <option value="Civil / Structural">Civil / Structural</option>
+            <option value="Flooring">Flooring</option>
+            <option value="Appliances">Appliances</option>
+            <option value="Other">Other</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Complaint / Issue *</label>
+        <textarea id="m-complaint" class="form-control" rows="3"
+          placeholder="Describe the maintenance issue in detail..."></textarea>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Action Taken</label>
+        <textarea id="m-action" class="form-control" rows="2"
+          placeholder="What steps have already been taken?"></textarea>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Remarks</label>
+        <textarea id="m-remarks" class="form-control" rows="2"
+          placeholder="Additional notes..."></textarea>
+      </div>
+
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="closeModal('modal-maintenance')">Cancel</button>
+      <button class="btn btn-green" id="maint-save-btn" onclick="saveMaintenance()">
+        Save Request
+      </button>
+    </div>
+  </div>
+</div>
+
+<script type="module">
+  import { requireAuth } from './js/auth.js';
+  import { renderNav, showToast, showConfirm, formatDate } from './js/shared.js';
+  import { supabase } from './js/supabase.js';
+
+  const session = requireAuth();
+  if (!session) throw new Error('Not authenticated');
+  renderNav('maintenance');
+
+  let allRecords   = [];
+  let allBuildings = [];
+  let editingId    = null;
+  let activeCategory = '';
+
+  // ── Load Data ────────────────────────────────────────────────────
+  async function loadMaintenance() {
+    const [buildingsRes, recordsRes] = await Promise.all([
+      supabase.from('buildings').select('*').order('name'),
+      supabase.from('maintenance_requests')
+        .select(`
+          *,
+          units(unit_number, tenant_name, size),
+          floors(name),
+          buildings(name)
+        `)
+        .order('created_at', { ascending: false })
+    ]);
+
+    allBuildings = buildingsRes.data || [];
+    allRecords   = recordsRes.data   || [];
+
+    // Populate building filter
+    const filterSel = document.getElementById('filter-building');
+    filterSel.innerHTML = '<option value="">All Buildings</option>' +
+      allBuildings.map(b =>
+        `<option value="${b.id}">${b.name}</option>`
+      ).join('');
+
+    updateSummary();
+    renderCategoryPills();
+    applyFilters();
+  }
+
+  function updateSummary() {
+    const open      = allRecords.filter(r => r.status === 'open').length;
+    const completed = allRecords.filter(r => r.status === 'completed').length;
+    const buildings = new Set(allRecords.filter(r => r.status === 'open')
+      .map(r => r.building_id)).size;
+
+    document.getElementById('s-open').textContent      = open;
+    document.getElementById('s-completed').textContent = completed;
+    document.getElementById('s-total').textContent     = allRecords.length;
+    document.getElementById('s-buildings').textContent = buildings;
+  }
+
+  function renderCategoryPills() {
+    const openRecords = allRecords.filter(r => r.status === 'open');
+    const categories  = {};
+    openRecords.forEach(r => {
+      const cat = r.category || 'Other';
+      categories[cat] = (categories[cat] || 0) + 1;
+    });
+
+    const pills = document.getElementById('category-pills');
+    pills.innerHTML = `
+      <div class="category-pill ${activeCategory === '' ? 'active' : ''}"
+        onclick="filterByCategory('')">
+        All <span class="pill-count">${openRecords.length}</span>
+      </div>
+      ${Object.entries(categories)
+        .sort((a,b) => b[1] - a[1])
+        .map(([cat, count]) => `
+          <div class="category-pill ${activeCategory === cat ? 'active' : ''}"
+            onclick="filterByCategory('${cat}')">
+            ${cat} <span class="pill-count">${count}</span>
+          </div>`
+        ).join('')}
+    `;
+  }
+
+  window.filterByCategory = function(cat) {
+    activeCategory = cat;
+    renderCategoryPills();
+    applyFilters();
+  };
+
+  window.applyFilters = function() {
+    const search    = document.getElementById('search-input').value.toLowerCase().trim();
+    const buildingF = document.getElementById('filter-building').value;
+    const statusF   = document.getElementById('filter-status').value;
+
+    let filtered = allRecords;
+
+    if (statusF)   filtered = filtered.filter(r => r.status === statusF);
+    if (buildingF) filtered = filtered.filter(r => r.building_id === buildingF);
+    if (activeCategory) filtered = filtered.filter(r => r.category === activeCategory);
+    if (search) {
+      filtered = filtered.filter(r =>
+        r.units?.unit_number?.toLowerCase().includes(search) ||
+        r.units?.tenant_name?.toLowerCase().includes(search) ||
+        r.complaint?.toLowerCase().includes(search) ||
+        r.category?.toLowerCase().includes(search)
+      );
+    }
+
+    renderMaintenance(filtered);
+  };
+
+  function renderMaintenance(records) {
+    const container = document.getElementById('maintenance-container');
+
+    if (records.length === 0) {
+      container.innerHTML = `
+        <div class="empty-state">
+          <div class="empty-state-icon">🔧</div>
+          <div class="empty-state-title">No Maintenance Requests</div>
+          <div class="empty-state-text">
+            No records found. Click "Add Request" to log a new maintenance issue.
+          </div>
+        </div>`;
+      return;
+    }
+
+    // Group by building then unit
+    const grouped = {};
+    records.forEach(r => {
+      const bName = r.buildings?.name || 'Unknown Building';
+      if (!grouped[bName]) grouped[bName] = {};
+      const uKey = r.units?.unit_number
+        ? `Unit ${r.units.unit_number}${r.floors?.name ? ' — Floor ' + r.floors.name : ''}`
+        : 'Unknown Unit';
+      if (!grouped[bName][uKey]) grouped[bName][uKey] = [];
+      grouped[bName][uKey].push(r);
+    });
+
+    container.innerHTML = Object.entries(grouped).map(([bName, units]) => `
+      <div class="building-section">
+        <div class="building-section-header">
+          <div class="building-section-name">🏢 ${bName}</div>
+          <div style="font-size:0.82rem;color:var(--text-muted)">
+            ${Object.values(units).flat().filter(r => r.status === 'open').length} open
+          </div>
+        </div>
+        ${Object.entries(units).map(([uKey, recs]) => `
+          <div class="unit-group">
+            <div class="unit-group-header">
+              <div class="unit-group-title">
+                🏠 ${uKey}
+                ${recs[0]?.units?.tenant_name
+                  ? `<span style="font-weight:400;color:var(--text-muted);
+                      font-size:0.82rem;margin-left:8px">
+                      👤 ${recs[0].units.tenant_name}
+                    </span>`
+                  : ''}
+              </div>
+              <div style="font-size:0.8rem;color:var(--text-muted)">
+                ${recs.filter(r => r.status === 'open').length} open /
+                ${recs.filter(r => r.status === 'completed').length} completed
+              </div>
+            </div>
+            ${recs.map(r => renderMaintenanceCard(r)).join('')}
+          </div>
+        `).join('')}
+      </div>
+    `).join('');
+  }
+
+  function renderMaintenanceCard(r) {
+    const isCompleted = r.status === 'completed';
+    const categoryColors = {
+      'Electrical':       '#f0c060',
+      'Plumbing':         '#6fa3e0',
+      'Air Conditioning': '#4ec99a',
+      'Carpentry':        '#c9a87c',
+      'Painting':         '#c97ca8',
+      'Civil / Structural': '#a87cc9',
+      'Flooring':         '#7cc9c9',
+      'Appliances':       '#c9c97c',
+      'Other':            '#8896a8',
+    };
+    const catColor = categoryColors[r.category] || '#8896a8';
+
+    return `
+      <div class="maint-card ${isCompleted ? 'completed' : ''}">
+        <div class="maint-card-header">
+          <div class="maint-card-left">
+            <div class="maint-unit-num">
+              Unit ${r.units?.unit_number || '—'}
+            </div>
+            <span class="badge" style="background:${catColor}22;color:${catColor}">
+              ${r.category || 'Other'}
+            </span>
+            <span class="badge ${isCompleted ? 'badge-green' : 'badge-orange'}">
+              ${isCompleted ? 'Completed' : 'Open'}
+            </span>
+          </div>
+          <div style="font-size:0.78rem;color:var(--text-muted)">
+            ${formatDate(r.created_at)}
+            ${r.completed_at
+              ? `<br><span style="color:var(--green)">
+                  ✅ Completed ${formatDate(r.completed_at)}
+                </span>`
+              : ''}
+          </div>
+        </div>
+
+        <div class="maint-details">
+          <div>
+            <div class="maint-detail-label">Floor</div>
+            <div class="maint-detail-value">${r.floors?.name || '—'}</div>
+          </div>
+          <div>
+            <div class="maint-detail-label">Category</div>
+            <div class="maint-detail-value">${r.category || '—'}</div>
+          </div>
+        </div>
+
+        ${r.complaint ? `
+          <div class="maint-complaint">
+            <strong style="color:var(--text-muted);font-size:0.75rem;
+              text-transform:uppercase;letter-spacing:0.3px">
+              Complaint
+            </strong><br>
+            ${r.complaint}
+          </div>` : ''}
+
+        ${r.action_taken ? `
+          <div style="font-size:0.82rem;color:var(--text-muted);margin-bottom:10px">
+            <strong>Action Taken:</strong> ${r.action_taken}
+          </div>` : ''}
+
+        ${r.remarks ? `
+          <div style="font-size:0.82rem;color:var(--text-muted);margin-bottom:10px">
+            <strong>Remarks:</strong> ${r.remarks}
+          </div>` : ''}
+
+        <div class="maint-actions">
+          ${!isCompleted
+            ? `<button class="btn btn-green btn-sm"
+                onclick="markCompleted('${r.id}')">
+                ✅ Mark Completed
+              </button>`
+            : `<button class="btn btn-outline btn-sm"
+                onclick="markOpen('${r.id}')">
+                🔄 Reopen
+              </button>`
+          }
+          <button class="btn btn-outline btn-sm"
+            onclick="openEditMaintenance('${r.id}')">
+            ✏️ Edit
+          </button>
+          <button class="btn btn-danger btn-sm"
+            onclick="deleteRequest('${r.id}')">
+            🗑️ Delete
+          </button>
+        </div>
+      </div>`;
+  }
+
+  // ── Mark Completed ───────────────────────────────────────────────
+  window.markCompleted = async function(id) {
+    const ok = await showConfirm(
+      'Mark this request as completed? It will be removed from open count but kept for records.'
+    );
+    if (!ok) return;
+
+    const { error } = await supabase
+      .from('maintenance_requests')
+      .update({ status: 'completed', completed_at: new Date().toISOString() })
+      .eq('id', id);
+
+    if (error) { showToast('Error updating request.', 'error'); return; }
+    showToast('Request marked as completed!');
+    loadMaintenance();
+  };
+
+  // ── Reopen ───────────────────────────────────────────────────────
+  window.markOpen = async function(id) {
+    const { error } = await supabase
+      .from('maintenance_requests')
+      .update({ status: 'open', completed_at: null })
+      .eq('id', id);
+
+    if (error) { showToast('Error updating request.', 'error'); return; }
+    showToast('Request reopened.');
+    loadMaintenance();
+  };
+
+  // ── Delete ───────────────────────────────────────────────────────
+  window.deleteRequest = async function(id) {
+    const ok = await showConfirm('Delete this maintenance request? This cannot be undone.');
+    if (!ok) return;
+
+    const { error } = await supabase
+      .from('maintenance_requests').delete().eq('id', id);
+
+    if (error) { showToast('Error deleting request.', 'error'); return; }
+    showToast('Request deleted.');
+    loadMaintenance();
+  };
+
+  // ── Open Add Modal ───────────────────────────────────────────────
+  window.openAddMaintenance = function() {
+    editingId = null;
+    document.getElementById('maint-modal-title').textContent = 'Add Maintenance Request';
+    document.getElementById('maint-save-btn').textContent    = 'Save Request';
+    clearForm();
+    populateBuildingDropdown();
+    openModal('modal-maintenance');
+  };
+
+  // ── Open Edit Modal ──────────────────────────────────────────────
+  window.openEditMaintenance = async function(id) {
+    const record = allRecords.find(r => r.id === id);
+    if (!record) return;
+
+    editingId = id;
+    document.getElementById('maint-modal-title').textContent = 'Edit Maintenance Request';
+    document.getElementById('maint-save-btn').textContent    = 'Save Changes';
+
+    await populateBuildingDropdown();
+    document.getElementById('m-building').value = record.building_id;
+    await loadFloorsForBuilding();
+    document.getElementById('m-floor').value = record.floor_id;
+    await loadUnitsForFloor();
+    document.getElementById('m-unit').value     = record.unit_id;
+    document.getElementById('m-category').value = record.category  || '';
+    document.getElementById('m-complaint').value= record.complaint || '';
+    document.getElementById('m-action').value   = record.action_taken || '';
+    document.getElementById('m-remarks').value  = record.remarks   || '';
+
+    openModal('modal-maintenance');
+  };
+
+  function clearForm() {
+    ['m-building','m-floor','m-unit','m-category',
+     'm-complaint','m-action','m-remarks'].forEach(id => {
+      document.getElementById(id).value = '';
+    });
+    document.getElementById('m-floor').innerHTML =
+      '<option value="">Select Floor</option>';
+    document.getElementById('m-unit').innerHTML  =
+      '<option value="">Select Unit</option>';
+  }
+
+  async function populateBuildingDropdown() {
+    const sel = document.getElementById('m-building');
+    sel.innerHTML = '<option value="">Select Building</option>' +
+      allBuildings.map(b =>
+        `<option value="${b.id}">${b.name}</option>`
+      ).join('');
+  }
+
+  // ── Load Floors for Building ──────────────────────────────────────
+  window.loadFloorsForBuilding = async function() {
+    const buildingId = document.getElementById('m-building').value;
+    const floorSel   = document.getElementById('m-floor');
+    const unitSel    = document.getElementById('m-unit');
+
+    floorSel.innerHTML = '<option value="">Select Floor</option>';
+    unitSel.innerHTML  = '<option value="">Select Unit</option>';
+
+    if (!buildingId) return;
+
+    const { data: floors } = await supabase
+      .from('floors')
+      .select('*')
+      .eq('building_id', buildingId)
+      .order('sort_order');
+
+    (floors || []).forEach(f => {
+      const opt = document.createElement('option');
+      opt.value       = f.id;
+      opt.textContent = f.name;
+      floorSel.appendChild(opt);
+    });
+  };
+
+  // ── Load Units for Floor ──────────────────────────────────────────
+  window.loadUnitsForFloor = async function() {
+    const floorId = document.getElementById('m-floor').value;
+    const unitSel = document.getElementById('m-unit');
+    unitSel.innerHTML = '<option value="">Select Unit</option>';
+
+    if (!floorId) return;
+
+    const { data: units } = await supabase
+      .from('units')
+      .select('id, unit_number, tenant_name')
+      .eq('floor_id', floorId)
+      .order('unit_number');
+
+    (units || []).forEach(u => {
+      const opt = document.createElement('option');
+      opt.value       = u.id;
+      opt.textContent = `${u.unit_number}${u.tenant_name ? ' (' + u.tenant_name + ')' : ' (Vacant)'}`;
+      unitSel.appendChild(opt);
+    });
+  };
+
+  // ── Save Maintenance Request ─────────────────────────────────────
+  window.saveMaintenance = async function() {
+    const buildingId = document.getElementById('m-building').value;
+    const floorId    = document.getElementById('m-floor').value;
+    const unitId     = document.getElementById('m-unit').value;
+    const category   = document.getElementById('m-category').value;
+    const complaint  = document.getElementById('m-complaint').value.trim();
+
+    if (!buildingId || !floorId || !unitId || !category || !complaint) {
+      showToast('Building, Floor, Unit, Category, and Complaint are required.', 'error');
+      return;
+    }
+
+    const payload = {
+      building_id:  buildingId,
+      floor_id:     floorId,
+      unit_id:      unitId,
+      category,
+      complaint,
+      action_taken: document.getElementById('m-action').value.trim()  || null,
+      remarks:      document.getElementById('m-remarks').value.trim() || null,
+      status:       'open',
+    };
+
+    let error;
+    if (editingId) {
+      ({ error } = await supabase
+        .from('maintenance_requests')
+        .update(payload).eq('id', editingId));
+    } else {
+      ({ error } = await supabase
+        .from('maintenance_requests').insert(payload));
+    }
+
+    if (error) {
+      showToast('Error saving request.', 'error');
+      console.error(error);
+      return;
+    }
+
+    closeModal('modal-maintenance');
+    showToast(editingId ? 'Request updated!' : 'Maintenance request logged!');
+    loadMaintenance();
+  };
+
+  // ── Modal Helpers ────────────────────────────────────────────────
+  window.openModal = function(id) {
+    document.getElementById(id).style.display = 'flex';
+  };
+
+  window.closeModal = function(id) {
+    document.getElementById(id).style.display = 'none';
+  };
+
+  document.querySelectorAll('.modal-overlay').forEach(overlay => {
+    overlay.addEventListener('click', e => {
+      if (e.target === overlay) overlay.style.display = 'none';
+    });
+  });
+
+  // ── Init ─────────────────────────────────────────────────────────
+  loadMaintenance();
+</script>
+
+</body>
+</html>
