@@ -576,13 +576,32 @@
             ? new Date(lastBackup).toLocaleDateString("en-GB")
             : "Never";
 
-          // ── Last updated time ────────────────────────────────────────
-          document.getElementById("last-updated").textContent =
-            "Last updated: " +
-            new Date().toLocaleTimeString("en-GB", {
-              hour: "2-digit",
-              minute: "2-digit",
-            });
+          // ── Last Activity ────────────────────────────────────────────────
+          const { data: lastActivity } = await supabase
+            .from("activity_log")
+            .select("*")
+            .order("created_at", { ascending: false })
+            .limit(1)
+            .single();
+
+          if (lastActivity) {
+            const d = new Date(lastActivity.created_at);
+            document.getElementById("last-updated").textContent =
+              `Last update: ${lastActivity.action} by ${lastActivity.user_name} — ` +
+              d.toLocaleDateString("en-GB", {
+                day: "2-digit",
+                month: "short",
+                year: "numeric",
+              }) +
+              " at " +
+              d.toLocaleTimeString("en-GB", {
+                hour: "2-digit",
+                minute: "2-digit",
+              });
+          } else {
+            document.getElementById("last-updated").textContent =
+              "No activity recorded yet.";
+          }
         } catch (err) {
           console.error("Dashboard load error:", err);
           document.getElementById("last-updated").textContent =

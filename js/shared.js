@@ -195,3 +195,18 @@ export async function fetchBuildingUnits(buildingId) {
   }
   return data;
 }
+
+// ── Log Activity ──────────────────────────────────────────────────
+export async function logActivity(action, module) {
+  const session = getSession();
+  if (!session) return;
+  try {
+    await supabase.from("activity_log").insert({
+      user_name: session.full_name,
+      action,
+      module,
+    });
+  } catch (err) {
+    console.error("Activity log error:", err);
+  }
+}

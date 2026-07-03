@@ -575,6 +575,7 @@
         formatDate,
       } from "./js/shared.js";
       import { supabase } from "./js/supabase.js";
+      import { logActivity } from "./js/shared.js";
 
       const session = requireAuth();
       if (!session) throw new Error("Not authenticated");
@@ -960,6 +961,7 @@
 
         closeModal("modal-create-building");
         showToast("Building created successfully!");
+        await logActivity("Created building: " + name, "Properties");
         loadBuildings();
       };
 
@@ -996,6 +998,7 @@
 
         closeModal("modal-edit-building");
         showToast("Building updated successfully!");
+        await logActivity("Updated building: " + name, "Properties");
         loadBuildings();
       };
 
@@ -1016,6 +1019,7 @@
         }
 
         showToast("Building deleted.");
+        await logActivity("Deleted building: " + name, "Properties");
         loadBuildings();
       };
 
@@ -1048,6 +1052,10 @@
 
         closeModal("modal-add-floor");
         showToast("Floor added!");
+        await logActivity(
+          "Added floor: " + name + " in " + currentBuilding.name,
+          "Properties",
+        );
         loadBuildingDetail();
       };
 
@@ -1065,6 +1073,10 @@
         }
 
         showToast("Floor deleted.");
+        await logActivity(
+          "Deleted floor: " + name + " in " + currentBuilding.name,
+          "Properties",
+        );
         loadBuildingDetail();
       };
 
@@ -1204,6 +1216,14 @@
 
         closeModal("modal-unit");
         showToast(editingUnitId ? "Unit updated!" : "Unit added!");
+        await logActivity(
+          (editingUnitId ? "Updated" : "Added") +
+            " unit " +
+            number +
+            " in " +
+            currentBuilding.name,
+          "Properties",
+        );
         loadBuildingDetail();
       };
 
@@ -1221,6 +1241,10 @@
         }
 
         showToast("Unit deleted.");
+        await logActivity(
+          "Deleted unit " + number + " in " + currentBuilding.name,
+          "Properties",
+        );
         loadBuildingDetail();
       };
 
