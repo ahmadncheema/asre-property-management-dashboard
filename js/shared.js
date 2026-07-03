@@ -115,7 +115,8 @@ export function renderNav(activePage) {
 
   nav.innerHTML = `
     <div class="nav-brand">
-      <span class="nav-logo">ASRE</span>
+      <img src="assets/logo/logo-small.png" alt="ASRE"
+        style="height:36px; width:auto; object-fit:contain;" />
       <span class="nav-title">Property Management</span>
     </div>
     <div class="nav-links">
