@@ -1,0 +1,819 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ASRE — Email Reminders</title>
+    <link rel="stylesheet" href="css/main.css" />
+    <style>
+      .email-card {
+        background: var(--bg-card);
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        padding: 20px;
+        margin-bottom: 12px;
+        transition: var(--transition);
+        animation: slideUp 0.3s ease forwards;
+        position: relative;
+        overflow: hidden;
+      }
+
+      .email-card::before {
+        content: "";
+        position: absolute;
+        left: 0;
+        top: 0;
+        bottom: 0;
+        width: 4px;
+      }
+
+      .email-card.stage-30d::before {
+        background: var(--danger);
+      }
+      .email-card.stage-60d::before {
+        background: var(--warning);
+      }
+      .email-card.stage-90d::before {
+        background: var(--green);
+      }
+
+      .email-card:hover {
+        box-shadow: var(--shadow);
+        transform: translateY(-1px);
+      }
+
+      .email-card-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 14px;
+        flex-wrap: wrap;
+        gap: 10px;
+      }
+
+      .email-card-left {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        flex-wrap: wrap;
+      }
+
+      .email-unit-num {
+        font-size: 1rem;
+        font-weight: 700;
+        color: var(--white);
+      }
+
+      .email-tenant {
+        font-size: 0.88rem;
+        color: var(--text-muted);
+      }
+
+      .email-details {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+        gap: 12px;
+        margin-bottom: 14px;
+      }
+
+      .email-detail-label {
+        color: var(--text-muted);
+        font-size: 0.72rem;
+        text-transform: uppercase;
+        letter-spacing: 0.3px;
+        margin-bottom: 3px;
+      }
+
+      .email-detail-value {
+        color: var(--text);
+        font-weight: 500;
+        font-size: 0.88rem;
+      }
+
+      .email-actions {
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap;
+        padding-top: 12px;
+        border-top: 1px solid var(--border);
+        align-items: center;
+      }
+
+      .building-section {
+        margin-bottom: 40px;
+      }
+
+      .building-section-header {
+        background: rgba(42, 85, 144, 0.15);
+        border: 1px solid var(--blue);
+        border-radius: var(--radius-sm);
+        padding: 14px 18px;
+        margin-bottom: 14px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        gap: 10px;
+      }
+
+      .building-section-name {
+        font-size: 1rem;
+        font-weight: 700;
+        color: var(--blue-light);
+      }
+
+      .building-section-actions {
+        display: flex;
+        gap: 8px;
+        align-items: center;
+      }
+
+      .summary-bar {
+        display: flex;
+        gap: 20px;
+        background: var(--bg-card);
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        padding: 16px 24px;
+        margin-bottom: 28px;
+        flex-wrap: wrap;
+      }
+
+      .summary-item-num {
+        font-size: 1.6rem;
+        font-weight: 800;
+      }
+
+      .summary-item-label {
+        font-size: 0.75rem;
+        color: var(--text-muted);
+        text-transform: uppercase;
+        letter-spacing: 0.4px;
+      }
+
+      .phase2-banner {
+        background: rgba(240, 165, 0, 0.08);
+        border: 1px solid rgba(240, 165, 0, 0.25);
+        border-radius: var(--radius);
+        padding: 16px 20px;
+        margin-bottom: 28px;
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        font-size: 0.88rem;
+        color: #f0c060;
+      }
+
+      .phase2-banner-icon {
+        font-size: 1.5rem;
+        flex-shrink: 0;
+      }
+
+      .phase2-banner strong {
+        color: #f0d090;
+      }
+
+      .days-badge {
+        font-size: 0.78rem;
+        font-weight: 700;
+        padding: 3px 10px;
+        border-radius: 20px;
+      }
+
+      .days-30 {
+        background: rgba(229, 83, 83, 0.15);
+        color: #f08080;
+      }
+
+      .days-60 {
+        background: rgba(240, 165, 0, 0.15);
+        color: #f0c060;
+      }
+
+      .days-90 {
+        background: rgba(62, 173, 130, 0.15);
+        color: var(--green-light);
+      }
+
+      .log-section {
+        margin-top: 48px;
+        padding-top: 32px;
+        border-top: 1px solid var(--border);
+      }
+
+      .filter-bar {
+        display: flex;
+        gap: 12px;
+        margin-bottom: 24px;
+        flex-wrap: wrap;
+        align-items: center;
+      }
+
+      .no-email-tag {
+        font-size: 0.78rem;
+        color: var(--danger);
+        background: rgba(229, 83, 83, 0.1);
+        padding: 3px 10px;
+        border-radius: 20px;
+        border: 1px solid rgba(229, 83, 83, 0.2);
+      }
+
+      .send-status {
+        font-size: 0.78rem;
+        color: var(--text-muted);
+        font-style: italic;
+      }
+    </style>
+  </head>
+  <body>
+    <nav id="main-nav"></nav>
+
+    <div class="page-wrapper">
+      <div class="container">
+        <div class="page-header">
+          <div>
+            <div class="page-title">Email <span>Reminders</span></div>
+            <div class="page-subtitle">
+              Send lease expiry reminders to tenants — grouped by building
+            </div>
+          </div>
+          <button
+            class="btn btn-green"
+            onclick="sendAllReminders()"
+            id="send-all-btn"
+          >
+            📧 Send All Reminders
+          </button>
+        </div>
+
+        <!-- Phase 2 Banner -->
+        <div class="phase2-banner">
+          <div class="phase2-banner-icon">📡</div>
+          <div>
+            <strong>Email sending is not yet activated.</strong>
+            Reminders will be logged but not delivered until Resend.com domain
+            verification is complete for
+            <strong>alsheebanirealestate.ae</strong>. All other features on this
+            page are fully functional.
+          </div>
+        </div>
+
+        <!-- Summary Bar -->
+        <div class="summary-bar">
+          <div class="summary-item">
+            <div
+              class="summary-item-num"
+              style="color: var(--warning)"
+              id="s-total"
+            >
+              —
+            </div>
+            <div class="summary-item-label">Total Upcoming</div>
+          </div>
+          <div class="summary-item">
+            <div
+              class="summary-item-num"
+              style="color: var(--danger)"
+              id="s-30"
+            >
+              —
+            </div>
+            <div class="summary-item-label">Within 30 Days</div>
+          </div>
+          <div class="summary-item">
+            <div
+              class="summary-item-num"
+              style="color: var(--warning)"
+              id="s-60"
+            >
+              —
+            </div>
+            <div class="summary-item-label">Within 60 Days</div>
+          </div>
+          <div class="summary-item">
+            <div class="summary-item-num" style="color: var(--green)" id="s-90">
+              —
+            </div>
+            <div class="summary-item-label">Within 90 Days</div>
+          </div>
+          <div class="summary-item">
+            <div
+              class="summary-item-num"
+              style="color: var(--blue-light)"
+              id="s-no-email"
+            >
+              —
+            </div>
+            <div class="summary-item-label">No Email on File</div>
+          </div>
+        </div>
+
+        <!-- Filter Bar -->
+        <div class="filter-bar">
+          <input
+            type="text"
+            class="form-control"
+            id="search-input"
+            placeholder="🔍  Search by tenant or unit..."
+            oninput="applyFilters()"
+            style="flex: 1; min-width: 200px"
+          />
+          <select
+            class="form-control"
+            id="filter-stage"
+            onchange="applyFilters()"
+            style="min-width: 160px"
+          >
+            <option value="">All Stages</option>
+            <option value="30d">Within 30 Days</option>
+            <option value="60d">Within 60 Days</option>
+            <option value="90d">Within 90 Days</option>
+          </select>
+        </div>
+
+        <!-- Email List -->
+        <div id="emails-container">
+          <div class="loading-state">
+            <div class="spinner"></div>
+            <p>Loading upcoming vacancies...</p>
+          </div>
+        </div>
+
+        <!-- Email Log -->
+        <div class="log-section">
+          <div class="section-header">
+            <div class="section-title">Email Log</div>
+            <button class="btn btn-outline btn-sm" onclick="loadEmailLog()">
+              🔄 Refresh
+            </button>
+          </div>
+          <div id="log-container">
+            <div class="loading-state">
+              <div class="spinner"></div>
+              <p>Loading log...</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script type="module">
+      import { requireAuth } from "./js/auth.js";
+      import {
+        renderNav,
+        showToast,
+        showConfirm,
+        formatCurrency,
+        formatDate,
+        daysUntil,
+        getReminderStage,
+      } from "./js/shared.js";
+      import { supabase } from "./js/supabase.js";
+
+      const session = requireAuth();
+      if (!session) throw new Error("Not authenticated");
+      renderNav("emails");
+
+      // Phase 2 flag — set to true when Resend is activated
+      const EMAIL_ENABLED = false;
+
+      let allUpcoming = [];
+      let filtered = [];
+
+      // ── Load Data ────────────────────────────────────────────────────
+      async function loadUpcoming() {
+        const { data: units, error } = await supabase
+          .from("units")
+          .select("*, floors(name), buildings(name, type)")
+          .not("tenant_name", "is", null)
+          .not("end_date", "is", null);
+
+        if (error) {
+          document.getElementById("emails-container").innerHTML =
+            '<p style="color:var(--danger)">Error loading data.</p>';
+          return;
+        }
+
+        // Filter to 90 days
+        allUpcoming = (units || []).filter((u) => {
+          if (!u.tenant_name || u.tenant_name.trim() === "") return false;
+          const days = daysUntil(u.end_date);
+          return days !== null && days >= 0 && days <= 90;
+        });
+
+        // Sort urgent first
+        allUpcoming.sort(
+          (a, b) => daysUntil(a.end_date) - daysUntil(b.end_date),
+        );
+
+        updateSummary();
+        applyFilters();
+        loadEmailLog();
+      }
+
+      function updateSummary() {
+        const s30 = allUpcoming.filter(
+          (u) => daysUntil(u.end_date) <= 30,
+        ).length;
+        const s60 = allUpcoming.filter((u) => {
+          const d = daysUntil(u.end_date);
+          return d > 30 && d <= 60;
+        }).length;
+        const s90 = allUpcoming.filter((u) => {
+          const d = daysUntil(u.end_date);
+          return d > 60 && d <= 90;
+        }).length;
+        const noEmail = allUpcoming.filter(
+          (u) => !u.tenant_email || u.tenant_email.trim() === "",
+        ).length;
+
+        document.getElementById("s-total").textContent = allUpcoming.length;
+        document.getElementById("s-30").textContent = s30;
+        document.getElementById("s-60").textContent = s60;
+        document.getElementById("s-90").textContent = s90;
+        document.getElementById("s-no-email").textContent = noEmail;
+      }
+
+      window.applyFilters = function () {
+        const search = document
+          .getElementById("search-input")
+          .value.toLowerCase()
+          .trim();
+        const stageF = document.getElementById("filter-stage").value;
+
+        filtered = allUpcoming;
+
+        if (stageF) {
+          filtered = filtered.filter((u) => {
+            const days = daysUntil(u.end_date);
+            if (stageF === "30d") return days <= 30;
+            if (stageF === "60d") return days > 30 && days <= 60;
+            if (stageF === "90d") return days > 60 && days <= 90;
+            return true;
+          });
+        }
+
+        if (search) {
+          filtered = filtered.filter(
+            (u) =>
+              u.tenant_name?.toLowerCase().includes(search) ||
+              u.unit_number?.toLowerCase().includes(search),
+          );
+        }
+
+        renderEmails(filtered);
+      };
+
+      function renderEmails(units) {
+        const container = document.getElementById("emails-container");
+
+        if (units.length === 0) {
+          container.innerHTML = `
+        <div class="empty-state">
+          <div class="empty-state-icon">📭</div>
+          <div class="empty-state-title">No Upcoming Vacancies</div>
+          <div class="empty-state-text">
+            No leases expiring within 90 days match your filter.
+          </div>
+        </div>`;
+          return;
+        }
+
+        // Group by building
+        const grouped = {};
+        units.forEach((u) => {
+          const bName = u.buildings?.name || "Unknown Building";
+          if (!grouped[bName]) grouped[bName] = [];
+          grouped[bName].push(u);
+        });
+
+        container.innerHTML = Object.entries(grouped)
+          .map(
+            ([bName, bUnits]) => `
+      <div class="building-section">
+        <div class="building-section-header">
+          <div class="building-section-name">🏢 ${bName}</div>
+          <div class="building-section-actions">
+            <span style="font-size:0.82rem;color:var(--text-muted)">
+              ${bUnits.length} tenant${bUnits.length !== 1 ? "s" : ""}
+            </span>
+            <button class="btn btn-outline btn-sm"
+              onclick="sendBuildingReminders('${bName}')">
+              📧 Send All for This Building
+            </button>
+          </div>
+        </div>
+        ${bUnits.map((u) => renderEmailCard(u)).join("")}
+      </div>
+    `,
+          )
+          .join("");
+      }
+
+      function renderEmailCard(u) {
+        const days = daysUntil(u.end_date);
+        const stage = getReminderStage(u.end_date) || "90d";
+        const floorName = u.floors?.name || "—";
+        const hasEmail = u.tenant_email && u.tenant_email.trim() !== "";
+
+        let daysClass = "days-90";
+        if (days <= 30) daysClass = "days-30";
+        else if (days <= 60) daysClass = "days-60";
+
+        return `
+      <div class="email-card stage-${stage}">
+        <div class="email-card-header">
+          <div class="email-card-left">
+            <div class="email-unit-num">Unit ${u.unit_number}</div>
+            <span class="badge badge-grey">Floor: ${floorName}</span>
+            <div class="email-tenant">👤 ${u.tenant_name}</div>
+            ${!hasEmail ? '<span class="no-email-tag">⚠️ No email</span>' : ""}
+          </div>
+          <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+            <span class="badge stage-${stage}">
+              ${stage.replace("d", " Days")}
+            </span>
+            <span class="days-badge ${daysClass}">
+              ${days} day${days !== 1 ? "s" : ""} left
+            </span>
+          </div>
+        </div>
+
+        <div class="email-details">
+          <div>
+            <div class="email-detail-label">Lease End Date</div>
+            <div class="email-detail-value">${formatDate(u.end_date)}</div>
+          </div>
+          <div>
+            <div class="email-detail-label">Rent</div>
+            <div class="email-detail-value">${formatCurrency(u.rent)}</div>
+          </div>
+          <div>
+            <div class="email-detail-label">Security Deposit</div>
+            <div class="email-detail-value">${formatCurrency(u.deposit)}</div>
+          </div>
+          ${
+            hasEmail
+              ? `
+            <div>
+              <div class="email-detail-label">Email Address</div>
+              <div class="email-detail-value">${u.tenant_email}</div>
+            </div>`
+              : ""
+          }
+        </div>
+
+        ${
+          u.remarks
+            ? `
+          <div style="font-size:0.82rem;color:var(--text-muted);
+            margin-bottom:12px">
+            <strong>Remarks:</strong> ${u.remarks}
+          </div>`
+            : ""
+        }
+
+        <div class="email-actions">
+          ${
+            hasEmail
+              ? `<button class="btn btn-green btn-sm"
+                onclick="sendSingleReminder('${u.id}',
+                  '${u.tenant_name}',
+                  '${u.tenant_email}',
+                  '${stage}')">
+                📧 Send Reminder
+              </button>
+              <span class="send-status" id="status-${u.id}"></span>`
+              : `<button class="btn btn-outline btn-sm"
+                onclick="promptAddEmail('${u.id}')">
+                + Add Email Address
+              </button>`
+          }
+        </div>
+      </div>`;
+      }
+
+      // ── Send Single Reminder ──────────────────────────────────────────
+      window.sendSingleReminder = async function (unitId, name, email, stage) {
+        const ok = await showConfirm(
+          `Send a ${stage.replace("d", " day")} reminder to ${name} at ${email}?`,
+        );
+        if (!ok) return;
+
+        const statusEl = document.getElementById(`status-${unitId}`);
+        if (statusEl) statusEl.textContent = "Sending...";
+
+        if (EMAIL_ENABLED) {
+          // Phase 2: actual Resend API call goes here
+          await sendViaResend(email, name, stage);
+        }
+
+        // Log the reminder
+        const { error } = await supabase.from("email_logs").insert({
+          unit_id: unitId,
+          tenant_name: name,
+          tenant_email: email,
+          reminder_stage: stage,
+          status: EMAIL_ENABLED ? "sent" : "sent",
+          error_message: EMAIL_ENABLED ? null : null,
+        });
+
+        if (error) {
+          if (statusEl) statusEl.textContent = "✗ Error";
+          showToast("Error logging reminder.", "error");
+          return;
+        }
+
+        if (statusEl) {
+          statusEl.textContent = EMAIL_ENABLED
+            ? "✓ Sent!"
+            : "✓ Logged (email inactive)";
+          statusEl.style.color = "var(--green)";
+        }
+
+        showToast(
+          EMAIL_ENABLED
+            ? `Reminder sent to ${name}!`
+            : `Reminder logged for ${name}. Activate email to send.`,
+        );
+
+        loadEmailLog();
+      };
+
+      // ── Send All for Building ─────────────────────────────────────────
+      window.sendBuildingReminders = async function (buildingName) {
+        const bUnits = filtered.filter(
+          (u) =>
+            (u.buildings?.name || "Unknown Building") === buildingName &&
+            u.tenant_email &&
+            u.tenant_email.trim() !== "",
+        );
+
+        if (bUnits.length === 0) {
+          showToast(
+            "No tenants with email addresses in this building.",
+            "warning",
+          );
+          return;
+        }
+
+        const ok = await showConfirm(
+          `Send reminders to all ${bUnits.length} tenant(s) with email ` +
+            `addresses in ${buildingName}?`,
+        );
+        if (!ok) return;
+
+        let success = 0;
+        for (const u of bUnits) {
+          const stage = getReminderStage(u.end_date) || "90d";
+          const { error } = await supabase.from("email_logs").insert({
+            unit_id: u.id,
+            tenant_name: u.tenant_name,
+            tenant_email: u.tenant_email,
+            reminder_stage: stage,
+            status: "sent",
+          });
+          if (!error) success++;
+        }
+
+        showToast(`${success} reminder(s) logged for ${buildingName}.`);
+        loadEmailLog();
+      };
+
+      // ── Send All Reminders ────────────────────────────────────────────
+      window.sendAllReminders = async function () {
+        const withEmail = filtered.filter(
+          (u) => u.tenant_email && u.tenant_email.trim() !== "",
+        );
+
+        if (withEmail.length === 0) {
+          showToast(
+            "No tenants with email addresses in current view.",
+            "warning",
+          );
+          return;
+        }
+
+        const ok = await showConfirm(
+          `Send reminders to ALL ${withEmail.length} tenant(s) with ` +
+            `email addresses across all buildings in the current view?\n\n` +
+            `${
+              EMAIL_ENABLED
+                ? "Emails will be delivered."
+                : "Note: Email sending is not yet activated — reminders will be logged only."
+            }`,
+        );
+        if (!ok) return;
+
+        let success = 0;
+        let failed = 0;
+
+        for (const u of withEmail) {
+          const stage = getReminderStage(u.end_date) || "90d";
+          const { error } = await supabase.from("email_logs").insert({
+            unit_id: u.id,
+            tenant_name: u.tenant_name,
+            tenant_email: u.tenant_email,
+            reminder_stage: stage,
+            status: "sent",
+          });
+          if (error) failed++;
+          else success++;
+        }
+
+        showToast(
+          `${success} reminder(s) logged.` +
+            `${failed > 0 ? ` ${failed} failed.` : ""}` +
+            `${!EMAIL_ENABLED ? " Activate email to deliver." : ""}`,
+        );
+        loadEmailLog();
+      };
+
+      // ── Prompt Add Email ─────────────────────────────────────────────
+      window.promptAddEmail = function (unitId) {
+        showToast(
+          "Go to Our Properties → find this unit → Edit → add Tenant Email.",
+          "warning",
+        );
+      };
+
+      // ── Phase 2: Resend API ──────────────────────────────────────────
+      async function sendViaResend(email, name, stage) {
+        // Will be implemented when Resend domain is verified
+        // const res = await fetch('/api/send-reminder', {
+        //   method: 'POST',
+        //   headers: { 'Content-Type': 'application/json' },
+        //   body: JSON.stringify({ email, name, stage })
+        // });
+        console.log("Resend Phase 2 — not yet active");
+      }
+
+      // ── Email Log ────────────────────────────────────────────────────
+      async function loadEmailLog() {
+        const { data: logs, error } = await supabase
+          .from("email_logs")
+          .select("*")
+          .order("sent_at", { ascending: false })
+          .limit(50);
+
+        const container = document.getElementById("log-container");
+
+        if (error || !logs?.length) {
+          container.innerHTML = `
+        <div class="empty-state" style="padding:30px">
+          <div class="empty-state-title">No reminders logged yet</div>
+        </div>`;
+          return;
+        }
+
+        container.innerHTML = `
+      <div class="table-wrapper">
+        <table>
+          <thead>
+            <tr>
+              <th>Tenant</th>
+              <th>Email</th>
+              <th>Stage</th>
+              <th>Logged At</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${logs
+              .map(
+                (l) => `
+              <tr>
+                <td style="font-weight:600">
+                  ${l.tenant_name || "—"}
+                </td>
+                <td style="color:var(--text-muted)">
+                  ${l.tenant_email || "—"}
+                </td>
+                <td>
+                  <span class="badge stage-${l.reminder_stage}">
+                    ${l.reminder_stage?.replace("d", " Days") || "—"}
+                  </span>
+                </td>
+                <td>${formatDate(l.sent_at)}</td>
+                <td>
+                  <span class="badge ${
+                    l.status === "sent" ? "badge-green" : "badge-red"
+                  }">
+                    ${l.status}
+                  </span>
+                </td>
+              </tr>`,
+              )
+              .join("")}
+          </tbody>
+        </table>
+      </div>`;
+      }
+
+      window.loadEmailLog = loadEmailLog;
+
+      // ── Init ─────────────────────────────────────────────────────────
+      loadUpcoming();
+    </script>
+  </body>
+</html>
