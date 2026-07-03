@@ -600,6 +600,7 @@
         showConfirm,
         formatCurrency,
         formatDate,
+        logActivity,
       } from "./js/shared.js";
       import { supabase } from "./js/supabase.js";
 
@@ -1032,8 +1033,15 @@
         });
 
         showToast("Invoice generated and saved!");
+        await logActivity(
+          "Generated invoice " +
+            invNum +
+            " for " +
+            (selectedUnit.tenant_name || "Vacant Unit"),
+          "Invoices",
+        );
         loadHistory();
-        generateInvoiceNumber(); // Update to next number
+        generateInvoiceNumber();
       };
 
       // ── PDF Generation ───────────────────────────────────────────────
@@ -1545,6 +1553,7 @@
           return;
         }
         showToast("Invoice deleted.");
+        await logActivity("Deleted invoice record", "Invoices");
         loadHistory();
       };
 
