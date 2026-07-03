@@ -425,6 +425,7 @@
         showToast,
         showConfirm,
         formatDate,
+        logActivity,
       } from "./js/shared.js";
       import { supabase } from "./js/supabase.js";
 
@@ -747,7 +748,17 @@
           showToast("Error updating request.", "error");
           return;
         }
+        const rec = allRecords.find((r) => r.id === id);
+        const unitNum = rec?.units?.unit_number || id;
         showToast("Request marked as completed!");
+        await logActivity(
+          "Completed maintenance request for Unit " +
+            unitNum +
+            " (" +
+            (rec?.category || "Unknown") +
+            ")",
+          "Maintenance",
+        );
         loadMaintenance();
       };
 
@@ -762,7 +773,13 @@
           showToast("Error updating request.", "error");
           return;
         }
+        const rec2 = allRecords.find((r) => r.id === id);
+        const unitNum2 = rec2?.units?.unit_number || id;
         showToast("Request reopened.");
+        await logActivity(
+          "Reopened maintenance request for Unit " + unitNum2,
+          "Maintenance",
+        );
         loadMaintenance();
       };
 
@@ -783,6 +800,7 @@
           return;
         }
         showToast("Request deleted.");
+        await logActivity("Deleted maintenance request", "Maintenance");
         loadMaintenance();
       };
 
@@ -941,9 +959,19 @@
           return;
         }
 
+        const unitSel = document.getElementById("m-unit");
+        const unitText = unitSel.options[unitSel.selectedIndex]?.text || unitId;
         closeModal("modal-maintenance");
         showToast(
           editingId ? "Request updated!" : "Maintenance request logged!",
+        );
+        await logActivity(
+          (editingId ? "Updated" : "Added") +
+            " maintenance request (" +
+            category +
+            ") for " +
+            unitText,
+          "Maintenance",
         );
         loadMaintenance();
       };
