@@ -380,6 +380,7 @@
         showConfirm,
         formatCurrency,
         formatDate,
+        logActivity,
       } from "./js/shared.js";
       import { supabase } from "./js/supabase.js";
 
@@ -614,10 +615,18 @@
           showToast("Error updating status.", "error");
           return;
         }
+        const record = allRecords.find((r) => r.id === id);
+        const unitNum = record?.units?.unit_number || id;
         showToast(
           newStatus === "resolved"
             ? "Marked as resolved!"
             : "Marked as active.",
+        );
+        await logActivity(
+          (newStatus === "resolved" ? "Resolved" : "Reopened") +
+            " bounce check for Unit " +
+            unitNum,
+          "Bounce Check",
         );
         loadBounceChecks();
       };
@@ -638,6 +647,7 @@
           return;
         }
         showToast("Record deleted.");
+        await logActivity("Deleted bounce check record", "Bounce Check");
         loadBounceChecks();
       };
 
@@ -785,8 +795,16 @@
           return;
         }
 
+        const unitNum =
+          allUnits.find((u) => u.id === unitId)?.unit_number || unitId;
         closeModal("modal-bounce");
         showToast(editingId ? "Record updated!" : "Bounce check recorded!");
+        await logActivity(
+          (editingId ? "Updated" : "Added") +
+            " bounce check for Unit " +
+            unitNum,
+          "Bounce Check",
+        );
         loadBounceChecks();
       };
 
