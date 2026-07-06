@@ -530,6 +530,12 @@
         .widget-row-3 {
           grid-template-columns: 1fr 1fr;
         }
+        .widget-row-2 {
+          grid-template-columns: 1fr 1fr;
+        }
+        .dashboard-grid {
+          grid-template-columns: repeat(2, 1fr);
+        }
       }
 
       @media (max-width: 768px) {
@@ -539,11 +545,91 @@
         .widget-row-2 {
           grid-template-columns: 1fr;
         }
+        .dashboard-grid {
+          grid-template-columns: repeat(2, 1fr);
+        }
         .quick-stats-strip {
-          justify-content: center;
+          display: grid;
+          grid-template-columns: repeat(2, 1fr);
+          gap: 16px;
         }
         .qs-divider {
           display: none;
+        }
+        .qs-item {
+          text-align: center;
+        }
+        .revenue-grid {
+          grid-template-columns: 1fr;
+        }
+        .clock-display {
+          font-size: 3rem;
+        }
+        .weather-temp {
+          font-size: 3rem;
+        }
+        .weather-icon {
+          font-size: 2.8rem;
+        }
+        #widget-clock {
+          min-height: 180px;
+        }
+        #widget-weather {
+          min-height: 180px;
+        }
+        .revenue-total-bar {
+          flex-direction: column;
+          gap: 8px;
+          text-align: center;
+        }
+        .dashboard-welcome h1 {
+          font-size: 1.4rem;
+        }
+      }
+
+      @media (max-width: 480px) {
+        .dashboard-grid {
+          grid-template-columns: 1fr;
+        }
+        .quick-stats-strip {
+          grid-template-columns: 1fr 1fr;
+        }
+        .clock-display {
+          font-size: 2.6rem;
+          letter-spacing: 2px;
+        }
+        .weather-temp {
+          font-size: 2.6rem;
+        }
+        .weather-icon {
+          font-size: 2.4rem;
+        }
+        .stat-card-number {
+          font-size: 2rem;
+        }
+        .stat-card-icon {
+          min-height: 80px;
+        }
+        .stat-card-icon img {
+          width: 52px;
+          height: 52px;
+        }
+        .revenue-total-amount {
+          font-size: 1.1rem;
+        }
+        .widget-card {
+          padding: 16px;
+        }
+        .dashboard-welcome h1 {
+          font-size: 1.2rem;
+        }
+        .alert-item {
+          flex-wrap: wrap;
+          gap: 8px;
+        }
+        .notice-meta {
+          flex-wrap: wrap;
+          gap: 4px;
         }
       }
     </style>
