@@ -167,60 +167,80 @@
       }
 
       /* Clock */
+      #widget-clock {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+        min-height: 220px;
+      }
+
       .clock-display {
-        font-size: 2.6rem;
+        font-size: 3.8rem;
         font-weight: 800;
         color: var(--white);
-        letter-spacing: 2px;
+        letter-spacing: 4px;
         line-height: 1;
-        margin-bottom: 6px;
+        margin-bottom: 12px;
         font-variant-numeric: tabular-nums;
       }
 
       .clock-date {
-        font-size: 0.88rem;
+        font-size: 1rem;
         color: var(--green);
         font-weight: 600;
-        margin-bottom: 4px;
+        margin-bottom: 6px;
       }
 
       .clock-hijri {
-        font-size: 0.78rem;
+        font-size: 0.85rem;
         color: var(--text-muted);
       }
 
       /* Weather */
+      #widget-weather {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+        min-height: 220px;
+      }
+
       .weather-main {
         display: flex;
         align-items: center;
-        gap: 12px;
-        margin-bottom: 8px;
+        justify-content: center;
+        gap: 16px;
+        margin-bottom: 12px;
       }
 
       .weather-temp {
-        font-size: 2.4rem;
+        font-size: 3.8rem;
         font-weight: 800;
         color: var(--white);
         line-height: 1;
       }
 
       .weather-icon {
-        font-size: 2.2rem;
+        font-size: 3.4rem;
         line-height: 1;
       }
 
       .weather-desc {
-        font-size: 0.88rem;
+        font-size: 1rem;
         color: var(--text-muted);
-        margin-bottom: 8px;
+        margin-bottom: 10px;
         text-transform: capitalize;
       }
 
       .weather-details {
         display: flex;
-        gap: 14px;
-        font-size: 0.78rem;
+        gap: 16px;
+        font-size: 0.82rem;
         color: var(--text-muted);
+        justify-content: center;
       }
 
       .weather-details span {
@@ -541,7 +561,7 @@
             Good <span id="greeting-time"></span>,
             <span id="greeting-name"></span> 👋
           </h1>
-          <p id="greeting-date"></p>
+          <p id="greeting-date" style="display: none"></p>
         </div>
 
         <!-- Last Updated -->
