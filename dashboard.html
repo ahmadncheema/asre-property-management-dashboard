@@ -119,6 +119,413 @@
         color: var(--text-muted);
         margin-bottom: 16px;
       }
+
+      /* ── Widget Section ───────────────────────────────────────── */
+      .widget-row-3 {
+        display: grid;
+        grid-template-columns: 1fr 1fr 1fr;
+        gap: 20px;
+      }
+
+      .widget-row-2 {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 20px;
+      }
+
+      .widget-full {
+        width: 100%;
+      }
+
+      .widget-card {
+        background: var(--bg-card);
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        padding: 20px;
+        transition: var(--transition);
+      }
+
+      .widget-card:hover {
+        border-color: var(--blue-light);
+        box-shadow: var(--shadow-sm);
+      }
+
+      .widget-title {
+        font-size: 0.78rem;
+        font-weight: 700;
+        color: var(--text-muted);
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        margin-bottom: 14px;
+      }
+
+      .widget-loading {
+        color: var(--text-muted);
+        font-size: 0.85rem;
+        text-align: center;
+        padding: 20px 0;
+      }
+
+      /* Clock */
+      .clock-display {
+        font-size: 2.6rem;
+        font-weight: 800;
+        color: var(--white);
+        letter-spacing: 2px;
+        line-height: 1;
+        margin-bottom: 6px;
+        font-variant-numeric: tabular-nums;
+      }
+
+      .clock-date {
+        font-size: 0.88rem;
+        color: var(--green);
+        font-weight: 600;
+        margin-bottom: 4px;
+      }
+
+      .clock-hijri {
+        font-size: 0.78rem;
+        color: var(--text-muted);
+      }
+
+      /* Weather */
+      .weather-main {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin-bottom: 8px;
+      }
+
+      .weather-temp {
+        font-size: 2.4rem;
+        font-weight: 800;
+        color: var(--white);
+        line-height: 1;
+      }
+
+      .weather-icon {
+        font-size: 2.2rem;
+        line-height: 1;
+      }
+
+      .weather-desc {
+        font-size: 0.88rem;
+        color: var(--text-muted);
+        margin-bottom: 8px;
+        text-transform: capitalize;
+      }
+
+      .weather-details {
+        display: flex;
+        gap: 14px;
+        font-size: 0.78rem;
+        color: var(--text-muted);
+      }
+
+      .weather-details span {
+        display: flex;
+        align-items: center;
+        gap: 4px;
+      }
+
+      /* Mini Calendar */
+      .mini-calendar {
+        width: 100%;
+      }
+
+      .cal-grid {
+        display: grid;
+        grid-template-columns: repeat(7, 1fr);
+        gap: 2px;
+      }
+
+      .cal-day-header {
+        text-align: center;
+        font-size: 0.68rem;
+        font-weight: 700;
+        color: var(--text-muted);
+        padding: 4px 0;
+        text-transform: uppercase;
+      }
+
+      .cal-day {
+        text-align: center;
+        font-size: 0.78rem;
+        padding: 5px 2px;
+        border-radius: 6px;
+        color: var(--text-muted);
+        cursor: default;
+        transition: var(--transition);
+      }
+
+      .cal-day.today {
+        background: var(--green);
+        color: var(--white);
+        font-weight: 700;
+      }
+
+      .cal-day.has-expiry {
+        background: rgba(240, 165, 0, 0.2);
+        color: var(--warning);
+        font-weight: 600;
+      }
+
+      .cal-day.other-month {
+        opacity: 0.25;
+      }
+
+      .cal-day:not(.other-month):hover {
+        background: var(--bg-hover);
+      }
+
+      /* Quick Stats Strip */
+      .quick-stats-strip {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        gap: 12px;
+      }
+
+      .qs-item {
+        text-align: center;
+        flex: 1;
+        min-width: 80px;
+      }
+
+      .qs-num {
+        font-size: 1.6rem;
+        font-weight: 800;
+        color: var(--green);
+        line-height: 1;
+        margin-bottom: 4px;
+      }
+
+      .qs-label {
+        font-size: 0.72rem;
+        color: var(--text-muted);
+        text-transform: uppercase;
+        letter-spacing: 0.3px;
+      }
+
+      .qs-divider {
+        width: 1px;
+        height: 40px;
+        background: var(--border);
+        flex-shrink: 0;
+      }
+
+      /* Upcoming Alert */
+      .alert-item {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 10px 12px;
+        border-radius: var(--radius-sm);
+        margin-bottom: 8px;
+        border: 1px solid var(--border);
+        background: var(--bg);
+        transition: var(--transition);
+      }
+
+      .alert-item:hover {
+        border-color: var(--blue-light);
+      }
+
+      .alert-item.urgent {
+        border-left: 3px solid var(--danger);
+        background: rgba(229, 83, 83, 0.05);
+      }
+
+      .alert-item.warning {
+        border-left: 3px solid var(--warning);
+        background: rgba(240, 165, 0, 0.05);
+      }
+
+      .alert-item.normal {
+        border-left: 3px solid var(--green);
+        background: rgba(62, 173, 130, 0.05);
+      }
+
+      .alert-unit {
+        font-size: 0.88rem;
+        font-weight: 700;
+        color: var(--white);
+      }
+
+      .alert-tenant {
+        font-size: 0.78rem;
+        color: var(--text-muted);
+        margin-top: 2px;
+      }
+
+      .alert-days {
+        font-size: 0.78rem;
+        font-weight: 700;
+        padding: 3px 10px;
+        border-radius: 20px;
+        white-space: nowrap;
+      }
+
+      .alert-days.urgent {
+        background: rgba(229, 83, 83, 0.15);
+        color: #f08080;
+      }
+      .alert-days.warning {
+        background: rgba(240, 165, 0, 0.15);
+        color: #f0c060;
+      }
+      .alert-days.normal {
+        background: rgba(62, 173, 130, 0.15);
+        color: var(--green-light);
+      }
+
+      /* Notice Board */
+      .notice-item {
+        background: var(--bg);
+        border: 1px solid var(--border);
+        border-radius: var(--radius-sm);
+        padding: 10px 12px;
+        margin-bottom: 8px;
+        transition: var(--transition);
+      }
+
+      .notice-item:hover {
+        border-color: var(--blue-light);
+      }
+
+      .notice-message {
+        font-size: 0.88rem;
+        color: var(--text);
+        margin-bottom: 6px;
+        line-height: 1.5;
+      }
+
+      .notice-meta {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        font-size: 0.72rem;
+        color: var(--text-muted);
+      }
+
+      .notice-delete {
+        background: transparent;
+        border: none;
+        color: var(--danger);
+        cursor: pointer;
+        font-size: 0.78rem;
+        padding: 2px 6px;
+        border-radius: 4px;
+        transition: var(--transition);
+        opacity: 0.6;
+      }
+
+      .notice-delete:hover {
+        opacity: 1;
+        background: rgba(229, 83, 83, 0.1);
+      }
+
+      /* Revenue Grid */
+      .revenue-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+        gap: 12px;
+        margin-bottom: 16px;
+      }
+
+      .revenue-item {
+        background: var(--bg);
+        border: 1px solid var(--border);
+        border-radius: var(--radius-sm);
+        padding: 14px;
+        border-left: 3px solid var(--blue);
+        transition: var(--transition);
+      }
+
+      .revenue-item:hover {
+        border-left-color: var(--green);
+      }
+
+      .revenue-building {
+        font-size: 0.82rem;
+        font-weight: 700;
+        color: var(--white);
+        margin-bottom: 6px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+
+      .revenue-units {
+        font-size: 0.72rem;
+        color: var(--text-muted);
+        margin-bottom: 6px;
+      }
+
+      .revenue-amount {
+        font-size: 1rem;
+        font-weight: 800;
+        color: var(--green);
+      }
+
+      .revenue-total-bar {
+        background: rgba(62, 173, 130, 0.1);
+        border: 1px solid rgba(62, 173, 130, 0.3);
+        border-radius: var(--radius-sm);
+        padding: 14px 20px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+
+      .revenue-total-label {
+        font-size: 0.88rem;
+        font-weight: 600;
+        color: var(--text-muted);
+      }
+
+      .revenue-total-amount {
+        font-size: 1.4rem;
+        font-weight: 800;
+        color: var(--green);
+      }
+
+      /* Notice Modal */
+      .notice-modal-overlay {
+        position: fixed;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.7);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 2000;
+        backdrop-filter: blur(4px);
+        animation: fadeIn 0.2s ease;
+      }
+
+      /* Responsive */
+      @media (max-width: 1024px) {
+        .widget-row-3 {
+          grid-template-columns: 1fr 1fr;
+        }
+      }
+
+      @media (max-width: 768px) {
+        .widget-row-3 {
+          grid-template-columns: 1fr;
+        }
+        .widget-row-2 {
+          grid-template-columns: 1fr;
+        }
+        .quick-stats-strip {
+          justify-content: center;
+        }
+        .qs-divider {
+          display: none;
+        }
+      }
     </style>
   </head>
   <body>
@@ -139,6 +546,152 @@
 
         <!-- Last Updated -->
         <div class="last-updated" id="last-updated"></div>
+
+        <!-- ── Widgets Section ─────────────────────────────────────── -->
+        <div id="widgets-section">
+          <!-- Row 1: Clock, Weather, Calendar -->
+          <div class="widget-row-3" style="margin-bottom: 20px">
+            <!-- Live Clock -->
+            <div class="widget-card" id="widget-clock">
+              <div class="widget-title">🕐 Dubai Time</div>
+              <div class="clock-display" id="clock-time">--:--:--</div>
+              <div class="clock-date" id="clock-date"></div>
+              <div class="clock-hijri" id="clock-hijri"></div>
+            </div>
+
+            <!-- Weather -->
+            <div class="widget-card" id="widget-weather">
+              <div class="widget-title">🌤️ Dubai Weather</div>
+              <div class="weather-main" id="weather-main">
+                <div class="weather-temp" id="weather-temp">--°C</div>
+                <div class="weather-icon" id="weather-icon">⛅</div>
+              </div>
+              <div class="weather-desc" id="weather-desc">Loading...</div>
+              <div class="weather-details" id="weather-details"></div>
+            </div>
+
+            <!-- Mini Calendar -->
+            <div class="widget-card" id="widget-calendar">
+              <div class="widget-title">
+                📅 <span id="cal-month-title"></span>
+              </div>
+              <div class="mini-calendar" id="mini-calendar"></div>
+            </div>
+          </div>
+
+          <!-- Row 2: Quick Stats Strip -->
+          <div class="widget-card widget-full" style="margin-bottom: 20px">
+            <div class="widget-title">⚡ Quick Stats</div>
+            <div class="quick-stats-strip" id="quick-stats-strip">
+              <div class="qs-item">
+                <div class="qs-num" id="qs-total-units">—</div>
+                <div class="qs-label">Total Units</div>
+              </div>
+              <div class="qs-divider"></div>
+              <div class="qs-item">
+                <div class="qs-num" id="qs-occupied">—</div>
+                <div class="qs-label">Occupied</div>
+              </div>
+              <div class="qs-divider"></div>
+              <div class="qs-item">
+                <div
+                  class="qs-num"
+                  style="color: var(--warning)"
+                  id="qs-vacant"
+                >
+                  —
+                </div>
+                <div class="qs-label">Vacant</div>
+              </div>
+              <div class="qs-divider"></div>
+              <div class="qs-item">
+                <div class="qs-num" id="qs-rate">—</div>
+                <div class="qs-label">Occupancy Rate</div>
+              </div>
+              <div class="qs-divider"></div>
+              <div class="qs-item">
+                <div
+                  class="qs-num"
+                  style="color: var(--danger)"
+                  id="qs-bounces"
+                >
+                  —
+                </div>
+                <div class="qs-label">Active Bounces</div>
+              </div>
+              <div class="qs-divider"></div>
+              <div class="qs-item">
+                <div class="qs-num" style="color: var(--warning)" id="qs-maint">
+                  —
+                </div>
+                <div class="qs-label">Open Maintenance</div>
+              </div>
+              <div class="qs-divider"></div>
+              <div class="qs-item">
+                <div
+                  class="qs-num"
+                  style="color: var(--green)"
+                  id="qs-invoices"
+                >
+                  —
+                </div>
+                <div class="qs-label">Invoices This Month</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Row 3: Upcoming Vacancy Alert + Notice Board -->
+          <div class="widget-row-2" style="margin-bottom: 20px">
+            <!-- Upcoming Vacancy Alert -->
+            <div class="widget-card">
+              <div class="widget-title">🚨 Upcoming Vacancy Alert</div>
+              <div id="upcoming-alert-list">
+                <div class="widget-loading">Loading...</div>
+              </div>
+            </div>
+
+            <!-- Notice Board -->
+            <div class="widget-card">
+              <div
+                class="widget-title"
+                style="
+                  display: flex;
+                  justify-content: space-between;
+                  align-items: center;
+                "
+              >
+                <span>📌 Notice Board</span>
+                <button class="btn btn-green btn-sm" onclick="openAddNotice()">
+                  + Post
+                </button>
+              </div>
+              <div id="notices-list">
+                <div class="widget-loading">Loading...</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Row 4: Monthly Revenue Estimate -->
+          <div class="widget-card widget-full" style="margin-bottom: 20px">
+            <div
+              class="widget-title"
+              style="
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+              "
+            >
+              <span>💰 Monthly Revenue Estimate</span>
+              <span style="font-size: 0.8rem; color: var(--text-muted)"
+                >Based on occupied units</span
+              >
+            </div>
+            <div class="revenue-grid" id="revenue-grid">
+              <div class="widget-loading">Loading...</div>
+            </div>
+            <div class="revenue-total-bar" id="revenue-total-bar"></div>
+          </div>
+        </div>
 
         <!-- Dashboard Grid -->
         <div class="dashboard-grid" id="dashboard-grid">
@@ -399,18 +952,10 @@
         document.getElementById("greeting-time").textContent = time;
         document.getElementById("greeting-name").textContent =
           session.full_name.split(" ")[0];
-
-        const now = new Date();
-        document.getElementById("greeting-date").textContent =
-          now.toLocaleDateString("en-GB", {
-            weekday: "long",
-            year: "numeric",
-            month: "long",
-            day: "numeric",
-          });
       }
 
       setGreeting();
+      loadWidgets();
 
       // ── Load all dashboard stats ────────────────────────────────────
       async function loadDashboard() {
@@ -617,6 +1162,418 @@
 
       // Auto-refresh every 5 minutes
       setInterval(loadDashboard, 5 * 60 * 1000);
+
+      // ================================================================
+      // WIDGETS
+      // ================================================================
+
+      async function loadWidgets() {
+        startClock();
+        loadWeather();
+        renderCalendar();
+        loadUpcomingAlert();
+        loadNotices();
+        loadQuickStats();
+        loadRevenueEstimate();
+      }
+
+      // ── Live Clock ────────────────────────────────────────────────────
+      function startClock() {
+        function tick() {
+          const now = new Date().toLocaleString("en-US", {
+            timeZone: "Asia/Dubai",
+          });
+          const d = new Date(now);
+
+          const h = String(d.getHours()).padStart(2, "0");
+          const m = String(d.getMinutes()).padStart(2, "0");
+          const s = String(d.getSeconds()).padStart(2, "0");
+          document.getElementById("clock-time").textContent = `${h}:${m}:${s}`;
+
+          document.getElementById("clock-date").textContent =
+            d.toLocaleDateString("en-GB", {
+              weekday: "long",
+              day: "2-digit",
+              month: "long",
+              year: "numeric",
+              timeZone: "Asia/Dubai",
+            });
+
+          // Hijri date approximation
+          try {
+            const hijri = new Intl.DateTimeFormat("ar-SA-u-ca-islamic", {
+              day: "numeric",
+              month: "long",
+              year: "numeric",
+              timeZone: "Asia/Dubai",
+            }).format(d);
+            document.getElementById("clock-hijri").textContent = hijri;
+          } catch (e) {
+            document.getElementById("clock-hijri").textContent = "";
+          }
+        }
+        tick();
+        setInterval(tick, 1000);
+      }
+
+      // ── Weather ───────────────────────────────────────────────────────
+      async function loadWeather() {
+        try {
+          // Dubai coordinates
+          const lat = 25.2048,
+            lon = 55.2708;
+          const url = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current_weather=true&hourly=relativehumidity_2m,apparent_temperature&timezone=Asia%2FDubai&forecast_days=1`;
+
+          const res = await fetch(url);
+          const data = await res.json();
+          const cw = data.current_weather;
+
+          const temp = Math.round(cw.temperature);
+          const wind = Math.round(cw.windspeed);
+          const code = cw.weathercode;
+
+          // Weather code to emoji + description
+          function getWeather(code) {
+            if (code === 0) return { icon: "☀️", desc: "Clear Sky" };
+            if (code <= 2) return { icon: "🌤️", desc: "Partly Cloudy" };
+            if (code === 3) return { icon: "☁️", desc: "Overcast" };
+            if (code <= 49) return { icon: "🌫️", desc: "Foggy" };
+            if (code <= 59) return { icon: "🌦️", desc: "Drizzle" };
+            if (code <= 69) return { icon: "🌧️", desc: "Rain" };
+            if (code <= 79) return { icon: "🌨️", desc: "Snow" };
+            if (code <= 84) return { icon: "🌧️", desc: "Rain Showers" };
+            if (code <= 99) return { icon: "⛈️", desc: "Thunderstorm" };
+            return { icon: "🌡️", desc: "Unknown" };
+          }
+
+          const w = getWeather(code);
+
+          document.getElementById("weather-temp").textContent = `${temp}°C`;
+          document.getElementById("weather-icon").textContent = w.icon;
+          document.getElementById("weather-desc").textContent = w.desc;
+          document.getElementById("weather-details").innerHTML = `
+      <span>💨 ${wind} km/h</span>
+      <span>📍 Dubai, UAE</span>
+    `;
+        } catch (err) {
+          document.getElementById("weather-desc").textContent =
+            "Weather unavailable";
+        }
+      }
+
+      // ── Mini Calendar ─────────────────────────────────────────────────
+      async function renderCalendar() {
+        const now = new Date();
+        const year = now.getFullYear();
+        const month = now.getMonth();
+
+        document.getElementById("cal-month-title").textContent =
+          now.toLocaleDateString("en-GB", { month: "long", year: "numeric" });
+
+        // Get lease end dates this month
+        const firstDay = new Date(year, month, 1).toISOString().split("T")[0];
+        const lastDay = new Date(year, month + 1, 0)
+          .toISOString()
+          .split("T")[0];
+
+        const { data: expiryUnits } = await supabase
+          .from("units")
+          .select("end_date")
+          .gte("end_date", firstDay)
+          .lte("end_date", lastDay);
+
+        const expiryDays = new Set(
+          (expiryUnits || []).map((u) => new Date(u.end_date).getDate()),
+        );
+
+        const days = ["Su", "Mo", "Tu", "We", "Th", "Fr", "Sa"];
+        const firstDow = new Date(year, month, 1).getDay();
+        const daysInMonth = new Date(year, month + 1, 0).getDate();
+        const today = now.getDate();
+
+        let html = '<div class="cal-grid">';
+        days.forEach((d) => {
+          html += `<div class="cal-day-header">${d}</div>`;
+        });
+
+        // Empty cells before first day
+        for (let i = 0; i < firstDow; i++) {
+          html += '<div class="cal-day other-month"></div>';
+        }
+
+        for (let day = 1; day <= daysInMonth; day++) {
+          let cls = "cal-day";
+          if (day === today) cls += " today";
+          if (expiryDays.has(day) && day !== today) cls += " has-expiry";
+          html += `<div class="${cls}">${day}</div>`;
+        }
+
+        html += "</div>";
+        html += `<div style="margin-top:10px;font-size:0.72rem;color:var(--text-muted);
+    display:flex;gap:12px;flex-wrap:wrap">
+    <span style="display:flex;align-items:center;gap:4px">
+      <span style="width:10px;height:10px;background:var(--green);
+        border-radius:50%;display:inline-block"></span> Today
+    </span>
+    <span style="display:flex;align-items:center;gap:4px">
+      <span style="width:10px;height:10px;background:rgba(240,165,0,0.4);
+        border-radius:50%;display:inline-block"></span> Lease Expiry
+    </span>
+  </div>`;
+
+        document.getElementById("mini-calendar").innerHTML = html;
+      }
+
+      // ── Quick Stats ───────────────────────────────────────────────────
+      async function loadQuickStats() {
+        const [unitsRes, bounceRes, maintRes, invoicesRes] = await Promise.all([
+          supabase.from("units").select("id, tenant_name"),
+          supabase
+            .from("bounce_checks")
+            .select("id, status")
+            .eq("status", "active"),
+          supabase
+            .from("maintenance_requests")
+            .select("id, status")
+            .eq("status", "open"),
+          supabase.from("invoices").select("id, created_at"),
+        ]);
+
+        const units = unitsRes.data || [];
+        const occupied = units.filter(
+          (u) => u.tenant_name && u.tenant_name.trim() !== "",
+        );
+        const vacant = units.length - occupied.length;
+        const rate =
+          units.length > 0
+            ? Math.round((occupied.length / units.length) * 100) + "%"
+            : "0%";
+
+        const today = new Date();
+        const invoicesThisMonth = (invoicesRes.data || []).filter((i) => {
+          const d = new Date(i.created_at);
+          return (
+            d.getMonth() === today.getMonth() &&
+            d.getFullYear() === today.getFullYear()
+          );
+        });
+
+        document.getElementById("qs-total-units").textContent = units.length;
+        document.getElementById("qs-occupied").textContent = occupied.length;
+        document.getElementById("qs-vacant").textContent = vacant;
+        document.getElementById("qs-rate").textContent = rate;
+        document.getElementById("qs-bounces").textContent = (
+          bounceRes.data || []
+        ).length;
+        document.getElementById("qs-maint").textContent = (
+          maintRes.data || []
+        ).length;
+        document.getElementById("qs-invoices").textContent =
+          invoicesThisMonth.length;
+      }
+
+      // ── Upcoming Vacancy Alert ────────────────────────────────────────
+      async function loadUpcomingAlert() {
+        const { data: units } = await supabase
+          .from("units")
+          .select("*, buildings(name), floors(name)")
+          .not("tenant_name", "is", null)
+          .not("end_date", "is", null);
+
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+
+        const upcoming = (units || [])
+          .filter((u) => {
+            if (!u.tenant_name || u.tenant_name.trim() === "") return false;
+            const days = Math.ceil((new Date(u.end_date) - today) / 86400000);
+            return days >= 0 && days <= 90;
+          })
+          .sort((a, b) => new Date(a.end_date) - new Date(b.end_date))
+          .slice(0, 5);
+
+        const container = document.getElementById("upcoming-alert-list");
+
+        if (upcoming.length === 0) {
+          container.innerHTML = `
+      <div style="text-align:center;padding:20px;color:var(--text-muted);font-size:0.85rem">
+        ✅ No upcoming vacancies within 90 days
+      </div>`;
+          return;
+        }
+
+        container.innerHTML = upcoming
+          .map((u) => {
+            const days = Math.ceil((new Date(u.end_date) - today) / 86400000);
+            let urgency = "normal";
+            if (days <= 30) urgency = "urgent";
+            else if (days <= 60) urgency = "warning";
+
+            return `
+      <div class="alert-item ${urgency}">
+        <div>
+          <div class="alert-unit">
+            Unit ${u.unit_number}
+            <span style="font-size:0.72rem;color:var(--text-muted);
+              font-weight:400;margin-left:6px">
+              ${u.buildings?.name || "—"}
+            </span>
+          </div>
+          <div class="alert-tenant">👤 ${u.tenant_name}</div>
+        </div>
+        <span class="alert-days ${urgency}">
+          ${days} day${days !== 1 ? "s" : ""}
+        </span>
+      </div>`;
+          })
+          .join("");
+      }
+
+      // ── Notice Board ──────────────────────────────────────────────────
+      async function loadNotices() {
+        const { data: notices } = await supabase
+          .from("notices")
+          .select("*")
+          .order("created_at", { ascending: false })
+          .limit(5);
+
+        const container = document.getElementById("notices-list");
+
+        if (!notices || notices.length === 0) {
+          container.innerHTML = `
+      <div style="text-align:center;padding:20px;color:var(--text-muted);font-size:0.85rem">
+        No notices posted yet. Click "+ Post" to add one.
+      </div>`;
+          return;
+        }
+
+        container.innerHTML = notices
+          .map((n) => {
+            const d = new Date(n.created_at);
+            const timeAgo = getTimeAgo(d);
+            return `
+      <div class="notice-item">
+        <div class="notice-message">${n.message}</div>
+        <div class="notice-meta">
+          <span>📌 ${n.posted_by} · ${timeAgo}</span>
+          <button class="notice-delete"
+            onclick="deleteNotice('${n.id}')">✕ Remove</button>
+        </div>
+      </div>`;
+          })
+          .join("");
+      }
+
+      function getTimeAgo(date) {
+        const diff = Math.floor((new Date() - date) / 1000);
+        if (diff < 60) return "Just now";
+        if (diff < 3600) return Math.floor(diff / 60) + "m ago";
+        if (diff < 86400) return Math.floor(diff / 3600) + "h ago";
+        return Math.floor(diff / 86400) + "d ago";
+      }
+
+      window.openAddNotice = function () {
+        document.getElementById("notice-text").value = "";
+        document.getElementById("modal-notice").style.display = "flex";
+      };
+
+      window.closeNoticeModal = function () {
+        document.getElementById("modal-notice").style.display = "none";
+      };
+
+      window.saveNotice = async function () {
+        const message = document.getElementById("notice-text").value.trim();
+        if (!message) {
+          showToast("Please enter a notice message.", "error");
+          return;
+        }
+
+        const { error } = await supabase.from("notices").insert({
+          message,
+          posted_by: session.full_name,
+        });
+
+        if (error) {
+          showToast("Error posting notice.", "error");
+          return;
+        }
+
+        closeNoticeModal();
+        showToast("Notice posted!");
+        loadNotices();
+      };
+
+      window.deleteNotice = async function (id) {
+        const { error } = await supabase.from("notices").delete().eq("id", id);
+        if (error) {
+          showToast("Error removing notice.", "error");
+          return;
+        }
+        showToast("Notice removed.");
+        loadNotices();
+      };
+
+      // ── Monthly Revenue Estimate ──────────────────────────────────────
+      async function loadRevenueEstimate() {
+        const { data: buildings } = await supabase
+          .from("buildings")
+          .select("id, name")
+          .order("name");
+
+        const { data: units } = await supabase
+          .from("units")
+          .select("building_id, tenant_name, rent");
+
+        const allBuildings = buildings || [];
+        const allUnits = units || [];
+
+        let grandTotal = 0;
+        let grandOccupied = 0;
+
+        const grid = document.getElementById("revenue-grid");
+        grid.innerHTML = allBuildings
+          .map((b) => {
+            const bUnits = allUnits.filter((u) => u.building_id === b.id);
+            const occupied = bUnits.filter(
+              (u) => u.tenant_name && u.tenant_name.trim() !== "",
+            );
+            const revenue = occupied.reduce(
+              (s, u) => s + (parseFloat(u.rent) || 0),
+              0,
+            );
+            const monthly = Math.round(revenue / 12);
+
+            grandTotal += monthly;
+            grandOccupied += occupied.length;
+
+            return `
+      <div class="revenue-item">
+        <div class="revenue-building">${b.name}</div>
+        <div class="revenue-units">
+          ${occupied.length} occupied unit${occupied.length !== 1 ? "s" : ""}
+        </div>
+        <div class="revenue-amount">
+          AED ${monthly.toLocaleString("en-AE")}
+          <span style="font-size:0.72rem;color:var(--text-muted);
+            font-weight:400">/month</span>
+        </div>
+      </div>`;
+          })
+          .join("");
+
+        document.getElementById("revenue-total-bar").innerHTML = `
+    <div>
+      <div class="revenue-total-label">
+        Total Monthly Revenue Estimate
+        <span style="margin-left:12px;font-size:0.75rem;color:var(--text-muted)">
+          (${grandOccupied} occupied units across ${allBuildings.length} buildings)
+        </span>
+      </div>
+    </div>
+    <div class="revenue-total-amount">
+      AED ${grandTotal.toLocaleString("en-AE")}
+    </div>`;
+      }
     </script>
   </body>
 </html>
