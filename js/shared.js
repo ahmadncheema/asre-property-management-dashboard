@@ -114,12 +114,13 @@ export function renderNav(activePage) {
   ];
 
   nav.innerHTML = `
-    <div class="nav-brand">
+    <div class="nav-brand" onclick="window.location.href='/dashboard.html'"
+      style="cursor:pointer">
       <img src="assets/logo/logo-small.png" alt="ASRE"
         style="height:36px; width:auto; object-fit:contain;" />
       <span class="nav-title">Property Management</span>
     </div>
-    <div class="nav-links">
+    <div class="nav-links" id="nav-links-desktop">
       ${links
         .map(
           (l) => `
@@ -133,9 +134,49 @@ export function renderNav(activePage) {
     <div class="nav-user">
       <span class="nav-username">👤 ${session.full_name}</span>
       <button class="nav-logout" onclick="handleLogout()">Logout</button>
+      <button class="nav-hamburger" id="nav-hamburger" onclick="toggleMobileMenu()">
+        ☰
+      </button>
+    </div>
+
+    <!-- Mobile Menu -->
+    <div class="mobile-menu" id="mobile-menu">
+      ${links
+        .map(
+          (l) => `
+        <a href="${l.href}" class="mobile-menu-link ${activePage === l.key ? "active" : ""}">
+          ${l.label}
+        </a>
+      `,
+        )
+        .join("")}
+      <div class="mobile-menu-footer">
+        <span>👤 ${session.full_name}</span>
+        <button class="nav-logout" onclick="handleLogout()">Logout</button>
+      </div>
     </div>
   `;
+
+  // Close mobile menu when clicking outside
+  document.addEventListener("click", function (e) {
+    const menu = document.getElementById("mobile-menu");
+    const hamburger = document.getElementById("nav-hamburger");
+    if (
+      menu &&
+      hamburger &&
+      !menu.contains(e.target) &&
+      !hamburger.contains(e.target)
+    ) {
+      menu.classList.remove("open");
+    }
+  });
 }
+
+// ── Toggle Mobile Menu ────────────────────────────────────────────
+window.toggleMobileMenu = function () {
+  const menu = document.getElementById("mobile-menu");
+  if (menu) menu.classList.toggle("open");
+};
 
 // ── Logout handler (called from nav) ─────────────────────────────
 window.handleLogout = function () {
