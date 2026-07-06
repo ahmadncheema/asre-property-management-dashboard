@@ -1178,6 +1178,57 @@
         }
       }
 
+      // ── Notice Board Functions ────────────────────────────────────────
+      window.openAddNotice = function () {
+        document.getElementById("notice-text").value = "";
+        document.getElementById("modal-notice").style.display = "flex";
+        setTimeout(() => document.getElementById("notice-text").focus(), 100);
+      };
+
+      window.closeNoticeModal = function () {
+        document.getElementById("modal-notice").style.display = "none";
+      };
+
+      window.saveNotice = async function () {
+        const message = document.getElementById("notice-text").value.trim();
+        if (!message) {
+          showToast("Please enter a notice message.", "error");
+          return;
+        }
+
+        const { error } = await supabase.from("notices").insert({
+          message,
+          posted_by: session.full_name,
+        });
+
+        if (error) {
+          showToast("Error posting notice.", "error");
+          return;
+        }
+
+        closeNoticeModal();
+        showToast("Notice posted!");
+        loadNotices();
+      };
+
+      window.deleteNotice = async function (id) {
+        const { error } = await supabase.from("notices").delete().eq("id", id);
+        if (error) {
+          showToast("Error removing notice.", "error");
+          return;
+        }
+        showToast("Notice removed.");
+        loadNotices();
+      };
+
+      document
+        .getElementById("modal-notice")
+        .addEventListener("click", function (e) {
+          if (e.target === this) this.style.display = "none";
+        });
+
+      // ── Init ─────────────────────────────────────────────────────────
+
       loadDashboard();
 
       // Auto-refresh every 5 minutes
@@ -1595,5 +1646,33 @@
     </div>`;
       }
     </script>
+    <!-- Notice Modal -->
+    <div class="modal-overlay" id="modal-notice" style="display: none">
+      <div class="modal" style="max-width: 480px">
+        <div class="modal-header">
+          <div class="modal-title">Post a Notice</div>
+          <button class="modal-close" onclick="closeNoticeModal()">×</button>
+        </div>
+        <div class="modal-body">
+          <div class="form-group">
+            <label class="form-label">Notice Message *</label>
+            <textarea
+              id="notice-text"
+              class="form-control"
+              rows="4"
+              placeholder="Type your announcement or notice here..."
+            ></textarea>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button class="btn btn-outline" onclick="closeNoticeModal()">
+            Cancel
+          </button>
+          <button class="btn btn-green" onclick="saveNotice()">
+            Post Notice
+          </button>
+        </div>
+      </div>
+    </div>
   </body>
 </html>
