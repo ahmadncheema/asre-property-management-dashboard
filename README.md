@@ -41,26 +41,28 @@ This dashboard is an internal tool for the Al Sheebani Real Estate property mana
 
 ## 📁 Project Structure
 
+```
 asre-property-management-dashboard/
 ├── assets/
-│ ├── icons/ # GIF icons for dashboard cards
-│ └── logo/ # Company logo files
+│   ├── icons/          # GIF icons for dashboard cards
+│   └── logo/           # Company logo files
 ├── css/
-│ └── main.css # Shared stylesheet
+│   └── main.css        # Shared stylesheet
 ├── js/
-│ ├── auth.js # Login, logout, session management
-│ ├── shared.js # Shared utilities, nav, activity logging
-│ └── supabase.js # Supabase client
-├── index.html # Login screen
-├── dashboard.html # Main dashboard — 8 summary cards
-├── properties.html # Our Properties — building, floor, unit CRUD
-├── vacancy.html # Vacancy List
-├── upcoming.html # Upcoming Vacancy
-├── bounce.html # Bounce Check Tracker
-├── maintenance.html # Maintenance Tracker
-├── invoices.html # Invoice Generator
-├── emails.html # Email Reminders
-└── admin.html # Admin Panel
+│   ├── auth.js         # Login, logout, session management
+│   ├── shared.js       # Shared utilities, nav, activity logging
+│   └── supabase.js     # Supabase client
+├── index.html          # Login screen
+├── dashboard.html      # Main dashboard — 8 summary cards
+├── properties.html     # Our Properties — building, floor, unit CRUD
+├── vacancy.html        # Vacancy List
+├── upcoming.html       # Upcoming Vacancy
+├── bounce.html         # Bounce Check Tracker
+├── maintenance.html    # Maintenance Tracker
+├── invoices.html       # Invoice Generator
+├── emails.html         # Email Reminders
+└── admin.html          # Admin Panel
+```
 
 ---
 
