@@ -1289,7 +1289,6 @@ tbody td {
 }
 
 .mobile-menu {
-  display: none;
   position: fixed;
   top: 64px;
   left: 0;
@@ -1300,7 +1299,7 @@ tbody td {
   flex-direction: column;
   padding: 12px 0;
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
-  animation: slideUp 0.2s ease;
+  display: none;
 }
 
 .mobile-menu.open {
@@ -1338,6 +1337,15 @@ tbody td {
   border-top: 1px solid var(--border);
   font-size: 0.85rem;
   color: var(--text-muted);
+}
+
+@media (min-width: 769px) {
+  .mobile-menu {
+    display: none !important;
+  }
+  .nav-hamburger {
+    display: none !important;
+  }
 }
 
 @media (max-width: 768px) {
