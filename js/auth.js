@@ -9,18 +9,18 @@ const SESSION_KEY = "asre_session";
 
 // ── Save session after login ──────────────────────────────────────
 export function saveSession(user) {
-  sessionStorage.setItem(SESSION_KEY, JSON.stringify(user));
+  localStorage.setItem(SESSION_KEY, JSON.stringify(user));
 }
 
 // ── Get current session ───────────────────────────────────────────
 export function getSession() {
-  const data = sessionStorage.getItem(SESSION_KEY);
+  const data = localStorage.getItem(SESSION_KEY);
   return data ? JSON.parse(data) : null;
 }
 
 // ── Clear session on logout ───────────────────────────────────────
 export function clearSession() {
-  sessionStorage.removeItem(SESSION_KEY);
+  localStorage.removeItem(SESSION_KEY);
 }
 
 // ── Require login — call at top of every protected page ───────────
