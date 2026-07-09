@@ -1057,210 +1057,332 @@
           format: "a4",
         });
 
-        const W = 210,
-          H = 297;
+        const W = 210;
         const margin = 18;
+        const cWidth = W - margin * 2;
 
-        // Background
-        doc.setFillColor(15, 22, 35);
-        doc.rect(0, 0, W, H, "F");
+        // ── Load Background Image ─────────────────────────────────────
+        const bgImg = new Image();
+        bgImg.src = "assets/logo/invoice-bg.png";
 
-        // Header bar
-        doc.setFillColor(42, 85, 144);
-        doc.rect(0, 0, W, 42, "F");
+        bgImg.onload = function () {
+          // Draw background full page
+          doc.addImage(bgImg, "PNG", 0, 0, 210, 297);
 
-        // Green accent line
-        doc.setFillColor(62, 173, 130);
-        doc.rect(0, 42, W, 2, "F");
+          // ── All text is dark on white background ───────────────────
+          const BLACK = [30, 30, 30];
+          const BLUE = [42, 85, 144];
+          const GREEN = [62, 173, 130];
+          const GREY = [120, 120, 120];
+          const LIGHTGREY = [220, 220, 220];
+          const WHITE = [255, 255, 255];
 
-        // Company name
-        doc.setTextColor(255, 255, 255);
-        doc.setFontSize(18);
-        doc.setFont("helvetica", "bold");
-        doc.text("AHMED AL SHEEBANI REAL ESTATE", margin, 18);
+          // ── Helper: set color ──────────────────────────────────────
+          function setColor(rgb) {
+            doc.setTextColor(rgb[0], rgb[1], rgb[2]);
+          }
+          function setDraw(rgb) {
+            doc.setDrawColor(rgb[0], rgb[1], rgb[2]);
+          }
+          function setFill(rgb) {
+            doc.setFillColor(rgb[0], rgb[1], rgb[2]);
+          }
 
-        doc.setFontSize(9);
-        doc.setFont("helvetica", "normal");
-        doc.setTextColor(180, 200, 220);
-        doc.text("Property Management Department", margin, 26);
-        doc.text("Dubai, United Arab Emirates", margin, 32);
+          // ── Start below header (35mm) ──────────────────────────────
+          let y = 38;
 
-        // Invoice label (right)
-        doc.setTextColor(62, 173, 130);
-        doc.setFontSize(22);
-        doc.setFont("helvetica", "bold");
-        doc.text("INVOICE", W - margin, 20, { align: "right" });
+          // ── Company Info (Left) + Invoice Title (Right) ────────────
+          // Company name
+          doc.setFont("helvetica", "bold");
+          doc.setFontSize(13);
+          setColor(BLUE);
+          doc.text("Ahmed Al Sheebani Real Estate L.L.C", margin, y);
 
-        doc.setFontSize(9);
-        doc.setFont("helvetica", "normal");
-        doc.setTextColor(180, 200, 220);
-        doc.text(data.invNum, W - margin, 28, { align: "right" });
-        doc.text(`Date: ${data.invDate}`, W - margin, 34, { align: "right" });
-        doc.text(`Due: ${data.invDate} (On Receipt)`, W - margin, 40, {
-          align: "right",
-        });
+          // INVOICE title right
+          doc.setFontSize(22);
+          doc.setFont("helvetica", "bold");
+          setColor(BLUE);
+          doc.text("INVOICE", W - margin, y, { align: "right" });
 
-        // Invoice Type Banner
-        doc.setFillColor(22, 31, 46);
-        doc.rect(margin, 50, W - margin * 2, 14, "F");
-        doc.setTextColor(62, 173, 130);
-        doc.setFontSize(11);
-        doc.setFont("helvetica", "bold");
-        doc.text(data.type.label.toUpperCase(), W / 2, 59, { align: "center" });
+          y += 6;
 
-        // Tenant Info Box
-        let y = 74;
-        doc.setFillColor(22, 31, 46);
-        doc.rect(margin, y, W - margin * 2, 44, "F");
-
-        doc.setTextColor(136, 150, 168);
-        doc.setFontSize(7.5);
-        doc.setFont("helvetica", "bold");
-        doc.text("BILLED TO", margin + 4, y + 8);
-        doc.text("PROPERTY DETAILS", W / 2 + 2, y + 8);
-
-        doc.setDrawColor(42, 85, 144);
-        doc.line(W / 2, y, W / 2, y + 44);
-
-        doc.setTextColor(255, 255, 255);
-        doc.setFontSize(10);
-        doc.setFont("helvetica", "bold");
-        doc.text(data.unit.tenant_name || "Vacant Unit", margin + 4, y + 17);
-
-        doc.setFont("helvetica", "normal");
-        doc.setFontSize(8.5);
-        doc.setTextColor(180, 200, 220);
-        doc.text(`Unit: ${data.unit.unit_number}`, margin + 4, y + 25);
-        doc.text(`Size: ${data.unit.size || "—"}`, margin + 4, y + 32);
-        if (data.unit.tenant_email) {
-          doc.text(data.unit.tenant_email, margin + 4, y + 39);
-        }
-
-        doc.setTextColor(255, 255, 255);
-        doc.setFont("helvetica", "bold");
-        doc.setFontSize(9);
-        doc.text(data.unit.buildings?.name || "—", W / 2 + 4, y + 17);
-        doc.setFont("helvetica", "normal");
-        doc.setFontSize(8.5);
-        doc.setTextColor(180, 200, 220);
-        doc.text(`Floor: ${data.unit.floors?.name || "—"}`, W / 2 + 4, y + 25);
-        doc.text(
-          `Parking: ${data.unit.parking_number || "—"}`,
-          W / 2 + 4,
-          y + 32,
-        );
-
-        // Line Items Table
-        y += 52;
-        const colX = [
-          margin,
-          margin + 80,
-          margin + 115,
-          margin + 140,
-          margin + 162,
-        ];
-        const colW = [80, 35, 25, 22, 30];
-        const headers = [
-          "Description",
-          "Qty",
-          "Rate (AED)",
-          "VAT",
-          "Total (AED)",
-        ];
-
-        // Table header
-        doc.setFillColor(42, 85, 144);
-        doc.rect(margin, y, W - margin * 2, 10, "F");
-        doc.setTextColor(255, 255, 255);
-        doc.setFontSize(8);
-        doc.setFont("helvetica", "bold");
-        headers.forEach((h, i) => {
-          doc.text(h, colX[i] + 2, y + 7);
-        });
-
-        y += 10;
-
-        // Table rows
-        data.items.forEach((item, idx) => {
-          const rowColor = idx % 2 === 0 ? [22, 31, 46] : [26, 38, 58];
-          doc.setFillColor(...rowColor);
-          doc.rect(margin, y, W - margin * 2, 9, "F");
-
-          doc.setTextColor(220, 230, 240);
-          doc.setFontSize(8);
+          // Company details left
           doc.setFont("helvetica", "normal");
+          doc.setFontSize(8.5);
+          setColor(GREY);
+          const companyLines = [
+            "502 Ithraa Tower, P.O. Box 20190, Dubai, UAE",
+            "info@alsheebanirealestate.ae",
+            "+971 4 294 5001",
+            "www.alsheebani-realestate.com",
+            "TRN: 104488244500003",
+          ];
+          companyLines.forEach((line) => {
+            doc.text(line, margin, y);
+            y += 4.5;
+          });
 
-          const desc = doc.splitTextToSize(item.description, colW[0] - 4);
-          doc.text(desc[0], colX[0] + 2, y + 6);
-          doc.text(String(item.qty), colX[1] + 2, y + 6);
-          doc.text(item.rate.toFixed(2), colX[2] + 2, y + 6);
-          doc.text(item.vat.toFixed(2), colX[3] + 2, y + 6);
-          doc.setTextColor(62, 173, 130);
-          doc.text(item.total.toFixed(2), colX[4] + 2, y + 6);
-          doc.setTextColor(220, 230, 240);
-          y += 9;
-        });
+          // Invoice details right — align with company info
+          let ry = 44;
+          const invoiceDetails = [
+            { label: "Invoice #", value: data.invNum },
+            { label: "Date", value: data.invDate },
+            { label: "Due Date", value: "On Receipt" },
+            { label: "Type", value: data.type.label },
+          ];
 
-        // Totals
-        y += 6;
-        doc.setFillColor(22, 31, 46);
-        doc.rect(W - margin - 70, y, 70, 38, "F");
+          invoiceDetails.forEach((d) => {
+            doc.setFont("helvetica", "bold");
+            doc.setFontSize(8.5);
+            setColor(GREY);
+            doc.text(d.label, W - margin - 45, ry, { align: "right" });
 
-        doc.setFontSize(8.5);
-        doc.setFont("helvetica", "normal");
-        doc.setTextColor(136, 150, 168);
-        doc.text("Subtotal:", W - margin - 68, y + 9);
-        doc.text("VAT (5%):", W - margin - 68, y + 18);
-        doc.setTextColor(255, 255, 255);
-        doc.setFont("helvetica", "bold");
-        doc.text("TOTAL DUE:", W - margin - 68, y + 29);
+            doc.setFont("helvetica", "bold");
+            setColor(BLACK);
+            doc.text(d.value, W - margin, ry, { align: "right" });
+            ry += 5;
+          });
 
-        doc.setFont("helvetica", "normal");
-        doc.setTextColor(220, 230, 240);
-        doc.text(`AED ${data.subtotal.toFixed(2)}`, W - margin - 2, y + 9, {
-          align: "right",
-        });
-        doc.text(`AED ${data.vat.toFixed(2)}`, W - margin - 2, y + 18, {
-          align: "right",
-        });
-        doc.setFont("helvetica", "bold");
-        doc.setTextColor(62, 173, 130);
-        doc.setFontSize(11);
-        doc.text(`AED ${data.total.toFixed(2)}`, W - margin - 2, y + 29, {
-          align: "right",
-        });
+          y = Math.max(y, ry) + 4;
 
-        // Green accent line before footer
-        doc.setFillColor(62, 173, 130);
-        doc.rect(0, H - 24, W, 1, "F");
+          // ── Divider Line ───────────────────────────────────────────
+          setDraw(LIGHTGREY);
+          doc.setLineWidth(0.3);
+          doc.line(margin, y, W - margin, y);
+          y += 6;
 
-        // Footer
-        doc.setFillColor(22, 31, 46);
-        doc.rect(0, H - 23, W, 23, "F");
-        doc.setTextColor(136, 150, 168);
-        doc.setFontSize(7.5);
-        doc.setFont("helvetica", "normal");
-        doc.text(
-          "Ahmed Al Sheebani Real Estate — Property Management Department",
-          W / 2,
-          H - 14,
-          { align: "center" },
-        );
-        doc.text(
-          "Dubai, United Arab Emirates    |    Internal Document",
-          W / 2,
-          H - 8,
-          { align: "center" },
-        );
+          // ── Bill To Section ────────────────────────────────────────
+          setFill(BLUE);
+          doc.rect(margin, y, 60, 6, "F");
+          doc.setFont("helvetica", "bold");
+          doc.setFontSize(8.5);
+          setColor(WHITE);
+          doc.text("BILL TO", margin + 3, y + 4.2);
+          y += 8;
 
-        // Notes
-        if (data.notes) {
-          doc.setTextColor(136, 150, 168);
+          doc.setFont("helvetica", "bold");
+          doc.setFontSize(10);
+          setColor(BLACK);
+          doc.text(data.unit.tenant_name || "Vacant Unit", margin, y);
+          y += 5;
+
+          doc.setFont("helvetica", "normal");
+          doc.setFontSize(8.5);
+          setColor(GREY);
+
+          const billLines = [
+            `Unit ${data.unit.unit_number}  —  Floor ${data.unit.floors?.name || "—"}  —  ${data.unit.buildings?.name || "—"}`,
+            data.unit.size ? `Size: ${data.unit.size}` : "",
+            data.unit.tenant_email || "",
+          ].filter(Boolean);
+
+          billLines.forEach((line) => {
+            doc.text(line, margin, y);
+            y += 4.5;
+          });
+
+          y += 4;
+
+          // ── Divider ────────────────────────────────────────────────
+          setDraw(LIGHTGREY);
+          doc.setLineWidth(0.3);
+          doc.line(margin, y, W - margin, y);
+          y += 6;
+
+          // ── Invoice Type Title ─────────────────────────────────────
+          doc.setFont("helvetica", "bold");
+          doc.setFontSize(11);
+          setColor(BLUE);
+          doc.text(data.type.label.toUpperCase(), W / 2, y, {
+            align: "center",
+          });
+          y += 8;
+
+          // ── Line Items Table ───────────────────────────────────────
+          const colX = [
+            margin,
+            margin + 85,
+            margin + 110,
+            margin + 137,
+            margin + 158,
+          ];
+          const colW = [85, 25, 27, 21, cWidth - 158];
+          const headers = [
+            "Description",
+            "Qty",
+            "Rate (AED)",
+            "VAT 5%",
+            "Total (AED)",
+          ];
+          const rowH = 8;
+
+          // Table header
+          setFill(BLUE);
+          doc.rect(margin, y, cWidth, rowH, "F");
+          doc.setFont("helvetica", "bold");
           doc.setFontSize(8);
-          doc.text("Notes: " + data.notes, margin, y + 42);
-        }
+          setColor(WHITE);
+          headers.forEach((h, i) => {
+            const align = i === 0 ? "left" : "right";
+            const x = i === 0 ? colX[i] + 2 : colX[i] + colW[i] - 2;
+            doc.text(h, x, y + 5.5, { align });
+          });
+          y += rowH;
 
-        doc.save(`${data.invNum}.pdf`);
+          // Table rows
+          data.items.forEach((item, idx) => {
+            const fillColor = idx % 2 === 0 ? [245, 247, 250] : [255, 255, 255];
+            setFill(fillColor);
+            doc.rect(margin, y, cWidth, rowH, "F");
+
+            // Row border
+            setDraw(LIGHTGREY);
+            doc.setLineWidth(0.1);
+            doc.rect(margin, y, cWidth, rowH, "S");
+
+            doc.setFont("helvetica", "normal");
+            doc.setFontSize(8.5);
+            setColor(BLACK);
+
+            // Description — truncate if too long
+            const desc = doc.splitTextToSize(
+              item.description || "—",
+              colW[0] - 4,
+            );
+            doc.text(desc[0], colX[0] + 2, y + 5.5);
+
+            // Right-aligned numeric columns
+            doc.text(String(item.qty || 1), colX[1] + colW[1] - 2, y + 5.5, {
+              align: "right",
+            });
+            doc.text(
+              Number(item.rate || 0).toFixed(2),
+              colX[2] + colW[2] - 2,
+              y + 5.5,
+              { align: "right" },
+            );
+            doc.text(
+              Number(item.vat || 0).toFixed(2),
+              colX[3] + colW[3] - 2,
+              y + 5.5,
+              { align: "right" },
+            );
+
+            doc.setFont("helvetica", "bold");
+            setColor(BLUE);
+            doc.text(
+              Number(item.total || 0).toFixed(2),
+              colX[4] + colW[4] - 2,
+              y + 5.5,
+              { align: "right" },
+            );
+
+            y += rowH;
+          });
+
+          // Table bottom border
+          setDraw(BLUE);
+          doc.setLineWidth(0.4);
+          doc.line(margin, y, W - margin, y);
+          y += 6;
+
+          // ── Totals Section ─────────────────────────────────────────
+          const totalsX = W - margin - 70;
+          const totalsWidth = 70;
+
+          // Subtotal row
+          doc.setFont("helvetica", "normal");
+          doc.setFontSize(9);
+          setColor(GREY);
+          doc.text("Subtotal", totalsX, y + 4);
+          doc.setFont("helvetica", "normal");
+          setColor(BLACK);
+          doc.text(`AED ${data.subtotal.toFixed(2)}`, W - margin, y + 4, {
+            align: "right",
+          });
+          y += 7;
+
+          // VAT row
+          setColor(GREY);
+          doc.text("VAT (5%)", totalsX, y + 4);
+          setColor(BLACK);
+          doc.text(`AED ${data.vat.toFixed(2)}`, W - margin, y + 4, {
+            align: "right",
+          });
+          y += 7;
+
+          // Divider above total
+          setDraw(BLUE);
+          doc.setLineWidth(0.4);
+          doc.line(totalsX, y, W - margin, y);
+          y += 2;
+
+          // Grand Total
+          setFill(BLUE);
+          doc.rect(totalsX - 2, y, totalsWidth + 2, 9, "F");
+          doc.setFont("helvetica", "bold");
+          doc.setFontSize(10);
+          setColor(WHITE);
+          doc.text("TOTAL DUE", totalsX + 1, y + 6);
+          doc.setFontSize(11);
+          doc.text(`AED ${data.total.toFixed(2)}`, W - margin - 1, y + 6, {
+            align: "right",
+          });
+          y += 14;
+
+          // ── Notes ──────────────────────────────────────────────────
+          if (data.notes) {
+            setDraw(LIGHTGREY);
+            doc.setLineWidth(0.3);
+            doc.line(margin, y, W - margin, y);
+            y += 5;
+
+            doc.setFont("helvetica", "bold");
+            doc.setFontSize(8.5);
+            setColor(BLUE);
+            doc.text("NOTES", margin, y);
+            y += 4.5;
+
+            doc.setFont("helvetica", "normal");
+            setColor(GREY);
+            const noteLines = doc.splitTextToSize(data.notes, cWidth);
+            noteLines.forEach((line) => {
+              doc.text(line, margin, y);
+              y += 4;
+            });
+            y += 2;
+          }
+
+          // ── Computer Generated Disclaimer ─────────────────────────
+          // Place it just above the footer (267mm from top)
+          const disclaimerY = 262;
+          setDraw(LIGHTGREY);
+          doc.setLineWidth(0.2);
+          doc.line(margin, disclaimerY - 3, W - margin, disclaimerY - 3);
+
+          doc.setFont("helvetica", "italic");
+          doc.setFontSize(7.5);
+          setColor(GREY);
+          doc.text(
+            "Computer Generated Invoice - E&OE. For Queries Contact: info@alsheebanirealestate.ae or Call +971 4 294 5001",
+            W / 2,
+            disclaimerY,
+            { align: "center" },
+          );
+
+          // ── Save PDF ───────────────────────────────────────────────
+          doc.save(`${data.invNum}.pdf`);
+        };
+
+        // Fallback if image fails to load
+        bgImg.onerror = function () {
+          showToast(
+            "Background image not found. Generating without background.",
+            "warning",
+          );
+          // Generate without background
+          doc.save(`${data.invNum}.pdf`);
+        };
       }
 
       // ── QuickBooks CSV — Single Invoice ──────────────────────────────
