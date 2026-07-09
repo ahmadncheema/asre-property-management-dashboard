@@ -1153,18 +1153,18 @@
 
           // ── Bill To Section ────────────────────────────────────────
           setFill(BLUE);
-          doc.rect(margin, y, 60, 6, "F");
+          doc.rect(margin, y, 60, 7, "F");
           doc.setFont("helvetica", "bold");
           doc.setFontSize(8.5);
           setColor(WHITE);
-          doc.text("BILL TO", margin + 3, y + 4.2);
-          y += 8;
+          doc.text("BILL TO", margin + 3, y + 5);
+          y += 10;
 
           doc.setFont("helvetica", "bold");
           doc.setFontSize(10);
           setColor(BLACK);
           doc.text(data.unit.tenant_name || "Vacant Unit", margin, y);
-          y += 5;
+          y += 6;
 
           doc.setFont("helvetica", "normal");
           doc.setFontSize(8.5);
@@ -1354,8 +1354,8 @@
           }
 
           // ── Computer Generated Disclaimer ─────────────────────────
-          // Place it just above the footer (267mm from top)
-          const disclaimerY = 262;
+          // Place it just above the footer contact bar (272mm from top)
+          const disclaimerY = 272;
           setDraw(LIGHTGREY);
           doc.setLineWidth(0.2);
           doc.line(margin, disclaimerY - 3, W - margin, disclaimerY - 3);
