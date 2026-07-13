@@ -125,10 +125,6 @@ This application is for **internal use only** by the Al Sheebani Real Estate pro
 
 ## 📌 Pending Items
 
-- [ ] Remaining 7 dashboard GIF icons
-- [ ] Final maintenance category list
-- [ ] Invoice PDF background/letterhead template
-- [ ] Company TRN number for VAT invoices
 - [ ] Resend.com DNS verification for email sending
 - [ ] Acknowledgement invoice type details
 
