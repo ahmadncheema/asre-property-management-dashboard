@@ -9,7 +9,6 @@
     />
     <title>ASRE — Dashboard</title>
     <link rel="stylesheet" href="css/main.css" />
-    <script src="https://cdn.jsdelivr.net/npm/bcryptjs@2.4.3/dist/bcrypt.min.js"></script>
     <style>
       .dashboard-grid {
         display: grid;
@@ -74,12 +73,6 @@
         color: var(--green);
       }
 
-      .dashboard-welcome p {
-        color: var(--text-muted);
-        font-size: 0.9rem;
-        margin-top: 4px;
-      }
-
       .stat-card-icon img {
         width: 72px;
         height: 72px;
@@ -90,7 +83,6 @@
         font-size: 2.8rem;
       }
 
-      /* Maintenance breakdown inside card */
       .maint-breakdown {
         margin-top: 10px;
         padding-top: 10px;
@@ -112,7 +104,6 @@
         font-weight: 600;
       }
 
-      /* Last updated */
       .last-updated {
         text-align: right;
         font-size: 0.78rem;
@@ -120,7 +111,7 @@
         margin-bottom: 16px;
       }
 
-      /* ── Widget Section ───────────────────────────────────────── */
+      /* ── Widgets ──────────────────────────────────────────────── */
       .widget-row-3 {
         display: grid;
         grid-template-columns: 1fr 1fr 1fr;
@@ -294,12 +285,11 @@
       .cal-day.other-month {
         opacity: 0.25;
       }
-
       .cal-day:not(.other-month):hover {
         background: var(--bg-hover);
       }
 
-      /* Quick Stats Strip */
+      /* Quick Stats */
       .quick-stats-strip {
         display: flex;
         align-items: center;
@@ -352,17 +342,14 @@
       .alert-item:hover {
         border-color: var(--blue-light);
       }
-
       .alert-item.urgent {
         border-left: 3px solid var(--danger);
         background: rgba(229, 83, 83, 0.05);
       }
-
       .alert-item.warning {
         border-left: 3px solid var(--warning);
         background: rgba(240, 165, 0, 0.05);
       }
-
       .alert-item.normal {
         border-left: 3px solid var(--green);
         background: rgba(62, 173, 130, 0.05);
@@ -373,7 +360,6 @@
         font-weight: 700;
         color: var(--white);
       }
-
       .alert-tenant {
         font-size: 0.78rem;
         color: var(--text-muted);
@@ -447,10 +433,10 @@
         background: rgba(229, 83, 83, 0.1);
       }
 
-      /* Revenue Grid */
+      /* Revenue */
       .revenue-grid {
         display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+        grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
         gap: 12px;
         margin-bottom: 16px;
       }
@@ -483,7 +469,6 @@
         color: var(--text-muted);
         margin-bottom: 6px;
       }
-
       .revenue-amount {
         font-size: 1rem;
         font-weight: 800;
@@ -505,24 +490,10 @@
         font-weight: 600;
         color: var(--text-muted);
       }
-
       .revenue-total-amount {
         font-size: 1.4rem;
         font-weight: 800;
         color: var(--green);
-      }
-
-      /* Notice Modal */
-      .notice-modal-overlay {
-        position: fixed;
-        inset: 0;
-        background: rgba(0, 0, 0, 0.7);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        z-index: 2000;
-        backdrop-filter: blur(4px);
-        animation: fadeIn 0.2s ease;
       }
 
       /* Responsive */
@@ -635,10 +606,8 @@
     </style>
   </head>
   <body>
-    <!-- Navigation -->
     <nav id="main-nav"></nav>
 
-    <!-- Page -->
     <div class="page-wrapper">
       <div class="container">
         <!-- Welcome -->
@@ -653,11 +622,10 @@
         <!-- Last Updated -->
         <div class="last-updated" id="last-updated"></div>
 
-        <!-- ── Widgets Section ─────────────────────────────────────── -->
+        <!-- ── Widgets Section ───────────────────────────────────────── -->
         <div id="widgets-section">
           <!-- Row 1: Clock, Weather, Calendar -->
           <div class="widget-row-3" style="margin-bottom: 20px">
-            <!-- Live Clock -->
             <div class="widget-card" id="widget-clock">
               <div class="widget-title">🕐 Dubai Time</div>
               <div class="clock-display" id="clock-time">--:--:--</div>
@@ -665,10 +633,9 @@
               <div class="clock-hijri" id="clock-hijri"></div>
             </div>
 
-            <!-- Weather -->
             <div class="widget-card" id="widget-weather">
               <div class="widget-title">🌤️ Dubai Weather</div>
-              <div class="weather-main" id="weather-main">
+              <div class="weather-main">
                 <div class="weather-temp" id="weather-temp">--°C</div>
                 <div class="weather-icon" id="weather-icon">⛅</div>
               </div>
@@ -676,7 +643,6 @@
               <div class="weather-details" id="weather-details"></div>
             </div>
 
-            <!-- Mini Calendar -->
             <div class="widget-card" id="widget-calendar">
               <div class="widget-title">
                 📅 <span id="cal-month-title"></span>
@@ -688,7 +654,7 @@
           <!-- Row 2: Quick Stats Strip -->
           <div class="widget-card widget-full" style="margin-bottom: 20px">
             <div class="widget-title">⚡ Quick Stats</div>
-            <div class="quick-stats-strip" id="quick-stats-strip">
+            <div class="quick-stats-strip">
               <div class="qs-item">
                 <div class="qs-num" id="qs-total-units">—</div>
                 <div class="qs-label">Total Units</div>
@@ -748,7 +714,6 @@
 
           <!-- Row 3: Upcoming Vacancy Alert + Notice Board -->
           <div class="widget-row-2" style="margin-bottom: 20px">
-            <!-- Upcoming Vacancy Alert -->
             <div class="widget-card">
               <div class="widget-title">🚨 Upcoming Vacancy Alert</div>
               <div id="upcoming-alert-list">
@@ -756,7 +721,6 @@
               </div>
             </div>
 
-            <!-- Notice Board -->
             <div class="widget-card">
               <div
                 class="widget-title"
@@ -777,32 +741,42 @@
             </div>
           </div>
 
-          <!-- Row 4: Monthly Revenue Estimate -->
-          <div class="widget-card widget-full" style="margin-bottom: 20px">
-            <div
-              class="widget-title"
-              style="
-                display: flex;
-                justify-content: space-between;
-                align-items: center;
-              "
-            >
-              <span>💰 Monthly Revenue Estimate</span>
-              <span style="font-size: 0.8rem; color: var(--text-muted)"
-                >Based on occupied units</span
+          <!-- Row 4: Revenue Cards -->
+          <div class="widget-row-3" style="margin-bottom: 20px">
+            <div class="widget-card">
+              <div
+                class="widget-title"
+                style="
+                  display: flex;
+                  justify-content: space-between;
+                  align-items: center;
+                "
               >
+                <span>💰 Monthly Revenue Estimate</span>
+                <span style="font-size: 0.75rem; color: var(--text-muted)"
+                  >Per building</span
+                >
+              </div>
+              <div class="revenue-grid" id="revenue-grid">
+                <div class="widget-loading">Loading...</div>
+              </div>
+              <div class="revenue-total-bar" id="revenue-total-bar"></div>
             </div>
-            <div class="revenue-grid" id="revenue-grid">
+
+            <div class="widget-card" id="revenue-mgmt-card">
               <div class="widget-loading">Loading...</div>
             </div>
-            <div class="revenue-total-bar" id="revenue-total-bar"></div>
+
+            <div class="widget-card" id="revenue-misc-card">
+              <div class="widget-loading">Loading...</div>
+            </div>
           </div>
         </div>
+        <!-- End Widgets Section -->
 
         <!-- Dashboard Grid -->
         <div class="dashboard-grid" id="dashboard-grid">
-          <!-- 1. Our Properties -->
-          <a href="properties.html" class="stat-card" id="card-properties">
+          <a href="properties.html" class="stat-card">
             <div class="stat-card-icon">
               <img
                 src="assets/icons/building.gif"
@@ -819,19 +793,16 @@
               <div class="stat-card-label">Our Properties</div>
               <div class="stat-card-breakdown">
                 <div class="breakdown-item">
-                  <span>Total Buildings</span>
-                  <span id="num-buildings">—</span>
+                  <span>Total Buildings</span><span id="num-buildings">—</span>
                 </div>
                 <div class="breakdown-item">
-                  <span>Total Units</span>
-                  <span id="num-units">—</span>
+                  <span>Total Units</span><span id="num-units">—</span>
                 </div>
               </div>
             </div>
           </a>
 
-          <!-- 2. Vacancy List -->
-          <a href="vacancy.html" class="stat-card" id="card-vacancy">
+          <a href="vacancy.html" class="stat-card">
             <div class="stat-card-icon">
               <img
                 src="assets/icons/vacancy.gif"
@@ -848,23 +819,20 @@
               <div class="stat-card-label">Vacant Units</div>
               <div class="stat-card-breakdown">
                 <div class="breakdown-item">
-                  <span>Occupied</span>
-                  <span id="num-occupied">—</span>
+                  <span>Occupied</span><span id="num-occupied">—</span>
                 </div>
                 <div class="breakdown-item">
-                  <span>Occupancy Rate</span>
-                  <span id="occupancy-rate">—</span>
+                  <span>Occupancy Rate</span><span id="occupancy-rate">—</span>
                 </div>
               </div>
             </div>
           </a>
 
-          <!-- 3. Upcoming Vacancy -->
-          <a href="upcoming.html" class="stat-card" id="card-upcoming">
+          <a href="upcoming.html" class="stat-card">
             <div class="stat-card-icon">
               <img
                 src="assets/icons/upcoming.gif"
-                alt="Upcoming Vacancy"
+                alt="Upcoming"
                 onerror="
                   this.style.display = 'none';
                   this.nextElementSibling.style.display = 'block';
@@ -877,27 +845,23 @@
               <div class="stat-card-label">Upcoming Vacancy</div>
               <div class="stat-card-breakdown">
                 <div class="breakdown-item">
-                  <span>Within 30 days</span>
-                  <span id="upcoming-30">—</span>
+                  <span>Within 30 days</span><span id="upcoming-30">—</span>
                 </div>
                 <div class="breakdown-item">
-                  <span>Within 60 days</span>
-                  <span id="upcoming-60">—</span>
+                  <span>Within 60 days</span><span id="upcoming-60">—</span>
                 </div>
                 <div class="breakdown-item">
-                  <span>Within 90 days</span>
-                  <span id="upcoming-90">—</span>
+                  <span>Within 90 days</span><span id="upcoming-90">—</span>
                 </div>
               </div>
             </div>
           </a>
 
-          <!-- 4. Bounce Check -->
-          <a href="bounce.html" class="stat-card" id="card-bounce">
+          <a href="bounce.html" class="stat-card">
             <div class="stat-card-icon">
               <img
                 src="assets/icons/bounce.gif"
-                alt="Bounce Check"
+                alt="Bounce"
                 onerror="
                   this.style.display = 'none';
                   this.nextElementSibling.style.display = 'block';
@@ -910,19 +874,16 @@
               <div class="stat-card-label">Bounced Checks</div>
               <div class="stat-card-breakdown">
                 <div class="breakdown-item">
-                  <span>Active</span>
-                  <span id="bounce-active">—</span>
+                  <span>Active</span><span id="bounce-active">—</span>
                 </div>
                 <div class="breakdown-item">
-                  <span>Resolved</span>
-                  <span id="bounce-resolved">—</span>
+                  <span>Resolved</span><span id="bounce-resolved">—</span>
                 </div>
               </div>
             </div>
           </a>
 
-          <!-- 5. Maintenance -->
-          <a href="maintenance.html" class="stat-card" id="card-maintenance">
+          <a href="maintenance.html" class="stat-card">
             <div class="stat-card-icon">
               <img
                 src="assets/icons/maintenance.gif"
@@ -938,15 +899,12 @@
               <div class="stat-card-number" id="num-maintenance">—</div>
               <div class="stat-card-label">Maintenance Requests</div>
               <div class="maint-breakdown" id="maint-breakdown">
-                <div class="maint-breakdown-row">
-                  <span>Loading...</span>
-                </div>
+                <div class="maint-breakdown-row"><span>Loading...</span></div>
               </div>
             </div>
           </a>
 
-          <!-- 6. Invoice Generator -->
-          <a href="invoices.html" class="stat-card" id="card-invoices">
+          <a href="invoices.html" class="stat-card">
             <div class="stat-card-icon">
               <img
                 src="assets/icons/invoice.gif"
@@ -963,19 +921,16 @@
               <div class="stat-card-label">Invoice Generator</div>
               <div class="stat-card-breakdown">
                 <div class="breakdown-item">
-                  <span>This Month</span>
-                  <span id="invoices-month">—</span>
+                  <span>This Month</span><span id="invoices-month">—</span>
                 </div>
                 <div class="breakdown-item">
-                  <span>Total Generated</span>
-                  <span id="invoices-total">—</span>
+                  <span>Total Generated</span><span id="invoices-total">—</span>
                 </div>
               </div>
             </div>
           </a>
 
-          <!-- 7. Emails -->
-          <a href="emails.html" class="stat-card" id="card-emails">
+          <a href="emails.html" class="stat-card">
             <div class="stat-card-icon">
               <img
                 src="assets/icons/email.gif"
@@ -992,19 +947,17 @@
               <div class="stat-card-label">Email Reminders</div>
               <div class="stat-card-breakdown">
                 <div class="breakdown-item">
-                  <span>Sent This Month</span>
-                  <span id="emails-month">—</span>
+                  <span>Sent This Month</span><span id="emails-month">—</span>
                 </div>
                 <div class="breakdown-item">
-                  <span>Pending Reminders</span>
-                  <span id="emails-pending">—</span>
+                  <span>Pending Reminders</span
+                  ><span id="emails-pending">—</span>
                 </div>
               </div>
             </div>
           </a>
 
-          <!-- 8. Admin -->
-          <a href="admin.html" class="stat-card" id="card-admin">
+          <a href="admin.html" class="stat-card">
             <div class="stat-card-icon">
               <img
                 src="assets/icons/admin.gif"
@@ -1021,27 +974,54 @@
               <div class="stat-card-label">Admin Panel</div>
               <div class="stat-card-breakdown">
                 <div class="breakdown-item">
-                  <span>Total Users</span>
-                  <span id="admin-users">—</span>
+                  <span>Total Users</span><span id="admin-users">—</span>
                 </div>
                 <div class="breakdown-item">
-                  <span>Last Backup</span>
-                  <span id="admin-backup">Never</span>
+                  <span>Last Backup</span><span id="admin-backup">Never</span>
                 </div>
               </div>
             </div>
           </a>
+        </div>
+        <!-- End Dashboard Grid -->
+      </div>
+    </div>
+
+    <!-- Notice Modal -->
+    <div class="modal-overlay" id="modal-notice" style="display: none">
+      <div class="modal" style="max-width: 480px">
+        <div class="modal-header">
+          <div class="modal-title">Post a Notice</div>
+          <button class="modal-close" onclick="closeNoticeModal()">×</button>
+        </div>
+        <div class="modal-body">
+          <div class="form-group">
+            <label class="form-label">Notice Message *</label>
+            <textarea
+              id="notice-text"
+              class="form-control"
+              rows="4"
+              placeholder="Type your announcement or notice here..."
+            ></textarea>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button class="btn btn-outline" onclick="closeNoticeModal()">
+            Cancel
+          </button>
+          <button class="btn btn-green" onclick="saveNotice()">
+            Post Notice
+          </button>
         </div>
       </div>
     </div>
 
     <script type="module">
       import { requireAuth } from "./js/auth.js";
-      import { renderNav } from "./js/shared.js";
+      import { renderNav, showToast, daysUntil } from "./js/shared.js";
       import { supabase } from "./js/supabase.js";
-      import { daysUntil } from "./js/shared.js";
 
-      // ── Auth check ──────────────────────────────────────────────────
+      // ── Auth ────────────────────────────────────────────────────────
       const session = requireAuth();
       if (!session) throw new Error("Not authenticated");
       if (session.role === "finance") {
@@ -1049,16 +1029,14 @@
         throw new Error("Access denied");
       }
 
-      // ── Render nav ──────────────────────────────────────────────────
       renderNav("dashboard");
 
-      // ── Greeting ────────────────────────────────────────────────────
+      // ── Greeting ─────────────────────────────────────────────────────
       function setGreeting() {
         const hour = new Date().getHours();
         let time = "Morning";
         if (hour >= 12 && hour < 17) time = "Afternoon";
         else if (hour >= 17) time = "Evening";
-
         document.getElementById("greeting-time").textContent = time;
         document.getElementById("greeting-name").textContent =
           session.full_name.split(" ")[0];
@@ -1066,13 +1044,14 @@
 
       setGreeting();
       loadWidgets();
+      loadDashboard();
+      setInterval(loadDashboard, 5 * 60 * 1000);
 
-      // ── Load all dashboard stats ────────────────────────────────────
+      // ── Dashboard Stats ───────────────────────────────────────────────
       async function loadDashboard() {
         document.getElementById("last-updated").textContent = "Loading data...";
 
         try {
-          // Fetch all data in parallel
           const [
             buildingsRes,
             unitsRes,
@@ -1104,14 +1083,14 @@
           const today = new Date();
           today.setHours(0, 0, 0, 0);
 
-          // ── Properties ──────────────────────────────────────────────
+          // Properties
           document.getElementById("num-properties").textContent =
             buildings.length;
           document.getElementById("num-buildings").textContent =
             buildings.length;
           document.getElementById("num-units").textContent = units.length;
 
-          // ── Vacancy ─────────────────────────────────────────────────
+          // Vacancy
           const vacant = units.filter(
             (u) => !u.tenant_name || u.tenant_name.trim() === "",
           );
@@ -1127,7 +1106,7 @@
           document.getElementById("num-occupied").textContent = occupied.length;
           document.getElementById("occupancy-rate").textContent = occRate;
 
-          // ── Upcoming Vacancy ─────────────────────────────────────────
+          // Upcoming Vacancy
           const upcoming = occupied.filter((u) => {
             if (!u.end_date) return false;
             const days = daysUntil(u.end_date);
@@ -1151,20 +1130,17 @@
           document.getElementById("upcoming-60").textContent = up60;
           document.getElementById("upcoming-90").textContent = up90;
 
-          // ── Bounce Checks ────────────────────────────────────────────
+          // Bounce Checks
           const activeB = bounces.filter((b) => b.status === "active").length;
           const resolvedB = bounces.filter(
             (b) => b.status === "resolved",
           ).length;
-
           document.getElementById("num-bounce").textContent = activeB;
           document.getElementById("bounce-active").textContent = activeB;
           document.getElementById("bounce-resolved").textContent = resolvedB;
 
-          // ── Maintenance ──────────────────────────────────────────────
+          // Maintenance
           const openMaint = maintenance.filter((m) => m.status === "open");
-
-          // Category breakdown
           const categories = {};
           openMaint.forEach((m) => {
             const cat = m.category || "Other";
@@ -1178,8 +1154,7 @@
           if (Object.keys(categories).length === 0) {
             breakdownEl.innerHTML = `
           <div class="maint-breakdown-row">
-            <span>No open requests</span>
-            <span>—</span>
+            <span>No open requests</span><span>—</span>
           </div>`;
           } else {
             breakdownEl.innerHTML = Object.entries(categories)
@@ -1187,14 +1162,13 @@
               .map(
                 ([cat, count]) => `
             <div class="maint-breakdown-row">
-              <span>${cat}</span>
-              <span>${count}</span>
+              <span>${cat}</span><span>${count}</span>
             </div>`,
               )
               .join("");
           }
 
-          // ── Invoices ─────────────────────────────────────────────────
+          // Invoices
           const thisMonth = invoices.filter((i) => {
             const d = new Date(i.created_at);
             return (
@@ -1209,7 +1183,7 @@
           document.getElementById("invoices-total").textContent =
             invoices.length;
 
-          // ── Emails ───────────────────────────────────────────────────
+          // Emails
           const emailsThisMonth = emailLogs.filter((e) => {
             const d = new Date(e.sent_at);
             return (
@@ -1225,104 +1199,51 @@
           document.getElementById("emails-pending").textContent =
             upcoming.length;
 
-          // ── Admin ────────────────────────────────────────────────────
+          // Admin
           document.getElementById("num-users").textContent = users.length;
           document.getElementById("admin-users").textContent = users.length;
 
-          // Last backup from localStorage
           const lastBackup = localStorage.getItem("asre_last_backup");
           document.getElementById("admin-backup").textContent = lastBackup
             ? new Date(lastBackup).toLocaleDateString("en-GB")
             : "Never";
 
-          // ── Last Activity ────────────────────────────────────────────────
-          const { data: lastActivity } = await supabase
-            .from("activity_log")
-            .select("*")
-            .order("created_at", { ascending: false })
-            .limit(1)
-            .single();
+          // Last Activity
+          try {
+            const { data: lastActivity } = await supabase
+              .from("activity_log")
+              .select("*")
+              .order("created_at", { ascending: false })
+              .limit(1)
+              .single();
 
-          if (lastActivity) {
-            const d = new Date(lastActivity.created_at);
-            document.getElementById("last-updated").textContent =
-              `Last update: ${lastActivity.action} by ${lastActivity.user_name} — ` +
-              d.toLocaleDateString("en-GB", {
-                day: "2-digit",
-                month: "short",
-                year: "numeric",
-              }) +
-              " at " +
-              d.toLocaleTimeString("en-GB", {
-                hour: "2-digit",
-                minute: "2-digit",
-              });
-          } else {
-            document.getElementById("last-updated").textContent =
-              "No activity recorded yet.";
+            if (lastActivity) {
+              const d = new Date(lastActivity.created_at);
+              document.getElementById("last-updated").textContent =
+                `Last update: ${lastActivity.action} by ${lastActivity.user_name} — ` +
+                d.toLocaleDateString("en-GB", {
+                  day: "2-digit",
+                  month: "short",
+                  year: "numeric",
+                }) +
+                " at " +
+                d.toLocaleTimeString("en-GB", {
+                  hour: "2-digit",
+                  minute: "2-digit",
+                });
+            } else {
+              document.getElementById("last-updated").textContent =
+                "No activity recorded yet.";
+            }
+          } catch {
+            document.getElementById("last-updated").textContent = "";
           }
         } catch (err) {
-          console.error("Dashboard load error:", err);
+          console.error("Dashboard error:", err);
           document.getElementById("last-updated").textContent =
             "Error loading data. Please refresh.";
         }
       }
-
-      // ── Notice Board Functions ────────────────────────────────────────
-      window.openAddNotice = function () {
-        document.getElementById("notice-text").value = "";
-        document.getElementById("modal-notice").style.display = "flex";
-        setTimeout(() => document.getElementById("notice-text").focus(), 100);
-      };
-
-      window.closeNoticeModal = function () {
-        document.getElementById("modal-notice").style.display = "none";
-      };
-
-      window.saveNotice = async function () {
-        const message = document.getElementById("notice-text").value.trim();
-        if (!message) {
-          showToast("Please enter a notice message.", "error");
-          return;
-        }
-
-        const { error } = await supabase.from("notices").insert({
-          message,
-          posted_by: session.full_name,
-        });
-
-        if (error) {
-          showToast("Error posting notice.", "error");
-          return;
-        }
-
-        closeNoticeModal();
-        showToast("Notice posted!");
-        loadNotices();
-      };
-
-      window.deleteNotice = async function (id) {
-        const { error } = await supabase.from("notices").delete().eq("id", id);
-        if (error) {
-          showToast("Error removing notice.", "error");
-          return;
-        }
-        showToast("Notice removed.");
-        loadNotices();
-      };
-
-      document
-        .getElementById("modal-notice")
-        .addEventListener("click", function (e) {
-          if (e.target === this) this.style.display = "none";
-        });
-
-      // ── Init ─────────────────────────────────────────────────────────
-
-      loadDashboard();
-
-      // Auto-refresh every 5 minutes
-      setInterval(loadDashboard, 5 * 60 * 1000);
 
       // ================================================================
       // WIDGETS
@@ -1345,12 +1266,10 @@
             timeZone: "Asia/Dubai",
           });
           const d = new Date(now);
-
           const h = String(d.getHours()).padStart(2, "0");
           const m = String(d.getMinutes()).padStart(2, "0");
           const s = String(d.getSeconds()).padStart(2, "0");
           document.getElementById("clock-time").textContent = `${h}:${m}:${s}`;
-
           document.getElementById("clock-date").textContent =
             d.toLocaleDateString("en-GB", {
               weekday: "long",
@@ -1359,8 +1278,6 @@
               year: "numeric",
               timeZone: "Asia/Dubai",
             });
-
-          // Hijri date approximation
           try {
             const hijri = new Intl.DateTimeFormat("ar-SA-u-ca-islamic", {
               day: "numeric",
@@ -1380,20 +1297,16 @@
       // ── Weather ───────────────────────────────────────────────────────
       async function loadWeather() {
         try {
-          // Dubai coordinates
           const lat = 25.2048,
             lon = 55.2708;
-          const url = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current_weather=true&hourly=relativehumidity_2m,apparent_temperature&timezone=Asia%2FDubai&forecast_days=1`;
-
+          const url = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current_weather=true&timezone=Asia%2FDubai&forecast_days=1`;
           const res = await fetch(url);
           const data = await res.json();
           const cw = data.current_weather;
-
           const temp = Math.round(cw.temperature);
           const wind = Math.round(cw.windspeed);
           const code = cw.weathercode;
 
-          // Weather code to emoji + description
           function getWeather(code) {
             if (code === 0) return { icon: "☀️", desc: "Clear Sky" };
             if (code <= 2) return { icon: "🌤️", desc: "Partly Cloudy" };
@@ -1408,15 +1321,13 @@
           }
 
           const w = getWeather(code);
-
           document.getElementById("weather-temp").textContent = `${temp}°C`;
           document.getElementById("weather-icon").textContent = w.icon;
           document.getElementById("weather-desc").textContent = w.desc;
           document.getElementById("weather-details").innerHTML = `
-      <span>💨 ${wind} km/h</span>
-      <span>📍 Dubai, UAE</span>
-    `;
-        } catch (err) {
+        <span>💨 ${wind} km/h</span>
+        <span>📍 Dubai, UAE</span>`;
+        } catch {
           document.getElementById("weather-desc").textContent =
             "Weather unavailable";
         }
@@ -1431,7 +1342,6 @@
         document.getElementById("cal-month-title").textContent =
           now.toLocaleDateString("en-GB", { month: "long", year: "numeric" });
 
-        // Get lease end dates this month
         const firstDay = new Date(year, month, 1).toISOString().split("T")[0];
         const lastDay = new Date(year, month + 1, 0)
           .toISOString()
@@ -1449,38 +1359,35 @@
 
         const days = ["Su", "Mo", "Tu", "We", "Th", "Fr", "Sa"];
         const firstDow = new Date(year, month, 1).getDay();
-        const daysInMonth = new Date(year, month + 1, 0).getDate();
+        const totalDays = new Date(year, month + 1, 0).getDate();
         const today = now.getDate();
 
         let html = '<div class="cal-grid">';
         days.forEach((d) => {
           html += `<div class="cal-day-header">${d}</div>`;
         });
-
-        // Empty cells before first day
         for (let i = 0; i < firstDow; i++) {
           html += '<div class="cal-day other-month"></div>';
         }
-
-        for (let day = 1; day <= daysInMonth; day++) {
+        for (let day = 1; day <= totalDays; day++) {
           let cls = "cal-day";
           if (day === today) cls += " today";
           if (expiryDays.has(day) && day !== today) cls += " has-expiry";
           html += `<div class="${cls}">${day}</div>`;
         }
-
         html += "</div>";
-        html += `<div style="margin-top:10px;font-size:0.72rem;color:var(--text-muted);
-    display:flex;gap:12px;flex-wrap:wrap">
-    <span style="display:flex;align-items:center;gap:4px">
-      <span style="width:10px;height:10px;background:var(--green);
-        border-radius:50%;display:inline-block"></span> Today
-    </span>
-    <span style="display:flex;align-items:center;gap:4px">
-      <span style="width:10px;height:10px;background:rgba(240,165,0,0.4);
-        border-radius:50%;display:inline-block"></span> Lease Expiry
-    </span>
-  </div>`;
+        html += `
+      <div style="margin-top:10px;font-size:0.72rem;color:var(--text-muted);
+        display:flex;gap:12px;flex-wrap:wrap">
+        <span style="display:flex;align-items:center;gap:4px">
+          <span style="width:10px;height:10px;background:var(--green);
+            border-radius:50%;display:inline-block"></span> Today
+        </span>
+        <span style="display:flex;align-items:center;gap:4px">
+          <span style="width:10px;height:10px;background:rgba(240,165,0,0.4);
+            border-radius:50%;display:inline-block"></span> Lease Expiry
+        </span>
+      </div>`;
 
         document.getElementById("mini-calendar").innerHTML = html;
       }
@@ -1537,7 +1444,7 @@
       async function loadUpcomingAlert() {
         const { data: units } = await supabase
           .from("units")
-          .select("*, buildings(name), floors(name)")
+          .select("*, buildings(name)")
           .not("tenant_name", "is", null)
           .not("end_date", "is", null);
 
@@ -1555,11 +1462,12 @@
 
         const container = document.getElementById("upcoming-alert-list");
 
-        if (upcoming.length === 0) {
+        if (!upcoming.length) {
           container.innerHTML = `
-      <div style="text-align:center;padding:20px;color:var(--text-muted);font-size:0.85rem">
-        ✅ No upcoming vacancies within 90 days
-      </div>`;
+        <div style="text-align:center;padding:20px;
+          color:var(--text-muted);font-size:0.85rem">
+          ✅ No upcoming vacancies within 90 days
+        </div>`;
           return;
         }
 
@@ -1571,21 +1479,21 @@
             else if (days <= 60) urgency = "warning";
 
             return `
-      <div class="alert-item ${urgency}">
-        <div>
-          <div class="alert-unit">
-            Unit ${u.unit_number}
-            <span style="font-size:0.72rem;color:var(--text-muted);
-              font-weight:400;margin-left:6px">
-              ${u.buildings?.name || "—"}
-            </span>
+        <div class="alert-item ${urgency}">
+          <div>
+            <div class="alert-unit">
+              Unit ${u.unit_number}
+              <span style="font-size:0.72rem;color:var(--text-muted);
+                font-weight:400;margin-left:6px">
+                ${u.buildings?.name || "—"}
+              </span>
+            </div>
+            <div class="alert-tenant">👤 ${u.tenant_name}</div>
           </div>
-          <div class="alert-tenant">👤 ${u.tenant_name}</div>
-        </div>
-        <span class="alert-days ${urgency}">
-          ${days} day${days !== 1 ? "s" : ""}
-        </span>
-      </div>`;
+          <span class="alert-days ${urgency}">
+            ${days} day${days !== 1 ? "s" : ""}
+          </span>
+        </div>`;
           })
           .join("");
       }
@@ -1600,42 +1508,42 @@
 
         const container = document.getElementById("notices-list");
 
-        if (!notices || notices.length === 0) {
+        if (!notices || !notices.length) {
           container.innerHTML = `
-      <div style="text-align:center;padding:20px;color:var(--text-muted);font-size:0.85rem">
-        No notices posted yet. Click "+ Post" to add one.
-      </div>`;
+        <div style="text-align:center;padding:20px;
+          color:var(--text-muted);font-size:0.85rem">
+          No notices posted yet. Click "+ Post" to add one.
+        </div>`;
           return;
         }
 
+        function getTimeAgo(date) {
+          const diff = Math.floor((new Date() - date) / 1000);
+          if (diff < 60) return "Just now";
+          if (diff < 3600) return Math.floor(diff / 60) + "m ago";
+          if (diff < 86400) return Math.floor(diff / 3600) + "h ago";
+          return Math.floor(diff / 86400) + "d ago";
+        }
+
         container.innerHTML = notices
-          .map((n) => {
-            const d = new Date(n.created_at);
-            const timeAgo = getTimeAgo(d);
-            return `
+          .map(
+            (n) => `
       <div class="notice-item">
         <div class="notice-message">${n.message}</div>
         <div class="notice-meta">
-          <span>📌 ${n.posted_by} · ${timeAgo}</span>
+          <span>📌 ${n.posted_by} · ${getTimeAgo(new Date(n.created_at))}</span>
           <button class="notice-delete"
             onclick="deleteNotice('${n.id}')">✕ Remove</button>
         </div>
-      </div>`;
-          })
+      </div>`,
+          )
           .join("");
-      }
-
-      function getTimeAgo(date) {
-        const diff = Math.floor((new Date() - date) / 1000);
-        if (diff < 60) return "Just now";
-        if (diff < 3600) return Math.floor(diff / 60) + "m ago";
-        if (diff < 86400) return Math.floor(diff / 3600) + "h ago";
-        return Math.floor(diff / 86400) + "d ago";
       }
 
       window.openAddNotice = function () {
         document.getElementById("notice-text").value = "";
         document.getElementById("modal-notice").style.display = "flex";
+        setTimeout(() => document.getElementById("notice-text").focus(), 100);
       };
 
       window.closeNoticeModal = function () {
@@ -1658,7 +1566,6 @@
           showToast("Error posting notice.", "error");
           return;
         }
-
         closeNoticeModal();
         showToast("Notice posted!");
         loadNotices();
@@ -1674,23 +1581,37 @@
         loadNotices();
       };
 
-      // ── Monthly Revenue Estimate ──────────────────────────────────────
+      document
+        .getElementById("modal-notice")
+        .addEventListener("click", function (e) {
+          if (e.target === this) this.style.display = "none";
+        });
+
+      // ── Revenue Estimate ──────────────────────────────────────────────
       async function loadRevenueEstimate() {
         const { data: buildings } = await supabase
           .from("buildings")
           .select("id, name")
           .order("name");
-
         const { data: units } = await supabase
           .from("units")
           .select("building_id, tenant_name, rent");
+        const { data: invoices } = await supabase
+          .from("invoices")
+          .select("vat_amount, created_at");
+        const { data: maint } = await supabase
+          .from("maintenance_requests")
+          .select("cost, status");
 
         const allBuildings = buildings || [];
         const allUnits = units || [];
+        const allInvoices = invoices || [];
+        const allMaint = maint || [];
 
         let grandTotal = 0;
         let grandOccupied = 0;
 
+        // Card 1 — Revenue per building
         const grid = document.getElementById("revenue-grid");
         grid.innerHTML = allBuildings
           .map((b) => {
@@ -1698,71 +1619,117 @@
             const occupied = bUnits.filter(
               (u) => u.tenant_name && u.tenant_name.trim() !== "",
             );
-            const revenue = occupied.reduce(
-              (s, u) => s + (parseFloat(u.rent) || 0),
-              0,
+            const monthly = Math.round(
+              occupied.reduce((s, u) => s + (parseFloat(u.rent) || 0), 0) / 12,
             );
-            const monthly = Math.round(revenue / 12);
 
             grandTotal += monthly;
             grandOccupied += occupied.length;
 
             return `
-      <div class="revenue-item">
-        <div class="revenue-building">${b.name}</div>
-        <div class="revenue-units">
-          ${occupied.length} occupied unit${occupied.length !== 1 ? "s" : ""}
-        </div>
-        <div class="revenue-amount">
-          AED ${monthly.toLocaleString("en-AE")}
-          <span style="font-size:0.72rem;color:var(--text-muted);
-            font-weight:400">/month</span>
-        </div>
-      </div>`;
+        <div class="revenue-item">
+          <div class="revenue-building">${b.name}</div>
+          <div class="revenue-units">
+            ${occupied.length} occupied unit${occupied.length !== 1 ? "s" : ""}
+          </div>
+          <div class="revenue-amount">
+            AED ${monthly.toLocaleString("en-AE")}
+            <span style="font-size:0.72rem;color:var(--text-muted);
+              font-weight:400">/month</span>
+          </div>
+        </div>`;
           })
           .join("");
 
         document.getElementById("revenue-total-bar").innerHTML = `
-    <div>
       <div class="revenue-total-label">
         Total Monthly Revenue Estimate
         <span style="margin-left:12px;font-size:0.75rem;color:var(--text-muted)">
           (${grandOccupied} occupied units across ${allBuildings.length} buildings)
         </span>
       </div>
-    </div>
-    <div class="revenue-total-amount">
-      AED ${grandTotal.toLocaleString("en-AE")}
-    </div>`;
-      }
-    </script>
-    <!-- Notice Modal -->
-    <div class="modal-overlay" id="modal-notice" style="display: none">
-      <div class="modal" style="max-width: 480px">
-        <div class="modal-header">
-          <div class="modal-title">Post a Notice</div>
-          <button class="modal-close" onclick="closeNoticeModal()">×</button>
+      <div class="revenue-total-amount">
+        AED ${grandTotal.toLocaleString("en-AE")}
+      </div>`;
+
+        // Card 2 — Property Management Revenue (1%)
+        const mgmt = Math.round(grandTotal * 0.01);
+        document.getElementById("revenue-mgmt-card").innerHTML = `
+      <div class="widget-title">🏢 Property Management Revenue</div>
+      <div style="font-size:0.78rem;color:var(--text-muted);margin-bottom:12px">
+        1% of Monthly Revenue Estimate
+      </div>
+      <div style="font-size:2rem;font-weight:800;color:var(--green);margin-bottom:8px">
+        AED ${mgmt.toLocaleString("en-AE")}
+        <span style="font-size:0.78rem;color:var(--text-muted);font-weight:400">/month</span>
+      </div>
+      <div style="font-size:0.82rem;color:var(--text-muted);margin-bottom:16px">
+        Annual: <strong style="color:var(--white)">
+          AED ${(mgmt * 12).toLocaleString("en-AE")}
+        </strong>
+      </div>
+      <div style="background:var(--bg);border-radius:var(--radius-sm);
+        padding:10px 14px;font-size:0.78rem;color:var(--text-muted)">
+        Based on total monthly revenue of
+        <strong style="color:var(--text)">
+          AED ${grandTotal.toLocaleString("en-AE")}
+        </strong>
+      </div>`;
+
+        // Card 3 — Maintenance Cost + VAT
+        const today = new Date();
+        const thisMonthInv = allInvoices.filter((i) => {
+          const d = new Date(i.created_at);
+          return (
+            d.getMonth() === today.getMonth() &&
+            d.getFullYear() === today.getFullYear()
+          );
+        });
+
+        const totalVAT = thisMonthInv.reduce(
+          (s, i) => s + (parseFloat(i.vat_amount) || 0),
+          0,
+        );
+        const totalMaint = allMaint.reduce(
+          (s, m) => s + (parseFloat(m.cost) || 0),
+          0,
+        );
+        const openCost = allMaint
+          .filter((m) => m.status === "open")
+          .reduce((s, m) => s + (parseFloat(m.cost) || 0), 0);
+
+        document.getElementById("revenue-misc-card").innerHTML = `
+      <div class="widget-title">📊 Costs & VAT Overview</div>
+      <div style="margin-bottom:16px">
+        <div style="font-size:0.75rem;color:var(--text-muted);
+          text-transform:uppercase;letter-spacing:0.4px;margin-bottom:6px">
+          Maintenance Costs
         </div>
-        <div class="modal-body">
-          <div class="form-group">
-            <label class="form-label">Notice Message *</label>
-            <textarea
-              id="notice-text"
-              class="form-control"
-              rows="4"
-              placeholder="Type your announcement or notice here..."
-            ></textarea>
-          </div>
+        <div style="font-size:1.6rem;font-weight:800;color:var(--warning);margin-bottom:4px">
+          AED ${totalMaint.toLocaleString("en-AE", { minimumFractionDigits: 2 })}
         </div>
-        <div class="modal-footer">
-          <button class="btn btn-outline" onclick="closeNoticeModal()">
-            Cancel
-          </button>
-          <button class="btn btn-green" onclick="saveNotice()">
-            Post Notice
-          </button>
+        <div style="font-size:0.78rem;color:var(--text-muted)">
+          Total logged across all requests<br>
+          Open requests cost:
+          <strong style="color:var(--text)">
+            AED ${openCost.toLocaleString("en-AE", { minimumFractionDigits: 2 })}
+          </strong>
         </div>
       </div>
-    </div>
+      <div style="border-top:1px solid var(--border);padding-top:16px">
+        <div style="font-size:0.75rem;color:var(--text-muted);
+          text-transform:uppercase;letter-spacing:0.4px;margin-bottom:6px">
+          VAT Collected — This Month
+        </div>
+        <div style="font-size:1.6rem;font-weight:800;color:var(--blue-light);margin-bottom:4px">
+          AED ${totalVAT.toLocaleString("en-AE", { minimumFractionDigits: 2 })}
+        </div>
+        <div style="font-size:0.78rem;color:var(--text-muted)">
+          From ${thisMonthInv.length} invoice${thisMonthInv.length !== 1 ? "s" : ""} this month<br>
+          TRN: <strong style="color:var(--text)">104488244500003</strong>
+        </div>
+      </div>`;
+      }
+    </script>
   </body>
 </html>
