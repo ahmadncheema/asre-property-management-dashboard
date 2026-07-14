@@ -65,155 +65,304 @@ export default async function handler(req, res) {
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Lease Renewal Notice</title>
+  <title>${subject}</title>
 </head>
-<body style="margin:0;padding:0;background-color:#f5f5f5;font-family:'Segoe UI',Arial,sans-serif;">
+<body style="margin:0;padding:0;background:#f0f2f5;
+  font-family:'Segoe UI',Arial,sans-serif;">
 
-  <div style="max-width:600px;margin:40px auto;background:#ffffff;
-    border-radius:12px;overflow:hidden;box-shadow:0 4px 24px rgba(0,0,0,0.1);">
+  <table width="100%" cellpadding="0" cellspacing="0"
+    style="background:#f0f2f5;padding:40px 20px;">
+    <tr>
+      <td align="center">
+        <table width="600" cellpadding="0" cellspacing="0"
+          style="max-width:600px;width:100%;background:#ffffff;
+          border-radius:16px;overflow:hidden;
+          box-shadow:0 4px 24px rgba(0,0,0,0.10);">
 
-    <!-- Header -->
-    <div style="background:#2a5590;padding:32px 40px;text-align:center;">
-      <div style="font-size:1.4rem;font-weight:800;color:#ffffff;
-        letter-spacing:1px;margin-bottom:4px;">
-        AHMED AL SHEEBANI REAL ESTATE
-      </div>
-      <div style="font-size:0.85rem;color:rgba(255,255,255,0.7);">
-        Property Management Department
-      </div>
-      <div style="margin-top:16px;display:inline-block;
-        background:${urgencyColor};color:#ffffff;
-        padding:6px 20px;border-radius:20px;
-        font-size:0.82rem;font-weight:700;letter-spacing:0.5px;">
-        ${urgencyLabel}
-      </div>
-    </div>
-
-    <!-- Green accent bar -->
-    <div style="height:4px;background:#3ead82;"></div>
-
-    <!-- Body -->
-    <div style="padding:40px;">
-
-      <p style="font-size:1rem;color:#1a1a2e;margin-bottom:8px;">
-        Dear <strong>${tenantName}</strong>,
-      </p>
-
-      <p style="font-size:0.95rem;color:#444;line-height:1.7;margin-bottom:24px;">
-        This is a friendly reminder that your lease agreement for the property
-        detailed below is approaching its expiry date.
-      </p>
-
-      <!-- Property Details Box -->
-      <div style="background:#f8f9fc;border:1px solid #e0e6ef;
-        border-left:4px solid #2a5590;border-radius:8px;
-        padding:20px 24px;margin-bottom:28px;">
-        <div style="font-size:0.75rem;font-weight:700;color:#8896a8;
-          text-transform:uppercase;letter-spacing:0.5px;margin-bottom:14px;">
-          Property Details
-        </div>
-        <table style="width:100%;border-collapse:collapse;">
+          <!-- Header -->
           <tr>
-            <td style="padding:6px 0;font-size:0.88rem;color:#8896a8;width:40%;">
-              Building
-            </td>
-            <td style="padding:6px 0;font-size:0.88rem;font-weight:600;color:#1a1a2e;">
-              ${buildingName}
+            <td style="background:#2a5590;padding:36px 40px 28px;
+              text-align:center;">
+
+              <!-- Logo -->
+              <img
+                src="https://raw.githubusercontent.com/ahmadncheema/asre-property-management-dashboard/main/assets/logo/logo.png"
+                alt="Ahmed Al Sheebani Real Estate"
+                width="200"
+                style="display:block;margin:0 auto 16px;
+                max-width:200px;height:auto;"
+              />
+
+              <!-- Green Divider -->
+              <div style="width:50px;height:3px;background:#3ead82;
+                margin:0 auto 14px;border-radius:2px;"></div>
+
+              <!-- Dept Label -->
+              <div style="font-size:12px;color:rgba(255,255,255,0.7);
+                letter-spacing:1px;text-transform:uppercase;">
+                Property Management Department
+              </div>
+
             </td>
           </tr>
+
+          <!-- Stage Badge -->
           <tr>
-            <td style="padding:6px 0;font-size:0.88rem;color:#8896a8;">
-              Floor
-            </td>
-            <td style="padding:6px 0;font-size:0.88rem;font-weight:600;color:#1a1a2e;">
-              ${floorName || "—"}
+            <td style="background:#2a5590;padding:0 40px 28px;
+              text-align:center;">
+              <div style="display:inline-block;background:${stageColor};
+                color:#ffffff;font-size:13px;font-weight:700;
+                letter-spacing:1px;padding:10px 32px;
+                border-radius:25px;">
+                ${stageLabel}
+              </div>
             </td>
           </tr>
+
+          <!-- Body -->
           <tr>
-            <td style="padding:6px 0;font-size:0.88rem;color:#8896a8;">
-              Unit Number
-            </td>
-            <td style="padding:6px 0;font-size:0.88rem;font-weight:600;color:#1a1a2e;">
-              ${unitNumber}
+            <td style="padding:36px 40px 28px;">
+
+              <p style="font-size:16px;color:#1a1a2e;margin:0 0 16px;">
+                Dear <strong>${tenantName}</strong>,
+              </p>
+
+              <p style="font-size:15px;color:#555;line-height:1.7;
+                margin:0 0 28px;">
+                This is a friendly reminder that your lease agreement for
+                the property detailed below is approaching its expiry date.
+                Please contact our leasing team at your earliest convenience
+                to discuss renewal options.
+              </p>
+
+              <!-- Property Details -->
+              <table width="100%" cellpadding="0" cellspacing="0"
+                style="border:1px solid #e0e8f5;border-radius:10px;
+                overflow:hidden;margin-bottom:24px;">
+                <tr>
+                  <td style="background:#2a5590;padding:12px 20px;">
+                    <span style="font-size:11px;font-weight:700;
+                      color:#ffffff;letter-spacing:1px;
+                      text-transform:uppercase;">
+                      Property Details
+                    </span>
+                  </td>
+                </tr>
+                <tr>
+                  <td style="padding:0 20px;">
+                    <table width="100%" cellpadding="0" cellspacing="0">
+                      <tr>
+                        <td style="padding:12px 0;border-bottom:
+                          1px solid #f0f4fa;width:40%;">
+                          <span style="font-size:12px;color:#8896a8;
+                            text-transform:uppercase;letter-spacing:0.5px;">
+                            Building
+                          </span>
+                        </td>
+                        <td style="padding:12px 0;border-bottom:
+                          1px solid #f0f4fa;">
+                          <strong style="font-size:14px;color:#1a1a2e;">
+                            ${buildingName}
+                          </strong>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td style="padding:12px 0;border-bottom:
+                          1px solid #f0f4fa;">
+                          <span style="font-size:12px;color:#8896a8;
+                            text-transform:uppercase;letter-spacing:0.5px;">
+                            Floor
+                          </span>
+                        </td>
+                        <td style="padding:12px 0;border-bottom:
+                          1px solid #f0f4fa;">
+                          <strong style="font-size:14px;color:#1a1a2e;">
+                            ${floorName}
+                          </strong>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td style="padding:12px 0;border-bottom:
+                          1px solid #f0f4fa;">
+                          <span style="font-size:12px;color:#8896a8;
+                            text-transform:uppercase;letter-spacing:0.5px;">
+                            Unit Number
+                          </span>
+                        </td>
+                        <td style="padding:12px 0;border-bottom:
+                          1px solid #f0f4fa;">
+                          <strong style="font-size:14px;color:#1a1a2e;">
+                            ${unitNumber}
+                          </strong>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td style="padding:12px 0;">
+                          <span style="font-size:12px;color:#8896a8;
+                            text-transform:uppercase;letter-spacing:0.5px;">
+                            Lease Expiry Date
+                          </span>
+                        </td>
+                        <td style="padding:12px 0;">
+                          <strong style="font-size:14px;color:#1a1a2e;">
+                            ${formattedDate}
+                          </strong>
+                        </td>
+                      </tr>
+                    </table>
+                  </td>
+                </tr>
+              </table>
+
+              <!-- Days Remaining Box -->
+              <table width="100%" cellpadding="0" cellspacing="0"
+                style="background:${stageColor}15;border:1px solid ${stageColor}40;
+                border-radius:10px;margin-bottom:28px;">
+                <tr>
+                  <td style="padding:20px;text-align:center;">
+                    <div style="font-size:42px;font-weight:800;
+                      color:${stageColor};line-height:1;margin-bottom:6px;">
+                      ${daysRemaining}
+                    </div>
+                    <div style="font-size:13px;color:#888;
+                      text-transform:uppercase;letter-spacing:1px;">
+                      days remaining on your lease
+                    </div>
+                  </td>
+                </tr>
+              </table>
+
+              <p style="font-size:15px;color:#555;line-height:1.7;
+                margin:0 0 28px;">
+                Please do not hesitate to reach out to our leasing team
+                using the contact details below. We look forward to
+                assisting you with your renewal.
+              </p>
+
+              <!-- Contact Section -->
+              <table width="100%" cellpadding="0" cellspacing="0"
+                style="background:#1a1a2e;border-radius:10px;
+                margin-bottom:28px;overflow:hidden;">
+                <tr>
+                  <td style="padding:16px 24px;
+                    border-bottom:1px solid rgba(255,255,255,0.08);">
+                    <span style="font-size:11px;font-weight:700;
+                      color:rgba(255,255,255,0.5);letter-spacing:1px;
+                      text-transform:uppercase;">
+                      Contact Our Leasing Team
+                    </span>
+                  </td>
+                </tr>
+                <tr>
+                  <td style="padding:20px 24px;">
+                    <table width="100%" cellpadding="0" cellspacing="0">
+
+                      <!-- Email -->
+                      <tr>
+                        <td style="padding:8px 0;width:32px;
+                          vertical-align:top;">
+                          <span style="font-size:16px;">📧</span>
+                        </td>
+                        <td style="padding:8px 0;vertical-align:top;">
+                          <div style="font-size:11px;color:rgba(255,255,255,0.4);
+                            text-transform:uppercase;letter-spacing:0.5px;
+                            margin-bottom:3px;">Email</div>
+                          <a href="mailto:leasing@alsheebanirealestate.ae"
+                            style="font-size:14px;color:#3ead82;
+                            text-decoration:none;font-weight:600;">
+                            leasing@alsheebanirealestate.ae
+                          </a>
+                        </td>
+                      </tr>
+
+                      <!-- Phone -->
+                      <tr>
+                        <td style="padding:8px 0;width:32px;
+                          vertical-align:top;">
+                          <span style="font-size:16px;">📞</span>
+                        </td>
+                        <td style="padding:8px 0;vertical-align:top;">
+                          <div style="font-size:11px;color:rgba(255,255,255,0.4);
+                            text-transform:uppercase;letter-spacing:0.5px;
+                            margin-bottom:3px;">Phone</div>
+                          <a href="tel:+97142945001"
+                            style="font-size:14px;color:#3ead82;
+                            text-decoration:none;font-weight:600;">
+                            +971 4 294 5001
+                          </a>
+                        </td>
+                      </tr>
+
+                      <!-- Website -->
+                      <tr>
+                        <td style="padding:8px 0;width:32px;
+                          vertical-align:top;">
+                          <span style="font-size:16px;">🌐</span>
+                        </td>
+                        <td style="padding:8px 0;vertical-align:top;">
+                          <div style="font-size:11px;color:rgba(255,255,255,0.4);
+                            text-transform:uppercase;letter-spacing:0.5px;
+                            margin-bottom:3px;">Website</div>
+                          <a href="https://www.alsheebani-realestate.com"
+                            style="font-size:14px;color:#3ead82;
+                            text-decoration:none;font-weight:600;">
+                            www.alsheebani-realestate.com
+                          </a>
+                        </td>
+                      </tr>
+
+                      <!-- Address -->
+                      <tr>
+                        <td style="padding:8px 0;width:32px;
+                          vertical-align:top;">
+                          <span style="font-size:16px;">📍</span>
+                        </td>
+                        <td style="padding:8px 0;vertical-align:top;">
+                          <div style="font-size:11px;color:rgba(255,255,255,0.4);
+                            text-transform:uppercase;letter-spacing:0.5px;
+                            margin-bottom:3px;">Address</div>
+                          <span style="font-size:14px;color:#ffffff;
+                            font-weight:600;">
+                            Office 502, Ithraa Tower,<br>
+                            Al Garhoud, Dubai, UAE
+                          </span>
+                        </td>
+                      </tr>
+
+                    </table>
+                  </td>
+                </tr>
+              </table>
+
+              <!-- Disclaimer -->
+              <p style="font-size:12px;color:#aaa;line-height:1.6;
+                border-top:1px solid #eee;padding-top:20px;margin:0;">
+                This is an automated reminder sent by the Ahmed Al Sheebani
+                Real Estate Property Management System. Please do not reply
+                to this email directly — contact us using the details above.
+              </p>
+
             </td>
           </tr>
+
+          <!-- Footer -->
           <tr>
-            <td style="padding:6px 0;font-size:0.88rem;color:#8896a8;">
-              Lease Expiry Date
-            </td>
-            <td style="padding:6px 0;font-size:0.88rem;font-weight:600;color:#1a1a2e;">
-              ${formattedDate}
+            <td style="background:#f8f9fa;padding:20px 40px;
+              border-top:1px solid #eee;text-align:center;">
+              <div style="font-size:12px;color:#999;line-height:1.8;">
+                <strong style="color:#2a5590;font-size:13px;">
+                  Ahmed Al Sheebani Real Estate L.L.C
+                </strong><br>
+                Office 502, Ithraa Tower, Al Garhoud, Dubai, UAE<br>
+                TRN: 104488244500003
+              </div>
             </td>
           </tr>
+
         </table>
-      </div>
-
-      <!-- Days Remaining Banner -->
-      <div style="background:${urgencyColor}15;border:1px solid ${urgencyColor}40;
-        border-radius:8px;padding:16px 24px;margin-bottom:28px;text-align:center;">
-        <div style="font-size:2rem;font-weight:800;color:${urgencyColor};line-height:1;">
-          ${daysRemaining}
-        </div>
-        <div style="font-size:0.85rem;color:#666;margin-top:4px;">
-          days remaining on your lease
-        </div>
-      </div>
-
-      <p style="font-size:0.95rem;color:#444;line-height:1.7;margin-bottom:28px;">
-        Please contact our leasing team at your earliest convenience to discuss
-        your renewal options and avoid any disruption to your tenancy.
-      </p>
-
-      <!-- Contact Box -->
-      <div style="background:#2a5590;border-radius:8px;
-        padding:20px 24px;margin-bottom:28px;">
-        <div style="font-size:0.75rem;font-weight:700;color:rgba(255,255,255,0.6);
-          text-transform:uppercase;letter-spacing:0.5px;margin-bottom:12px;">
-          Contact Our Leasing Team
-        </div>
-        <div style="display:flex;flex-direction:column;gap:8px;">
-          <div style="font-size:0.9rem;color:#ffffff;">
-            📧 <a href="mailto:leasing@alsheebanirealestate.ae"
-              style="color:#3ead82;text-decoration:none;">
-              leasing@alsheebanirealestate.ae
-            </a>
-          </div>
-          <div style="font-size:0.9rem;color:#ffffff;">
-            📞 +971 4 294 5001
-          </div>
-          <div style="font-size:0.9rem;color:#ffffff;">
-            🌐 <a href="http://www.alsheebani-realestate.com"
-              style="color:#3ead82;text-decoration:none;">
-              www.alsheebani-realestate.com
-            </a>
-          </div>
-          <div style="font-size:0.9rem;color:#ffffff;">
-            📍 502 Ithraa Tower, P.O. Box 20190, Dubai, UAE
-          </div>
-        </div>
-      </div>
-
-      <p style="font-size:0.82rem;color:#999;line-height:1.6;
-        border-top:1px solid #eee;padding-top:20px;">
-        This is an automated reminder sent by the Ahmed Al Sheebani Real Estate
-        Property Management System. Please do not reply to this email directly —
-        contact us using the details above.
-      </p>
-
-    </div>
-
-    <!-- Footer -->
-    <div style="background:#f8f9fc;border-top:1px solid #e0e6ef;
-      padding:20px 40px;text-align:center;">
-      <div style="font-size:0.82rem;color:#8896a8;">
-        Ahmed Al Sheebani Real Estate L.L.C · Dubai, UAE
-      </div>
-      <div style="font-size:0.78rem;color:#b0b8c4;margin-top:4px;">
-        TRN: 104488244500003
-      </div>
-    </div>
-
-  </div>
+      </td>
+    </tr>
+  </table>
 
 </body>
 </html>`;
