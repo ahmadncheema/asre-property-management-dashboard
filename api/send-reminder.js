@@ -1,12 +1,28 @@
 // ================================================================
 // ASRE Property Management Dashboard
-// Serverless Function — Send Lease Reminder Email via Resend
+// Vercel Serverless Function — Send Email Reminder via Resend
 // ================================================================
 
-export default async function handler(req, res) {
+module.exports = async function handler(req, res) {
+  // Set CORS headers
+  res.setHeader("Access-Control-Allow-Origin", "*");
+  res.setHeader("Access-Control-Allow-Methods", "POST, OPTIONS");
+  res.setHeader("Access-Control-Allow-Headers", "Content-Type");
+
+  // Handle preflight
+  if (req.method === "OPTIONS") {
+    return res.status(200).end();
+  }
+
   // Only allow POST
   if (req.method !== "POST") {
     return res.status(405).json({ error: "Method not allowed" });
+  }
+
+  // Check API key exists
+  if (!process.env.RESEND_API_KEY) {
+    console.error("RESEND_API_KEY is not set");
+    return res.status(500).json({ error: "Email service not configured" });
   }
 
   const {
@@ -21,11 +37,11 @@ export default async function handler(req, res) {
   } = req.body;
 
   // Validate required fields
-  if (!tenantEmail || !tenantName || !unitNumber) {
+  if (!tenantEmail || !tenantName || !unitNumber || !buildingName) {
     return res.status(400).json({ error: "Missing required fields" });
   }
 
-  // Subject line per stage
+  // Subject line based on stage
   const subjects = {
     "90d": `Lease Renewal Notice — Unit ${unitNumber}, ${buildingName}`,
     "60d": `Lease Renewal Reminder — Unit ${unitNumber}, ${buildingName}`,
@@ -36,29 +52,30 @@ export default async function handler(req, res) {
     subjects[stage] ||
     `Lease Renewal Notice — Unit ${unitNumber}, ${buildingName}`;
 
-  // Format date nicely
+  // Format end date
   const formattedDate = new Date(endDate).toLocaleDateString("en-GB", {
     day: "2-digit",
     month: "long",
     year: "numeric",
   });
 
-  // Urgency color per stage
-  const urgencyColor =
-    {
-      "90d": "#3ead82",
-      "60d": "#f0a500",
-      "30d": "#e55353",
-    }[stage] || "#3ead82";
+  // Stage colors and labels
+  const stageColors = {
+    "90d": "#3ead82",
+    "60d": "#f0a500",
+    "30d": "#e55353",
+  };
 
-  const urgencyLabel =
-    {
-      "90d": "90-Day Notice",
-      "60d": "60-Day Reminder",
-      "30d": "30-Day Urgent Notice",
-    }[stage] || "Lease Notice";
+  const stageLabels = {
+    "90d": "90 Days Notice",
+    "60d": "60 Days Reminder",
+    "30d": "Final 30 Days Notice",
+  };
 
-  // HTML Email Template
+  const stageColor = stageColors[stage] || "#3ead82";
+  const stageLabel = stageLabels[stage] || "Lease Notice";
+
+  // HTML email body
   const htmlBody = `
 <!DOCTYPE html>
 <html lang="en">
@@ -92,6 +109,12 @@ export default async function handler(req, res) {
                 style="display:block;margin:0 auto 16px;
                 max-width:200px;height:auto;"
               />
+
+              <!-- Company Name -->
+              <div style="font-size:18px;font-weight:800;color:#ffffff;
+                letter-spacing:1px;margin-bottom:8px;">
+                AHMED AL SHEEBANI REAL ESTATE
+              </div>
 
               <!-- Green Divider -->
               <div style="width:50px;height:3px;background:#3ead82;
@@ -216,12 +239,14 @@ export default async function handler(req, res) {
 
               <!-- Days Remaining Box -->
               <table width="100%" cellpadding="0" cellspacing="0"
-                style="background:${stageColor}15;border:1px solid ${stageColor}40;
+                style="background:${stageColor}15;
+                border:2px solid ${stageColor};
                 border-radius:10px;margin-bottom:28px;">
                 <tr>
-                  <td style="padding:20px;text-align:center;">
-                    <div style="font-size:42px;font-weight:800;
-                      color:${stageColor};line-height:1;margin-bottom:6px;">
+                  <td style="padding:24px;text-align:center;">
+                    <div style="font-size:48px;font-weight:800;
+                      color:${stageColor};line-height:1;
+                      margin-bottom:8px;">
                       ${daysRemaining}
                     </div>
                     <div style="font-size:13px;color:#888;
@@ -244,7 +269,7 @@ export default async function handler(req, res) {
                 style="background:#1a1a2e;border-radius:10px;
                 margin-bottom:28px;overflow:hidden;">
                 <tr>
-                  <td style="padding:16px 24px;
+                  <td style="padding:14px 24px;
                     border-bottom:1px solid rgba(255,255,255,0.08);">
                     <span style="font-size:11px;font-weight:700;
                       color:rgba(255,255,255,0.5);letter-spacing:1px;
@@ -259,12 +284,15 @@ export default async function handler(req, res) {
 
                       <!-- Email -->
                       <tr>
-                        <td style="padding:8px 0;width:32px;
-                          vertical-align:top;">
-                          <span style="font-size:16px;">📧</span>
+                        <td style="padding:10px 0;width:36px;
+                          vertical-align:middle;">
+                          <span style="font-size:18px;">📧</span>
                         </td>
-                        <td style="padding:8px 0;vertical-align:top;">
-                          <div style="font-size:11px;color:rgba(255,255,255,0.4);
+                        <td style="padding:10px 0;
+                          border-bottom:1px solid rgba(255,255,255,0.06);
+                          vertical-align:middle;">
+                          <div style="font-size:11px;
+                            color:rgba(255,255,255,0.4);
                             text-transform:uppercase;letter-spacing:0.5px;
                             margin-bottom:3px;">Email</div>
                           <a href="mailto:leasing@alsheebanirealestate.ae"
@@ -277,12 +305,15 @@ export default async function handler(req, res) {
 
                       <!-- Phone -->
                       <tr>
-                        <td style="padding:8px 0;width:32px;
-                          vertical-align:top;">
-                          <span style="font-size:16px;">📞</span>
+                        <td style="padding:10px 0;width:36px;
+                          vertical-align:middle;">
+                          <span style="font-size:18px;">📞</span>
                         </td>
-                        <td style="padding:8px 0;vertical-align:top;">
-                          <div style="font-size:11px;color:rgba(255,255,255,0.4);
+                        <td style="padding:10px 0;
+                          border-bottom:1px solid rgba(255,255,255,0.06);
+                          vertical-align:middle;">
+                          <div style="font-size:11px;
+                            color:rgba(255,255,255,0.4);
                             text-transform:uppercase;letter-spacing:0.5px;
                             margin-bottom:3px;">Phone</div>
                           <a href="tel:+97142945001"
@@ -295,12 +326,15 @@ export default async function handler(req, res) {
 
                       <!-- Website -->
                       <tr>
-                        <td style="padding:8px 0;width:32px;
-                          vertical-align:top;">
-                          <span style="font-size:16px;">🌐</span>
+                        <td style="padding:10px 0;width:36px;
+                          vertical-align:middle;">
+                          <span style="font-size:18px;">🌐</span>
                         </td>
-                        <td style="padding:8px 0;vertical-align:top;">
-                          <div style="font-size:11px;color:rgba(255,255,255,0.4);
+                        <td style="padding:10px 0;
+                          border-bottom:1px solid rgba(255,255,255,0.06);
+                          vertical-align:middle;">
+                          <div style="font-size:11px;
+                            color:rgba(255,255,255,0.4);
                             text-transform:uppercase;letter-spacing:0.5px;
                             margin-bottom:3px;">Website</div>
                           <a href="https://www.alsheebani-realestate.com"
@@ -313,17 +347,18 @@ export default async function handler(req, res) {
 
                       <!-- Address -->
                       <tr>
-                        <td style="padding:8px 0;width:32px;
-                          vertical-align:top;">
-                          <span style="font-size:16px;">📍</span>
+                        <td style="padding:10px 0;width:36px;
+                          vertical-align:middle;">
+                          <span style="font-size:18px;">📍</span>
                         </td>
-                        <td style="padding:8px 0;vertical-align:top;">
-                          <div style="font-size:11px;color:rgba(255,255,255,0.4);
+                        <td style="padding:10px 0;vertical-align:middle;">
+                          <div style="font-size:11px;
+                            color:rgba(255,255,255,0.4);
                             text-transform:uppercase;letter-spacing:0.5px;
                             margin-bottom:3px;">Address</div>
                           <span style="font-size:14px;color:#ffffff;
-                            font-weight:600;">
-                            Office 502, Ithraa Tower,<br>
+                            font-weight:600;line-height:1.5;">
+                            Office 502, Ithraa Tower,
                             Al Garhoud, Dubai, UAE
                           </span>
                         </td>
@@ -371,22 +406,18 @@ export default async function handler(req, res) {
   const textBody = `
 Dear ${tenantName},
 
-This is a ${urgencyLabel} for your lease at Unit ${unitNumber}, ${buildingName}.
+This is a reminder that your lease for Unit ${unitNumber} at ${buildingName}
+(Floor ${floorName}) expires on ${formattedDate} — ${daysRemaining} days remaining.
 
-Your lease expires on ${formattedDate} — ${daysRemaining} days remaining.
-
-Please contact our leasing team:
+Please contact our leasing team to discuss renewal:
 Email: leasing@alsheebanirealestate.ae
 Phone: +971 4 294 5001
+Address: Office 502, Ithraa Tower, Al Garhoud, Dubai, UAE
 
-This is an automated message. Please do not reply to this email.
-
-Ahmed Al Sheebani Real Estate
-Property Management Department
-502 Ithraa Tower, P.O. Box 20190, Dubai, UAE
+Ahmed Al Sheebani Real Estate L.L.C
+TRN: 104488244500003
   `.trim();
 
-  // Send via Resend
   try {
     const response = await fetch("https://api.resend.com/emails", {
       method: "POST",
@@ -404,21 +435,28 @@ Property Management Department
       }),
     });
 
-    const result = await response.json();
+    const responseText = await response.text();
+    let data = {};
 
-    if (!response.ok) {
-      console.error("Resend error:", result);
+    try {
+      data = JSON.parse(responseText);
+    } catch {
+      console.error("Resend non-JSON response:", responseText);
       return res.status(500).json({
-        error: result.message || "Failed to send email",
+        error: "Invalid response from email service",
       });
     }
 
-    return res.status(200).json({
-      success: true,
-      id: result.id,
-    });
+    if (!response.ok) {
+      console.error("Resend API error:", data);
+      return res.status(500).json({
+        error: data.message || data.name || "Failed to send email",
+      });
+    }
+
+    return res.status(200).json({ success: true, id: data.id });
   } catch (err) {
     console.error("Send error:", err);
-    return res.status(500).json({ error: "Internal server error" });
+    return res.status(500).json({ error: err.message });
   }
-}
+};
