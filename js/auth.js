@@ -23,10 +23,44 @@ export function clearSession() {
   localStorage.removeItem(SESSION_KEY);
 }
 
+// ── Check if user is admin ────────────────────────────────────────
+export function isAdmin() {
+  const session = getSession();
+  return session?.role === "admin";
+}
+
+// ── Check if user is finance ──────────────────────────────────────
+export function isFinance() {
+  const session = getSession();
+  return session?.role === "finance";
+}
+
 // ── Require login — call at top of every protected page ───────────
 export function requireAuth() {
   const session = getSession();
   if (!session) {
+    window.location.href = "/index.html";
+    return null;
+  }
+  return session;
+}
+
+// ── Require admin role ────────────────────────────────────────────
+export function requireAdmin() {
+  const session = requireAuth();
+  if (!session) return null;
+  if (session.role !== "admin") {
+    window.location.href = "/finance.html";
+    return null;
+  }
+  return session;
+}
+
+// ── Require finance or admin role ─────────────────────────────────
+export function requireFinanceOrAdmin() {
+  const session = requireAuth();
+  if (!session) return null;
+  if (session.role !== "admin" && session.role !== "finance") {
     window.location.href = "/index.html";
     return null;
   }
@@ -57,6 +91,7 @@ export async function login(username, password) {
       id: user.id,
       full_name: user.full_name,
       username: user.username,
+      role: user.role,
     });
 
     return { success: true, user };

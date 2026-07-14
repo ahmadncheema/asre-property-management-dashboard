@@ -487,6 +487,13 @@
               placeholder="Re-enter password"
             />
           </div>
+          <div class="form-group" id="u-role-group">
+            <label class="form-label">Role *</label>
+            <select id="u-role" class="form-control">
+              <option value="admin">Admin</option>
+              <option value="finance">Finance</option>
+            </select>
+          </div>
         </div>
         <div class="modal-footer">
           <button
@@ -607,6 +614,10 @@
 
       const session = requireAuth();
       if (!session) throw new Error("Not authenticated");
+      if (session.role === "finance") {
+        window.location.href = "/finance.html";
+        throw new Error("Access denied");
+      }
       renderNav("admin");
 
       let allUsers = [];
@@ -639,6 +650,7 @@
             <tr>
               <th>User</th>
               <th>Username</th>
+              <th>Role</th>
               <th>Created</th>
               <th>Actions</th>
             </tr>
@@ -664,6 +676,11 @@
                   </div>
                 </td>
                 <td style="color:var(--text-muted)">@${u.username}</td>
+                <td>
+                  <span class="badge ${u.role === "admin" ? "badge-blue" : "badge-green"}">
+                    ${u.role || "admin"}
+                  </span>
+                </td>
                 <td>${formatDate(u.created_at)}</td>
                 <td>
                   <div style="display:flex;gap:8px;flex-wrap:wrap">
@@ -706,6 +723,8 @@
         document.getElementById("u-confirm").value = "";
         document.getElementById("u-username").disabled = false;
         document.getElementById("u-confirm-group").style.display = "block";
+        document.getElementById("u-role-group").style.display = "block";
+        document.getElementById("u-role").value = "admin";
         openModal("modal-create-user");
       };
 
@@ -720,6 +739,7 @@
         document.getElementById("u-password").value = "";
         document.getElementById("u-username").disabled = false;
         document.getElementById("u-confirm-group").style.display = "none";
+        document.getElementById("u-role-group").style.display = "none";
         openModal("modal-create-user");
       };
 
@@ -757,10 +777,12 @@
             .update(payload)
             .eq("id", editingUserId));
         } else {
+          const role = document.getElementById("u-role").value;
           ({ error } = await supabase.from("users").insert({
             full_name: fullName,
             username,
             password_hash: password,
+            role,
           }));
         }
 

@@ -390,6 +390,10 @@
 
       const session = requireAuth();
       if (!session) throw new Error("Not authenticated");
+      if (session.role === "finance") {
+        window.location.href = "/finance.html";
+        throw new Error("Access denied");
+      }
       renderNav("bounce");
 
       let allRecords = [];

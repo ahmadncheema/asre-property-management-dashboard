@@ -101,7 +101,11 @@ export function renderNav(activePage) {
   const nav = document.getElementById("main-nav");
   if (!nav || !session) return;
 
-  const links = [
+  const isAdminRole = session.role === "admin";
+  const isFinanceRole = session.role === "finance";
+
+  // Admin links
+  const adminLinks = [
     { href: "/dashboard.html", label: "Dashboard", key: "dashboard" },
     { href: "/properties.html", label: "Properties", key: "properties" },
     { href: "/vacancy.html", label: "Vacancy", key: "vacancy" },
@@ -110,15 +114,36 @@ export function renderNav(activePage) {
     { href: "/maintenance.html", label: "Maintenance", key: "maintenance" },
     { href: "/invoices.html", label: "Invoices", key: "invoices" },
     { href: "/emails.html", label: "Emails", key: "emails" },
+    { href: "/finance.html", label: "Finance", key: "finance" },
     { href: "/admin.html", label: "Admin", key: "admin" },
   ];
 
+  // Finance links
+  const financeLinks = [
+    { href: "/finance.html", label: "Dashboard", key: "finance" },
+    { href: "/finance-income.html", label: "Income", key: "finance-income" },
+    {
+      href: "/finance-invoices.html",
+      label: "Invoices",
+      key: "finance-invoices",
+    },
+    { href: "/finance-cheques.html", label: "Cheques", key: "finance-cheques" },
+    {
+      href: "/finance-deposits.html",
+      label: "Deposits",
+      key: "finance-deposits",
+    },
+    { href: "/finance-reports.html", label: "Reports", key: "finance-reports" },
+  ];
+
+  const links = isFinanceRole ? financeLinks : adminLinks;
+
   nav.innerHTML = `
-    <div class="nav-brand" onclick="window.location.href='/dashboard.html'"
+    <div class="nav-brand" onclick="window.location.href='${isFinanceRole ? "/finance.html" : "/dashboard.html"}'"
       style="cursor:pointer">
       <img src="assets/logo/logo-small.png" alt="ASRE"
         style="height:36px; width:auto; object-fit:contain;" />
-      <span class="nav-title">Property Management</span>
+      <span class="nav-title">${isFinanceRole ? "Finance" : "Property Management"}</span>
     </div>
     <div class="nav-links" id="nav-links-desktop">
       ${links
