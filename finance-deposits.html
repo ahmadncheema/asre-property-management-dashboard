@@ -1,0 +1,571 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link
+      rel="icon"
+      href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🔒</text></svg>"
+    />
+    <title>ASRE — Security Deposits</title>
+    <link rel="stylesheet" href="css/main.css" />
+    <style>
+      .summary-bar {
+        display: flex;
+        gap: 20px;
+        background: var(--bg-card);
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        padding: 16px 24px;
+        margin-bottom: 24px;
+        flex-wrap: wrap;
+      }
+      .summary-item-num {
+        font-size: 1.4rem;
+        font-weight: 800;
+      }
+      .summary-item-label {
+        font-size: 0.72rem;
+        color: var(--text-muted);
+        text-transform: uppercase;
+        letter-spacing: 0.4px;
+      }
+    </style>
+  </head>
+  <body>
+    <nav id="main-nav"></nav>
+
+    <div class="page-wrapper">
+      <div class="container">
+        <div class="page-header">
+          <div>
+            <div class="page-title">Security <span>Deposits</span></div>
+            <div class="page-subtitle">
+              Track security deposits held, refunded, and partial
+            </div>
+          </div>
+          <button class="btn btn-green" onclick="openAddDeposit()">
+            + Add Deposit
+          </button>
+        </div>
+
+        <!-- Summary -->
+        <div class="summary-bar">
+          <div class="summary-item">
+            <div
+              class="summary-item-num"
+              style="color: var(--green)"
+              id="s-held-amount"
+            >
+              —
+            </div>
+            <div class="summary-item-label">Total Held (AED)</div>
+          </div>
+          <div class="summary-item">
+            <div
+              class="summary-item-num"
+              style="color: var(--blue-light)"
+              id="s-held-count"
+            >
+              —
+            </div>
+            <div class="summary-item-label">Active Deposits</div>
+          </div>
+          <div class="summary-item">
+            <div
+              class="summary-item-num"
+              style="color: var(--text-muted)"
+              id="s-refunded"
+            >
+              —
+            </div>
+            <div class="summary-item-label">Refunded</div>
+          </div>
+          <div class="summary-item">
+            <div
+              class="summary-item-num"
+              style="color: var(--warning)"
+              id="s-partial"
+            >
+              —
+            </div>
+            <div class="summary-item-label">Partial Refund</div>
+          </div>
+        </div>
+
+        <!-- Filters -->
+        <div class="filter-bar">
+          <input
+            type="text"
+            class="form-control"
+            id="search-input"
+            placeholder="🔍  Search tenant or building..."
+            oninput="applyFilters()"
+            style="flex: 1; min-width: 200px"
+          />
+          <select
+            class="form-control"
+            id="filter-building"
+            onchange="applyFilters()"
+            style="min-width: 200px"
+          >
+            <option value="">All Buildings</option>
+          </select>
+          <select
+            class="form-control"
+            id="filter-status"
+            onchange="applyFilters()"
+            style="min-width: 160px"
+          >
+            <option value="">All Status</option>
+            <option value="held">Held</option>
+            <option value="refunded">Refunded</option>
+            <option value="partial">Partial Refund</option>
+          </select>
+        </div>
+
+        <!-- Deposits Table -->
+        <div id="deposits-container">
+          <div class="loading-state">
+            <div class="spinner"></div>
+            <p>Loading deposits...</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Add/Edit Deposit Modal -->
+    <div class="modal-overlay" id="modal-deposit" style="display: none">
+      <div class="modal modal-lg">
+        <div class="modal-header">
+          <div class="modal-title" id="deposit-modal-title">Add Deposit</div>
+          <button class="modal-close" onclick="closeModal('modal-deposit')">
+            ×
+          </button>
+        </div>
+        <div class="modal-body">
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Building *</label>
+              <select
+                id="dep-building"
+                class="form-control"
+                onchange="loadUnitsForDeposit()"
+              >
+                <option value="">Select Building</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Unit *</label>
+              <select
+                id="dep-unit"
+                class="form-control"
+                onchange="autoFillDeposit()"
+              >
+                <option value="">Select Unit</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Tenant Name</label>
+              <input
+                type="text"
+                id="dep-tenant"
+                class="form-control"
+                placeholder="Auto-filled"
+              />
+            </div>
+            <div class="form-group">
+              <label class="form-label">Deposit Amount (AED) *</label>
+              <input
+                type="number"
+                id="dep-amount"
+                class="form-control"
+                placeholder="0.00"
+              />
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Received Date *</label>
+              <input type="date" id="dep-received" class="form-control" />
+            </div>
+            <div class="form-group">
+              <label class="form-label">Status</label>
+              <select
+                id="dep-status"
+                class="form-control"
+                onchange="toggleRefundFields()"
+              >
+                <option value="held">Held</option>
+                <option value="refunded">Refunded</option>
+                <option value="partial">Partial Refund</option>
+              </select>
+            </div>
+          </div>
+          <div id="refund-fields" style="display: none">
+            <div class="form-row">
+              <div class="form-group">
+                <label class="form-label">Refund Amount (AED)</label>
+                <input
+                  type="number"
+                  id="dep-refund-amount"
+                  class="form-control"
+                  placeholder="0.00"
+                />
+              </div>
+              <div class="form-group">
+                <label class="form-label">Refund Date</label>
+                <input type="date" id="dep-refund-date" class="form-control" />
+              </div>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Deductions (AED)</label>
+              <input
+                type="number"
+                id="dep-deductions"
+                class="form-control"
+                placeholder="0.00"
+              />
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Remarks</label>
+            <textarea
+              id="dep-remarks"
+              class="form-control"
+              rows="2"
+              placeholder="Additional notes..."
+            ></textarea>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button class="btn btn-outline" onclick="closeModal('modal-deposit')">
+            Cancel
+          </button>
+          <button
+            class="btn btn-green"
+            id="deposit-save-btn"
+            onclick="saveDeposit()"
+          >
+            Save Deposit
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <script type="module">
+      import { requireFinanceOrAdmin } from "./js/auth.js";
+      import {
+        renderNav,
+        showToast,
+        showConfirm,
+        formatCurrency,
+        formatDate,
+      } from "./js/shared.js";
+      import { supabase } from "./js/supabase.js";
+
+      const session = requireFinanceOrAdmin();
+      if (!session) throw new Error("Not authenticated");
+      renderNav("finance-deposits");
+
+      let allDeposits = [];
+      let allBuildings = [];
+      let allUnits = [];
+      let editingId = null;
+
+      async function loadDeposits() {
+        const [buildingsRes, depositsRes] = await Promise.all([
+          supabase.from("buildings").select("*").order("name"),
+          supabase
+            .from("deposit_register")
+            .select("*, units(unit_number), buildings(name)")
+            .order("created_at", { ascending: false }),
+        ]);
+
+        allBuildings = buildingsRes.data || [];
+        allDeposits = depositsRes.data || [];
+
+        const filterSel = document.getElementById("filter-building");
+        filterSel.innerHTML =
+          '<option value="">All Buildings</option>' +
+          allBuildings
+            .map((b) => `<option value="${b.id}">${b.name}</option>`)
+            .join("");
+
+        const depBldg = document.getElementById("dep-building");
+        depBldg.innerHTML =
+          '<option value="">Select Building</option>' +
+          allBuildings
+            .map((b) => `<option value="${b.id}">${b.name}</option>`)
+            .join("");
+
+        updateSummary();
+        applyFilters();
+      }
+
+      function updateSummary() {
+        const held = allDeposits.filter((d) => d.status === "held");
+        const refunded = allDeposits.filter((d) => d.status === "refunded");
+        const partial = allDeposits.filter((d) => d.status === "partial");
+        const total = held.reduce((s, d) => s + (parseFloat(d.amount) || 0), 0);
+
+        document.getElementById("s-held-amount").textContent =
+          "AED " + total.toLocaleString("en-AE", { minimumFractionDigits: 2 });
+        document.getElementById("s-held-count").textContent = held.length;
+        document.getElementById("s-refunded").textContent = refunded.length;
+        document.getElementById("s-partial").textContent = partial.length;
+      }
+
+      window.applyFilters = function () {
+        const search = document
+          .getElementById("search-input")
+          .value.toLowerCase();
+        const bldg = document.getElementById("filter-building").value;
+        const status = document.getElementById("filter-status").value;
+
+        let filtered = allDeposits;
+        if (bldg) filtered = filtered.filter((d) => d.building_id === bldg);
+        if (status) filtered = filtered.filter((d) => d.status === status);
+        if (search) {
+          filtered = filtered.filter(
+            (d) =>
+              d.tenant_name?.toLowerCase().includes(search) ||
+              d.buildings?.name?.toLowerCase().includes(search),
+          );
+        }
+
+        renderDeposits(filtered);
+      };
+
+      function renderDeposits(deposits) {
+        const container = document.getElementById("deposits-container");
+        if (!deposits.length) {
+          container.innerHTML = `
+        <div class="empty-state">
+          <div class="empty-state-icon">🔒</div>
+          <div class="empty-state-title">No deposit records found</div>
+        </div>`;
+          return;
+        }
+
+        const statusBadge = {
+          held: "badge-blue",
+          refunded: "badge-green",
+          partial: "badge-orange",
+        };
+
+        container.innerHTML = `
+      <div class="table-wrapper">
+        <table>
+          <thead>
+            <tr>
+              <th>Tenant</th>
+              <th>Building / Unit</th>
+              <th>Amount</th>
+              <th>Received</th>
+              <th>Status</th>
+              <th>Refund</th>
+              <th>Deductions</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${deposits
+              .map(
+                (d) => `
+              <tr>
+                <td style="font-weight:600">${d.tenant_name || "—"}</td>
+                <td>
+                  ${d.buildings?.name || "—"}<br>
+                  <span style="font-size:0.78rem;color:var(--text-muted)">
+                    Unit ${d.units?.unit_number || "—"}
+                  </span>
+                </td>
+                <td style="font-weight:700;color:var(--green)">
+                  ${formatCurrency(d.amount)}
+                </td>
+                <td>${formatDate(d.received_date)}</td>
+                <td>
+                  <span class="badge ${statusBadge[d.status] || "badge-grey"}">
+                    ${d.status}
+                  </span>
+                </td>
+                <td>${
+                  d.refund_amount ? formatCurrency(d.refund_amount) : "—"
+                }</td>
+                <td>${d.deductions ? formatCurrency(d.deductions) : "—"}</td>
+                <td>
+                  <div style="display:flex;gap:6px">
+                    <button class="btn btn-outline btn-sm"
+                      onclick="openEditDeposit('${d.id}')">✏️</button>
+                    <button class="btn btn-danger btn-sm"
+                      onclick="deleteDeposit('${d.id}')">🗑️</button>
+                  </div>
+                </td>
+              </tr>`,
+              )
+              .join("")}
+          </tbody>
+        </table>
+      </div>`;
+      }
+
+      window.openAddDeposit = function () {
+        editingId = null;
+        document.getElementById("deposit-modal-title").textContent =
+          "Add Deposit";
+        document.getElementById("deposit-save-btn").textContent =
+          "Save Deposit";
+        [
+          "dep-building",
+          "dep-unit",
+          "dep-tenant",
+          "dep-amount",
+          "dep-received",
+          "dep-refund-amount",
+          "dep-refund-date",
+          "dep-deductions",
+          "dep-remarks",
+        ].forEach((id) => {
+          document.getElementById(id).value = "";
+        });
+        document.getElementById("dep-status").value = "held";
+        document.getElementById("dep-unit").innerHTML =
+          '<option value="">Select Unit</option>';
+        document.getElementById("refund-fields").style.display = "none";
+        document.getElementById("dep-received").value = new Date()
+          .toISOString()
+          .split("T")[0];
+        document.getElementById("modal-deposit").style.display = "flex";
+      };
+
+      window.openEditDeposit = async function (id) {
+        const d = allDeposits.find((x) => x.id === id);
+        if (!d) return;
+        editingId = id;
+        document.getElementById("deposit-modal-title").textContent =
+          "Edit Deposit";
+        document.getElementById("deposit-save-btn").textContent =
+          "Save Changes";
+
+        document.getElementById("dep-building").value = d.building_id || "";
+        await loadUnitsForDeposit();
+        document.getElementById("dep-unit").value = d.unit_id || "";
+        document.getElementById("dep-tenant").value = d.tenant_name || "";
+        document.getElementById("dep-amount").value = d.amount || "";
+        document.getElementById("dep-received").value = d.received_date || "";
+        document.getElementById("dep-status").value = d.status || "held";
+        document.getElementById("dep-refund-amount").value =
+          d.refund_amount || "";
+        document.getElementById("dep-refund-date").value = d.refund_date || "";
+        document.getElementById("dep-deductions").value = d.deductions || "";
+        document.getElementById("dep-remarks").value = d.remarks || "";
+        toggleRefundFields();
+        document.getElementById("modal-deposit").style.display = "flex";
+      };
+
+      window.toggleRefundFields = function () {
+        const status = document.getElementById("dep-status").value;
+        document.getElementById("refund-fields").style.display =
+          status !== "held" ? "block" : "none";
+      };
+
+      window.loadUnitsForDeposit = async function () {
+        const bldg = document.getElementById("dep-building").value;
+        const sel = document.getElementById("dep-unit");
+        sel.innerHTML = '<option value="">Select Unit</option>';
+        if (!bldg) return;
+        const { data } = await supabase
+          .from("units")
+          .select("id, unit_number, tenant_name, deposit, floors(name)")
+          .eq("building_id", bldg)
+          .order("unit_number");
+        allUnits = data || [];
+        allUnits.forEach((u) => {
+          const opt = document.createElement("option");
+          opt.value = u.id;
+          opt.textContent = `${u.unit_number}${
+            u.floors?.name ? " — " + u.floors.name : ""
+          }${u.tenant_name ? " (" + u.tenant_name + ")" : ""}`;
+          sel.appendChild(opt);
+        });
+      };
+
+      window.autoFillDeposit = function () {
+        const unitId = document.getElementById("dep-unit").value;
+        const unit = allUnits.find((u) => u.id === unitId);
+        if (!unit) return;
+        document.getElementById("dep-tenant").value = unit.tenant_name || "";
+        document.getElementById("dep-amount").value = unit.deposit || "";
+      };
+
+      window.saveDeposit = async function () {
+        const bldg = document.getElementById("dep-building").value;
+        const unitId = document.getElementById("dep-unit").value;
+        const amount = parseFloat(document.getElementById("dep-amount").value);
+        const date = document.getElementById("dep-received").value;
+
+        if (!bldg || !unitId || !amount || !date) {
+          showToast("Building, Unit, Amount and Date are required.", "error");
+          return;
+        }
+
+        const payload = {
+          building_id: bldg,
+          unit_id: unitId,
+          tenant_name:
+            document.getElementById("dep-tenant").value.trim() || null,
+          amount,
+          received_date: date,
+          status: document.getElementById("dep-status").value,
+          refund_amount:
+            parseFloat(document.getElementById("dep-refund-amount").value) || 0,
+          refund_date: document.getElementById("dep-refund-date").value || null,
+          deductions:
+            parseFloat(document.getElementById("dep-deductions").value) || 0,
+          remarks: document.getElementById("dep-remarks").value.trim() || null,
+        };
+
+        let error;
+        if (editingId) {
+          ({ error } = await supabase
+            .from("deposit_register")
+            .update(payload)
+            .eq("id", editingId));
+        } else {
+          ({ error } = await supabase.from("deposit_register").insert(payload));
+        }
+
+        if (error) {
+          showToast("Error saving deposit.", "error");
+          return;
+        }
+        closeModal("modal-deposit");
+        showToast(editingId ? "Deposit updated!" : "Deposit added!");
+        loadDeposits();
+      };
+
+      window.deleteDeposit = async function (id) {
+        const ok = await showConfirm("Delete this deposit record?");
+        if (!ok) return;
+        await supabase.from("deposit_register").delete().eq("id", id);
+        showToast("Deposit deleted.");
+        loadDeposits();
+      };
+
+      window.closeModal = function (id) {
+        document.getElementById(id).style.display = "none";
+      };
+
+      document.querySelectorAll(".modal-overlay").forEach((o) => {
+        o.addEventListener("click", (e) => {
+          if (e.target === o) o.style.display = "none";
+        });
+      });
+
+      loadDeposits();
+    </script>
+  </body>
+</html>

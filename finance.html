@@ -1,0 +1,696 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link
+      rel="icon"
+      href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>💰</text></svg>"
+    />
+    <title>ASRE — Finance Dashboard</title>
+    <link rel="stylesheet" href="css/main.css" />
+    <style>
+      .finance-grid {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 20px;
+        margin-bottom: 32px;
+      }
+
+      @media (max-width: 1200px) {
+        .finance-grid {
+          grid-template-columns: repeat(2, 1fr);
+        }
+      }
+
+      @media (max-width: 600px) {
+        .finance-grid {
+          grid-template-columns: 1fr;
+        }
+      }
+
+      .finance-card {
+        background: var(--bg-card);
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        padding: 20px;
+        border-bottom: 3px solid var(--green);
+        transition: var(--transition);
+        cursor: pointer;
+        text-decoration: none;
+        color: inherit;
+        display: block;
+        animation: slideUp 0.3s ease forwards;
+        opacity: 0;
+      }
+
+      .finance-card:nth-child(1) {
+        animation-delay: 0.05s;
+      }
+      .finance-card:nth-child(2) {
+        animation-delay: 0.1s;
+      }
+      .finance-card:nth-child(3) {
+        animation-delay: 0.15s;
+      }
+      .finance-card:nth-child(4) {
+        animation-delay: 0.2s;
+      }
+      .finance-card:nth-child(5) {
+        animation-delay: 0.25s;
+      }
+      .finance-card:nth-child(6) {
+        animation-delay: 0.3s;
+      }
+      .finance-card:nth-child(7) {
+        animation-delay: 0.35s;
+      }
+      .finance-card:nth-child(8) {
+        animation-delay: 0.4s;
+      }
+
+      .finance-card:hover {
+        border-bottom-color: var(--blue);
+        box-shadow: 0 8px 32px rgba(42, 85, 144, 0.3);
+        transform: translateY(-4px);
+      }
+
+      .finance-card-icon {
+        font-size: 1.8rem;
+        margin-bottom: 12px;
+      }
+
+      .finance-card-num {
+        font-size: 1.8rem;
+        font-weight: 800;
+        color: var(--white);
+        line-height: 1;
+        margin-bottom: 6px;
+      }
+
+      .finance-card-label {
+        font-size: 0.82rem;
+        font-weight: 600;
+        color: var(--text-muted);
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        margin-bottom: 8px;
+      }
+
+      .finance-card-sub {
+        font-size: 0.78rem;
+        color: var(--text-muted);
+        line-height: 1.5;
+      }
+
+      /* Recent Activity */
+      .activity-item {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 10px 0;
+        border-bottom: 1px solid var(--border);
+      }
+
+      .activity-item:last-child {
+        border-bottom: none;
+      }
+
+      .activity-icon {
+        width: 36px;
+        height: 36px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1rem;
+        flex-shrink: 0;
+      }
+
+      .activity-icon.green {
+        background: rgba(62, 173, 130, 0.15);
+      }
+      .activity-icon.blue {
+        background: rgba(42, 85, 144, 0.15);
+      }
+      .activity-icon.red {
+        background: rgba(229, 83, 83, 0.15);
+      }
+      .activity-icon.orange {
+        background: rgba(240, 165, 0, 0.15);
+      }
+
+      .activity-text {
+        font-size: 0.85rem;
+        color: var(--text);
+        flex: 1;
+      }
+
+      .activity-time {
+        font-size: 0.75rem;
+        color: var(--text-muted);
+        white-space: nowrap;
+      }
+
+      /* Building Revenue Table */
+      .revenue-table-wrap {
+        overflow-x: auto;
+      }
+
+      .two-col {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 20px;
+        margin-bottom: 24px;
+      }
+
+      @media (max-width: 768px) {
+        .two-col {
+          grid-template-columns: 1fr;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <nav id="main-nav"></nav>
+
+    <div class="page-wrapper">
+      <div class="container">
+        <div class="page-header">
+          <div>
+            <div class="page-title">Finance <span>Dashboard</span></div>
+            <div class="page-subtitle" id="finance-date"></div>
+          </div>
+          <div style="display: flex; gap: 10px">
+            <a href="finance-reports.html" class="btn btn-green">
+              📊 Generate Report
+            </a>
+          </div>
+        </div>
+
+        <!-- Finance Cards -->
+        <div class="finance-grid">
+          <a href="finance-income.html" class="finance-card">
+            <div class="finance-card-icon">💰</div>
+            <div class="finance-card-num" id="fc-revenue">—</div>
+            <div class="finance-card-label">Monthly Revenue</div>
+            <div class="finance-card-sub" id="fc-revenue-sub">
+              Across all buildings
+            </div>
+          </a>
+
+          <a href="finance-reports.html" class="finance-card">
+            <div class="finance-card-icon">🧾</div>
+            <div class="finance-card-num" id="fc-vat">—</div>
+            <div class="finance-card-label">VAT Collected</div>
+            <div class="finance-card-sub" id="fc-vat-sub">This month</div>
+          </a>
+
+          <a href="finance-cheques.html" class="finance-card">
+            <div class="finance-card-icon">🏦</div>
+            <div class="finance-card-num" id="fc-cheques">—</div>
+            <div class="finance-card-label">Cheques Held</div>
+            <div class="finance-card-sub" id="fc-cheques-sub">Active PDCs</div>
+          </a>
+
+          <a href="finance-cheques.html" class="finance-card">
+            <div class="finance-card-icon">📅</div>
+            <div class="finance-card-num" id="fc-upcoming-cheques">—</div>
+            <div class="finance-card-label">Upcoming Deposits</div>
+            <div class="finance-card-sub">Next 7 days</div>
+          </a>
+
+          <a href="finance-deposits.html" class="finance-card">
+            <div class="finance-card-icon">🔒</div>
+            <div class="finance-card-num" id="fc-deposits">—</div>
+            <div class="finance-card-label">Security Deposits</div>
+            <div class="finance-card-sub" id="fc-deposits-sub">Total held</div>
+          </a>
+
+          <a href="finance-income.html" class="finance-card">
+            <div class="finance-card-icon">📉</div>
+            <div class="finance-card-num" id="fc-expenses">—</div>
+            <div class="finance-card-label">Expenses</div>
+            <div class="finance-card-sub">This month</div>
+          </a>
+
+          <a href="finance-invoices.html" class="finance-card">
+            <div class="finance-card-icon">📄</div>
+            <div class="finance-card-num" id="fc-invoices">—</div>
+            <div class="finance-card-label">Invoices</div>
+            <div class="finance-card-sub" id="fc-invoices-sub">This month</div>
+          </a>
+
+          <a href="finance-cheques.html" class="finance-card">
+            <div class="finance-card-icon" style="color: var(--danger)">⚠️</div>
+            <div
+              class="finance-card-num"
+              style="color: var(--danger)"
+              id="fc-bounced"
+            >
+              —
+            </div>
+            <div class="finance-card-label">Bounced Cheques</div>
+            <div class="finance-card-sub" id="fc-bounced-sub">
+              Financial exposure
+            </div>
+          </a>
+        </div>
+
+        <!-- Two Column Section -->
+        <div class="two-col">
+          <!-- Building Revenue Breakdown -->
+          <div class="card">
+            <div class="section-header" style="margin-bottom: 16px">
+              <div class="section-title">Revenue by Building</div>
+              <a href="finance-income.html" class="btn btn-outline btn-sm"
+                >View All</a
+              >
+            </div>
+            <div id="building-revenue-list">
+              <div class="loading-state"><div class="spinner"></div></div>
+            </div>
+          </div>
+
+          <!-- Recent Activity -->
+          <div class="card">
+            <div class="section-header" style="margin-bottom: 16px">
+              <div class="section-title">Recent Activity</div>
+              <button class="btn btn-outline btn-sm" onclick="loadActivity()">
+                🔄
+              </button>
+            </div>
+            <div id="activity-list">
+              <div class="loading-state"><div class="spinner"></div></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Upcoming Cheque Deposits -->
+        <div class="card" style="margin-bottom: 24px">
+          <div class="section-header" style="margin-bottom: 16px">
+            <div class="section-title">
+              Upcoming Cheque Deposits — Next 7 Days
+            </div>
+            <a href="finance-cheques.html" class="btn btn-outline btn-sm"
+              >View All</a
+            >
+          </div>
+          <div id="upcoming-cheques-list">
+            <div class="loading-state"><div class="spinner"></div></div>
+          </div>
+        </div>
+
+        <!-- Outstanding Bounced Cheques -->
+        <div class="card">
+          <div class="section-header" style="margin-bottom: 16px">
+            <div class="section-title" style="color: var(--danger)">
+              ⚠️ Active Bounced Cheques
+            </div>
+            <a href="finance-cheques.html" class="btn btn-outline btn-sm"
+              >View All</a
+            >
+          </div>
+          <div id="bounced-list">
+            <div class="loading-state"><div class="spinner"></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script type="module">
+      import { requireFinanceOrAdmin } from "./js/auth.js";
+      import {
+        renderNav,
+        showToast,
+        formatCurrency,
+        formatDate,
+      } from "./js/shared.js";
+      import { supabase } from "./js/supabase.js";
+
+      const session = requireFinanceOrAdmin();
+      if (!session) throw new Error("Not authenticated");
+      renderNav("finance");
+
+      // Date
+      document.getElementById("finance-date").textContent =
+        new Date().toLocaleDateString("en-GB", {
+          weekday: "long",
+          day: "2-digit",
+          month: "long",
+          year: "numeric",
+        });
+
+      async function loadDashboard() {
+        const today = new Date();
+        const firstOfMonth = new Date(today.getFullYear(), today.getMonth(), 1)
+          .toISOString()
+          .split("T")[0];
+        const todayStr = today.toISOString().split("T")[0];
+        const next7 = new Date(today.getTime() + 7 * 86400000)
+          .toISOString()
+          .split("T")[0];
+
+        const [
+          unitsRes,
+          chequesRes,
+          depositsRes,
+          invoicesRes,
+          bounceRes,
+          expensesRes,
+        ] = await Promise.all([
+          supabase.from("units").select("building_id, tenant_name, rent"),
+          supabase.from("cheques").select("*"),
+          supabase.from("deposit_register").select("amount, status"),
+          supabase.from("invoices").select("total, vat_amount, created_at"),
+          supabase
+            .from("bounce_checks")
+            .select("*, units(unit_number), buildings(name)")
+            .eq("status", "active"),
+          supabase.from("expenses").select("amount, expense_date"),
+        ]);
+
+        const units = unitsRes.data || [];
+        const cheques = chequesRes.data || [];
+        const deposits = depositsRes.data || [];
+        const invoices = invoicesRes.data || [];
+        const bounces = bounceRes.data || [];
+        const expenses = expensesRes.data || [];
+
+        // Monthly Revenue
+        const occupied = units.filter(
+          (u) => u.tenant_name && u.tenant_name.trim() !== "",
+        );
+        const annualRevenue = occupied.reduce(
+          (s, u) => s + (parseFloat(u.rent) || 0),
+          0,
+        );
+        const monthlyRevenue = Math.round(annualRevenue / 12);
+        document.getElementById("fc-revenue").textContent =
+          "AED " + monthlyRevenue.toLocaleString("en-AE");
+        document.getElementById("fc-revenue-sub").textContent =
+          `${occupied.length} occupied units`;
+
+        // VAT This Month
+        const thisMonthInvoices = invoices.filter((i) => {
+          const d = new Date(i.created_at);
+          return (
+            d.getMonth() === today.getMonth() &&
+            d.getFullYear() === today.getFullYear()
+          );
+        });
+        const vatThisMonth = thisMonthInvoices.reduce(
+          (s, i) => s + (parseFloat(i.vat_amount) || 0),
+          0,
+        );
+        document.getElementById("fc-vat").textContent =
+          "AED " +
+          vatThisMonth.toLocaleString("en-AE", { minimumFractionDigits: 2 });
+        document.getElementById("fc-vat-sub").textContent =
+          `From ${thisMonthInvoices.length} invoices`;
+
+        // Cheques Held
+        const held = cheques.filter((c) => c.status === "held");
+        const heldAmount = held.reduce(
+          (s, c) => s + (parseFloat(c.amount) || 0),
+          0,
+        );
+        document.getElementById("fc-cheques").textContent = held.length;
+        document.getElementById("fc-cheques-sub").textContent =
+          "AED " +
+          heldAmount.toLocaleString("en-AE", { minimumFractionDigits: 2 });
+
+        // Upcoming Deposits
+        const upcomingDeposits = cheques.filter(
+          (c) =>
+            c.status === "held" &&
+            c.deposit_date &&
+            c.deposit_date >= todayStr &&
+            c.deposit_date <= next7,
+        );
+        document.getElementById("fc-upcoming-cheques").textContent =
+          upcomingDeposits.length;
+
+        // Security Deposits
+        const heldDeposits = deposits.filter((d) => d.status === "held");
+        const totalDeposits = heldDeposits.reduce(
+          (s, d) => s + (parseFloat(d.amount) || 0),
+          0,
+        );
+        document.getElementById("fc-deposits").textContent =
+          "AED " +
+          totalDeposits.toLocaleString("en-AE", { minimumFractionDigits: 2 });
+        document.getElementById("fc-deposits-sub").textContent =
+          `${heldDeposits.length} units`;
+
+        // Expenses This Month
+        const monthExpenses = expenses.filter((e) => {
+          if (!e.expense_date) return false;
+          const d = new Date(e.expense_date);
+          return (
+            d.getMonth() === today.getMonth() &&
+            d.getFullYear() === today.getFullYear()
+          );
+        });
+        const totalExpenses = monthExpenses.reduce(
+          (s, e) => s + (parseFloat(e.amount) || 0),
+          0,
+        );
+        document.getElementById("fc-expenses").textContent =
+          "AED " +
+          totalExpenses.toLocaleString("en-AE", { minimumFractionDigits: 2 });
+
+        // Invoices
+        document.getElementById("fc-invoices").textContent =
+          thisMonthInvoices.length;
+        const invoiceTotal = thisMonthInvoices.reduce(
+          (s, i) => s + (parseFloat(i.total) || 0),
+          0,
+        );
+        document.getElementById("fc-invoices-sub").textContent =
+          "AED " +
+          invoiceTotal.toLocaleString("en-AE", { minimumFractionDigits: 2 });
+
+        // Bounced Cheques
+        const bouncedAmount = bounces.reduce(
+          (s, b) => s + (parseFloat(b.rent) || 0),
+          0,
+        );
+        document.getElementById("fc-bounced").textContent = bounces.length;
+        document.getElementById("fc-bounced-sub").textContent =
+          "AED " +
+          bouncedAmount.toLocaleString("en-AE", { minimumFractionDigits: 2 });
+
+        // Building Revenue
+        loadBuildingRevenue(units);
+
+        // Upcoming Cheque Deposits
+        loadUpcomingCheques(upcomingDeposits);
+
+        // Bounced List
+        loadBouncedList(bounces);
+      }
+
+      async function loadBuildingRevenue(units) {
+        const { data: buildings } = await supabase
+          .from("buildings")
+          .select("id, name")
+          .order("name");
+
+        const container = document.getElementById("building-revenue-list");
+        if (!buildings?.length) {
+          container.innerHTML =
+            '<p style="color:var(--text-muted);font-size:0.85rem">No buildings found.</p>';
+          return;
+        }
+
+        container.innerHTML = buildings
+          .map((b) => {
+            const bUnits = units.filter((u) => u.building_id === b.id);
+            const occupied = bUnits.filter(
+              (u) => u.tenant_name && u.tenant_name.trim() !== "",
+            );
+            const annual = occupied.reduce(
+              (s, u) => s + (parseFloat(u.rent) || 0),
+              0,
+            );
+            const monthly = Math.round(annual / 12);
+            const pct =
+              bUnits.length > 0
+                ? Math.round((occupied.length / bUnits.length) * 100)
+                : 0;
+
+            return `
+        <div style="margin-bottom:14px">
+          <div style="display:flex;justify-content:space-between;
+            align-items:center;margin-bottom:4px">
+            <span style="font-size:0.88rem;font-weight:600;
+              color:var(--white)">${b.name}</span>
+            <span style="font-size:0.85rem;font-weight:700;
+              color:var(--green)">
+              AED ${monthly.toLocaleString("en-AE")}
+            </span>
+          </div>
+          <div style="background:var(--bg);border-radius:4px;
+            height:6px;overflow:hidden">
+            <div style="height:100%;width:${pct}%;
+              background:var(--green);border-radius:4px;
+              transition:width 0.6s ease"></div>
+          </div>
+          <div style="display:flex;justify-content:space-between;
+            margin-top:3px;font-size:0.72rem;color:var(--text-muted)">
+            <span>${occupied.length}/${bUnits.length} occupied</span>
+            <span>${pct}%</span>
+          </div>
+        </div>`;
+          })
+          .join("");
+      }
+
+      function loadUpcomingCheques(cheques) {
+        const container = document.getElementById("upcoming-cheques-list");
+        if (!cheques.length) {
+          container.innerHTML = `
+        <div class="empty-state" style="padding:20px">
+          <div class="empty-state-title">No cheque deposits due in next 7 days</div>
+        </div>`;
+          return;
+        }
+
+        container.innerHTML = `
+      <div class="table-wrapper">
+        <table>
+          <thead>
+            <tr>
+              <th>Tenant</th>
+              <th>Cheque #</th>
+              <th>Bank</th>
+              <th>Amount</th>
+              <th>Deposit Date</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${cheques
+              .map(
+                (c) => `
+              <tr>
+                <td style="font-weight:600">${c.tenant_name || "—"}</td>
+                <td style="color:var(--text-muted)">${c.cheque_number || "—"}</td>
+                <td>${c.bank_name || "—"}</td>
+                <td style="font-weight:700;color:var(--green)">
+                  ${formatCurrency(c.amount)}
+                </td>
+                <td>
+                  <span class="badge badge-orange">
+                    ${formatDate(c.deposit_date)}
+                  </span>
+                </td>
+              </tr>`,
+              )
+              .join("")}
+          </tbody>
+        </table>
+      </div>`;
+      }
+
+      function loadBouncedList(bounces) {
+        const container = document.getElementById("bounced-list");
+        if (!bounces.length) {
+          container.innerHTML = `
+        <div class="empty-state" style="padding:20px">
+          <div class="empty-state-icon">✅</div>
+          <div class="empty-state-title">No active bounced cheques</div>
+        </div>`;
+          return;
+        }
+
+        container.innerHTML = `
+      <div class="table-wrapper">
+        <table>
+          <thead>
+            <tr>
+              <th>Building</th>
+              <th>Unit</th>
+              <th>Tenant</th>
+              <th>Bounce Date</th>
+              <th>Rent Amount</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${bounces
+              .map(
+                (b) => `
+              <tr>
+                <td>${b.buildings?.name || "—"}</td>
+                <td>Unit ${b.units?.unit_number || "—"}</td>
+                <td style="font-weight:600">${b.tenant_name || "—"}</td>
+                <td>${formatDate(b.date_of_bounce)}</td>
+                <td style="font-weight:700;color:var(--danger)">
+                  ${formatCurrency(b.rent)}
+                </td>
+              </tr>`,
+              )
+              .join("")}
+          </tbody>
+        </table>
+      </div>`;
+      }
+
+      async function loadActivity() {
+        const { data: logs } = await supabase
+          .from("activity_log")
+          .select("*")
+          .order("created_at", { ascending: false })
+          .limit(8);
+
+        const container = document.getElementById("activity-list");
+
+        if (!logs?.length) {
+          container.innerHTML = `
+        <div style="text-align:center;padding:20px;
+          color:var(--text-muted);font-size:0.85rem">
+          No recent activity
+        </div>`;
+          return;
+        }
+
+        function getIcon(module) {
+          const map = {
+            Invoices: { icon: "🧾", cls: "green" },
+            Properties: { icon: "🏢", cls: "blue" },
+            Maintenance: { icon: "🔧", cls: "orange" },
+            "Bounce Check": { icon: "💳", cls: "red" },
+          };
+          return map[module] || { icon: "📝", cls: "blue" };
+        }
+
+        function timeAgo(dateStr) {
+          const diff = Math.floor((new Date() - new Date(dateStr)) / 1000);
+          if (diff < 60) return "Just now";
+          if (diff < 3600) return Math.floor(diff / 60) + "m ago";
+          if (diff < 86400) return Math.floor(diff / 3600) + "h ago";
+          return Math.floor(diff / 86400) + "d ago";
+        }
+
+        container.innerHTML = logs
+          .map((l) => {
+            const { icon, cls } = getIcon(l.module);
+            return `
+        <div class="activity-item">
+          <div class="activity-icon ${cls}">${icon}</div>
+          <div class="activity-text">
+            <strong>${l.user_name}</strong> — ${l.action}
+          </div>
+          <div class="activity-time">${timeAgo(l.created_at)}</div>
+        </div>`;
+          })
+          .join("");
+      }
+
+      window.loadActivity = loadActivity;
+
+      loadDashboard();
+      loadActivity();
+    </script>
+  </body>
+</html>

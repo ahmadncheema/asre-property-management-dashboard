@@ -1,0 +1,847 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link
+      rel="icon"
+      href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📊</text></svg>"
+    />
+    <title>ASRE — Finance Reports</title>
+    <link rel="stylesheet" href="css/main.css" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <style>
+      .report-card {
+        background: var(--bg-card);
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        padding: 24px;
+        margin-bottom: 20px;
+        border-top: 3px solid var(--blue);
+      }
+
+      .report-card-title {
+        font-size: 1rem;
+        font-weight: 700;
+        color: var(--white);
+        margin-bottom: 6px;
+      }
+
+      .report-card-desc {
+        font-size: 0.83rem;
+        color: var(--text-muted);
+        margin-bottom: 20px;
+        line-height: 1.5;
+      }
+
+      .vat-table {
+        width: 100%;
+      }
+      .vat-row {
+        display: flex;
+        justify-content: space-between;
+        padding: 10px 0;
+        border-bottom: 1px solid var(--border);
+        font-size: 0.9rem;
+      }
+      .vat-row:last-child {
+        border-bottom: none;
+      }
+      .vat-row.total {
+        font-weight: 800;
+        font-size: 1rem;
+        color: var(--white);
+        border-top: 2px solid var(--green);
+        margin-top: 4px;
+        padding-top: 14px;
+      }
+      .vat-label {
+        color: var(--text-muted);
+      }
+      .vat-value {
+        font-weight: 600;
+        color: var(--green);
+      }
+
+      .month-selector {
+        display: flex;
+        gap: 12px;
+        margin-bottom: 20px;
+        flex-wrap: wrap;
+        align-items: center;
+      }
+
+      .report-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 20px;
+      }
+
+      @media (max-width: 768px) {
+        .report-grid {
+          grid-template-columns: 1fr;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <nav id="main-nav"></nav>
+
+    <div class="page-wrapper">
+      <div class="container">
+        <div class="page-header">
+          <div>
+            <div class="page-title">Finance <span>Reports</span></div>
+            <div class="page-subtitle">
+              Monthly reports, VAT returns, tenant payment history
+            </div>
+          </div>
+        </div>
+
+        <!-- Month Selector -->
+        <div class="month-selector">
+          <label class="form-label" style="margin: 0">Select Month:</label>
+          <input
+            type="month"
+            id="report-month"
+            class="form-control"
+            style="max-width: 200px"
+            onchange="loadAllReports()"
+          />
+          <button class="btn btn-green btn-sm" onclick="loadAllReports()">
+            🔄 Generate
+          </button>
+          <button class="btn btn-outline btn-sm" onclick="exportMonthlyExcel()">
+            ⬇️ Export to Excel
+          </button>
+        </div>
+
+        <div class="report-grid">
+          <!-- Monthly Financial Summary -->
+          <div class="report-card">
+            <div class="report-card-title">📋 Monthly Financial Summary</div>
+            <div class="report-card-desc">
+              Income, expenses, and net position for the selected month.
+            </div>
+            <div id="monthly-summary">
+              <div class="loading-state"><div class="spinner"></div></div>
+            </div>
+          </div>
+
+          <!-- VAT Report -->
+          <div class="report-card" style="border-top-color: var(--green)">
+            <div class="report-card-title">🧾 VAT Return Summary</div>
+            <div class="report-card-desc">
+              UAE FTA VAT return data. TRN: 104488244500003
+            </div>
+            <div id="vat-report">
+              <div class="loading-state"><div class="spinner"></div></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Tenant Payment History -->
+        <div class="report-card" style="margin-top: 4px">
+          <div class="report-card-title">👤 Tenant Payment History</div>
+          <div class="report-card-desc">
+            View all invoices and manual payments for a specific tenant.
+          </div>
+          <div class="filter-bar" style="margin-bottom: 16px">
+            <select
+              class="form-control"
+              id="tenant-building"
+              onchange="loadTenantsForBuilding()"
+              style="min-width: 200px"
+            >
+              <option value="">Select Building</option>
+            </select>
+            <select
+              class="form-control"
+              id="tenant-select"
+              onchange="loadTenantHistory()"
+              style="min-width: 200px"
+            >
+              <option value="">Select Tenant</option>
+            </select>
+            <button class="btn btn-outline btn-sm" onclick="openAddPayment()">
+              + Log Manual Payment
+            </button>
+          </div>
+          <div id="tenant-history">
+            <div
+              style="
+                text-align: center;
+                padding: 20px;
+                color: var(--text-muted);
+                font-size: 0.85rem;
+              "
+            >
+              Select a building and tenant to view payment history.
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Manual Payment Modal -->
+    <div class="modal-overlay" id="modal-payment" style="display: none">
+      <div class="modal">
+        <div class="modal-header">
+          <div class="modal-title">Log Manual Payment</div>
+          <button class="modal-close" onclick="closeModal('modal-payment')">
+            ×
+          </button>
+        </div>
+        <div class="modal-body">
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Building *</label>
+              <select
+                id="pay-building"
+                class="form-control"
+                onchange="loadUnitsForPayment()"
+              >
+                <option value="">Select Building</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Unit *</label>
+              <select
+                id="pay-unit"
+                class="form-control"
+                onchange="autoFillPayment()"
+              >
+                <option value="">Select Unit</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Tenant Name</label>
+              <input
+                type="text"
+                id="pay-tenant"
+                class="form-control"
+                placeholder="Auto-filled"
+              />
+            </div>
+            <div class="form-group">
+              <label class="form-label">Amount (AED) *</label>
+              <input
+                type="number"
+                id="pay-amount"
+                class="form-control"
+                placeholder="0.00"
+              />
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Payment Date *</label>
+              <input type="date" id="pay-date" class="form-control" />
+            </div>
+            <div class="form-group">
+              <label class="form-label">Payment Method *</label>
+              <select id="pay-method" class="form-control">
+                <option value="cash">Cash</option>
+                <option value="bank_transfer">Bank Transfer</option>
+                <option value="cheque">Cheque</option>
+                <option value="card">Card</option>
+                <option value="other">Other</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Reference / Receipt #</label>
+            <input
+              type="text"
+              id="pay-ref"
+              class="form-control"
+              placeholder="Transaction or receipt number"
+            />
+          </div>
+          <div class="form-group">
+            <label class="form-label">Notes</label>
+            <textarea
+              id="pay-notes"
+              class="form-control"
+              rows="2"
+              placeholder="Additional notes..."
+            ></textarea>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button class="btn btn-outline" onclick="closeModal('modal-payment')">
+            Cancel
+          </button>
+          <button class="btn btn-green" onclick="savePayment()">
+            Save Payment
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <script type="module">
+      import { requireFinanceOrAdmin } from "./js/auth.js";
+      import {
+        renderNav,
+        showToast,
+        showConfirm,
+        formatCurrency,
+        formatDate,
+      } from "./js/shared.js";
+      import { supabase } from "./js/supabase.js";
+
+      const session = requireFinanceOrAdmin();
+      if (!session) throw new Error("Not authenticated");
+      renderNav("finance-reports");
+
+      let allBuildings = [];
+      let allUnits = [];
+      let payUnits = [];
+      let selectedUnit = null;
+
+      // Set default month to current
+      const now = new Date();
+      document.getElementById("report-month").value =
+        `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}`;
+
+      async function init() {
+        const { data: buildings } = await supabase
+          .from("buildings")
+          .select("*")
+          .order("name");
+        allBuildings = buildings || [];
+
+        // Populate tenant building selector
+        const tenBldg = document.getElementById("tenant-building");
+        const payBldg = document.getElementById("pay-building");
+        const opts =
+          '<option value="">Select Building</option>' +
+          allBuildings
+            .map((b) => `<option value="${b.id}">${b.name}</option>`)
+            .join("");
+        tenBldg.innerHTML = opts;
+        payBldg.innerHTML = opts;
+
+        loadAllReports();
+      }
+
+      async function loadAllReports() {
+        const monthVal = document.getElementById("report-month").value;
+        if (!monthVal) return;
+
+        const [year, month] = monthVal.split("-").map(Number);
+        const firstDay = `${year}-${String(month).padStart(2, "0")}-01`;
+        const lastDay = new Date(year, month, 0).toISOString().split("T")[0];
+
+        await Promise.all([
+          loadMonthlySummary(firstDay, lastDay, year, month),
+          loadVATReport(firstDay, lastDay),
+        ]);
+      }
+
+      async function loadMonthlySummary(firstDay, lastDay, year, month) {
+        const [invoicesRes, expensesRes, unitsRes] = await Promise.all([
+          supabase
+            .from("invoices")
+            .select("total, vat_amount, amount")
+            .gte("created_at", firstDay)
+            .lte("created_at", lastDay + "T23:59:59"),
+          supabase
+            .from("expenses")
+            .select("amount")
+            .gte("expense_date", firstDay)
+            .lte("expense_date", lastDay),
+          supabase.from("units").select("tenant_name, rent"),
+        ]);
+
+        const invoices = invoicesRes.data || [];
+        const expenses = expensesRes.data || [];
+        const units = unitsRes.data || [];
+
+        const invoiceTotal = invoices.reduce(
+          (s, i) => s + (parseFloat(i.total) || 0),
+          0,
+        );
+        const vatTotal = invoices.reduce(
+          (s, i) => s + (parseFloat(i.vat_amount) || 0),
+          0,
+        );
+        const expenseTotal = expenses.reduce(
+          (s, e) => s + (parseFloat(e.amount) || 0),
+          0,
+        );
+        const occupied = units.filter(
+          (u) => u.tenant_name && u.tenant_name.trim() !== "",
+        );
+        const annualRent = occupied.reduce(
+          (s, u) => s + (parseFloat(u.rent) || 0),
+          0,
+        );
+        const monthlyRent = Math.round(annualRent / 12);
+        const net = monthlyRent - expenseTotal;
+
+        const monthName = new Date(year, month - 1, 1).toLocaleDateString(
+          "en-GB",
+          { month: "long", year: "numeric" },
+        );
+
+        document.getElementById("monthly-summary").innerHTML = `
+      <div style="font-size:0.82rem;color:var(--text-muted);
+        margin-bottom:16px">${monthName}</div>
+      <div class="vat-table">
+        <div class="vat-row">
+          <span class="vat-label">Estimated Monthly Rent Income</span>
+          <span class="vat-value">${formatCurrency(monthlyRent)}</span>
+        </div>
+        <div class="vat-row">
+          <span class="vat-label">Invoices Generated</span>
+          <span class="vat-value">${formatCurrency(invoiceTotal)}</span>
+        </div>
+        <div class="vat-row">
+          <span class="vat-label">VAT Collected</span>
+          <span class="vat-value">${formatCurrency(vatTotal)}</span>
+        </div>
+        <div class="vat-row">
+          <span class="vat-label" style="color:var(--danger)">
+            Total Expenses
+          </span>
+          <span style="color:var(--danger);font-weight:600">
+            - ${formatCurrency(expenseTotal)}
+          </span>
+        </div>
+        <div class="vat-row total">
+          <span class="vat-label" style="color:var(--white)">
+            Net Position
+          </span>
+          <span style="color:${net >= 0 ? "var(--green)" : "var(--danger)"}">
+            ${formatCurrency(net)}
+          </span>
+        </div>
+      </div>`;
+      }
+
+      async function loadVATReport(firstDay, lastDay) {
+        const { data: invoices } = await supabase
+          .from("invoices")
+          .select("amount, vat_amount, total, type")
+          .gte("created_at", firstDay)
+          .lte("created_at", lastDay + "T23:59:59");
+
+        const inv = invoices || [];
+        const taxableSupplies = inv.reduce(
+          (s, i) => s + (parseFloat(i.amount) || 0),
+          0,
+        );
+        const vatCollected = inv.reduce(
+          (s, i) => s + (parseFloat(i.vat_amount) || 0),
+          0,
+        );
+        const totalInclVAT = inv.reduce(
+          (s, i) => s + (parseFloat(i.total) || 0),
+          0,
+        );
+
+        document.getElementById("vat-report").innerHTML = `
+      <div style="font-size:0.78rem;color:var(--text-muted);
+        margin-bottom:16px">
+        TRN: 104488244500003 | VAT Rate: 5%
+      </div>
+      <div class="vat-table">
+        <div class="vat-row">
+          <span class="vat-label">Number of Tax Invoices</span>
+          <span class="vat-value">${inv.length}</span>
+        </div>
+        <div class="vat-row">
+          <span class="vat-label">Taxable Supplies (Excl. VAT)</span>
+          <span class="vat-value">${formatCurrency(taxableSupplies)}</span>
+        </div>
+        <div class="vat-row">
+          <span class="vat-label">VAT Collected (Output Tax)</span>
+          <span class="vat-value">${formatCurrency(vatCollected)}</span>
+        </div>
+        <div class="vat-row">
+          <span class="vat-label">Total Incl. VAT</span>
+          <span class="vat-value">${formatCurrency(totalInclVAT)}</span>
+        </div>
+        <div class="vat-row total">
+          <span class="vat-label" style="color:var(--white)">
+            VAT Payable to FTA
+          </span>
+          <span style="color:var(--green)">
+            ${formatCurrency(vatCollected)}
+          </span>
+        </div>
+      </div>
+      <div style="margin-top:16px;padding:12px;
+        background:rgba(62,173,130,0.08);
+        border:1px solid rgba(62,173,130,0.2);
+        border-radius:var(--radius-sm);
+        font-size:0.78rem;color:var(--text-muted);line-height:1.6">
+        ⚠️ This is an estimate based on invoices generated in the system.
+        Please verify with your accountant before filing with the FTA.
+      </div>`;
+      }
+
+      // ── Tenant History ────────────────────────────────────────────────
+      window.loadTenantsForBuilding = async function () {
+        const bldg = document.getElementById("tenant-building").value;
+        const sel = document.getElementById("tenant-select");
+        sel.innerHTML = '<option value="">Select Tenant</option>';
+        if (!bldg) return;
+
+        const { data: units } = await supabase
+          .from("units")
+          .select("id, unit_number, tenant_name")
+          .eq("building_id", bldg)
+          .not("tenant_name", "is", null)
+          .order("unit_number");
+
+        allUnits = units || [];
+        allUnits.forEach((u) => {
+          const opt = document.createElement("option");
+          opt.value = u.id;
+          opt.textContent = `Unit ${u.unit_number} — ${u.tenant_name}`;
+          sel.appendChild(opt);
+        });
+      };
+
+      window.loadTenantHistory = async function () {
+        const unitId = document.getElementById("tenant-select").value;
+        if (!unitId) return;
+
+        selectedUnit = allUnits.find((u) => u.id === unitId);
+        const container = document.getElementById("tenant-history");
+        container.innerHTML =
+          '<div class="loading-state"><div class="spinner"></div></div>';
+
+        const [invoicesRes, paymentsRes] = await Promise.all([
+          supabase
+            .from("invoices")
+            .select("*")
+            .eq("unit_id", unitId)
+            .order("created_at", { ascending: false }),
+          supabase
+            .from("payment_log")
+            .select("*")
+            .eq("unit_id", unitId)
+            .order("payment_date", { ascending: false }),
+        ]);
+
+        const invoices = invoicesRes.data || [];
+        const payments = paymentsRes.data || [];
+
+        if (!invoices.length && !payments.length) {
+          container.innerHTML = `
+        <div class="empty-state" style="padding:20px">
+          <div class="empty-state-title">
+            No payment history for ${selectedUnit?.tenant_name || "this tenant"}
+          </div>
+          <div class="empty-state-text">
+            Generate invoices or log manual payments to build history.
+          </div>
+        </div>`;
+          return;
+        }
+
+        const totalInvoiced = invoices.reduce(
+          (s, i) => s + (parseFloat(i.total) || 0),
+          0,
+        );
+        const totalPaid = payments.reduce(
+          (s, p) => s + (parseFloat(p.amount) || 0),
+          0,
+        );
+
+        container.innerHTML = `
+      <div style="display:flex;gap:16px;flex-wrap:wrap;margin-bottom:16px">
+        <div style="background:var(--bg);border:1px solid var(--border);
+          border-radius:var(--radius-sm);padding:12px 16px">
+          <div style="font-size:1.1rem;font-weight:800;color:var(--green)">
+            ${formatCurrency(totalInvoiced)}
+          </div>
+          <div style="font-size:0.72rem;color:var(--text-muted);
+            text-transform:uppercase">Total Invoiced</div>
+        </div>
+        <div style="background:var(--bg);border:1px solid var(--border);
+          border-radius:var(--radius-sm);padding:12px 16px">
+          <div style="font-size:1.1rem;font-weight:800;color:var(--blue-light)">
+            ${formatCurrency(totalPaid)}
+          </div>
+          <div style="font-size:0.72rem;color:var(--text-muted);
+            text-transform:uppercase">Total Paid (Manual)</div>
+        </div>
+      </div>
+
+      ${
+        invoices.length
+          ? `
+        <div style="font-size:0.82rem;font-weight:700;
+          color:var(--text-muted);text-transform:uppercase;
+          letter-spacing:0.4px;margin-bottom:8px">
+          Invoices
+        </div>
+        <div class="table-wrapper" style="margin-bottom:16px">
+          <table>
+            <thead>
+              <tr>
+                <th>Invoice #</th>
+                <th>Type</th>
+                <th>Amount</th>
+                <th>VAT</th>
+                <th>Total</th>
+                <th>Date</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${invoices
+                .map(
+                  (i) => `
+                <tr>
+                  <td style="color:var(--green);font-weight:700">
+                    ${i.invoice_number}
+                  </td>
+                  <td>${i.type}</td>
+                  <td>${formatCurrency(i.amount)}</td>
+                  <td>${formatCurrency(i.vat_amount)}</td>
+                  <td style="font-weight:700">${formatCurrency(i.total)}</td>
+                  <td>${formatDate(i.created_at)}</td>
+                </tr>`,
+                )
+                .join("")}
+            </tbody>
+          </table>
+        </div>`
+          : ""
+      }
+
+      ${
+        payments.length
+          ? `
+        <div style="font-size:0.82rem;font-weight:700;
+          color:var(--text-muted);text-transform:uppercase;
+          letter-spacing:0.4px;margin-bottom:8px">
+          Manual Payments
+        </div>
+        <div class="table-wrapper">
+          <table>
+            <thead>
+              <tr>
+                <th>Date</th>
+                <th>Amount</th>
+                <th>Method</th>
+                <th>Reference</th>
+                <th>Notes</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody>
+              ${payments
+                .map(
+                  (p) => `
+                <tr>
+                  <td>${formatDate(p.payment_date)}</td>
+                  <td style="font-weight:700;color:var(--green)">
+                    ${formatCurrency(p.amount)}
+                  </td>
+                  <td>
+                    <span class="badge badge-blue">
+                      ${p.payment_method?.replace("_", " ") || "—"}
+                    </span>
+                  </td>
+                  <td style="color:var(--text-muted)">
+                    ${p.reference || "—"}
+                  </td>
+                  <td>${p.notes || "—"}</td>
+                  <td>
+                    <button class="btn btn-danger btn-sm"
+                      onclick="deletePayment('${p.id}')">🗑️</button>
+                  </td>
+                </tr>`,
+                )
+                .join("")}
+            </tbody>
+          </table>
+        </div>`
+          : ""
+      }`;
+      };
+
+      window.deletePayment = async function (id) {
+        const ok = await showConfirm("Delete this payment record?");
+        if (!ok) return;
+        await supabase.from("payment_log").delete().eq("id", id);
+        showToast("Payment deleted.");
+        loadTenantHistory();
+      };
+
+      // ── Manual Payment ────────────────────────────────────────────────
+      window.openAddPayment = function () {
+        [
+          "pay-building",
+          "pay-unit",
+          "pay-tenant",
+          "pay-amount",
+          "pay-ref",
+          "pay-notes",
+        ].forEach((id) => {
+          document.getElementById(id).value = "";
+        });
+        document.getElementById("pay-method").value = "cash";
+        document.getElementById("pay-date").value = new Date()
+          .toISOString()
+          .split("T")[0];
+        document.getElementById("pay-unit").innerHTML =
+          '<option value="">Select Unit</option>';
+
+        // Pre-fill building/unit if selected
+        const tenBldg = document.getElementById("tenant-building").value;
+        const tenUnit = document.getElementById("tenant-select").value;
+        if (tenBldg) {
+          document.getElementById("pay-building").value = tenBldg;
+          loadUnitsForPayment().then(() => {
+            if (tenUnit) {
+              document.getElementById("pay-unit").value = tenUnit;
+              autoFillPayment();
+            }
+          });
+        }
+
+        document.getElementById("modal-payment").style.display = "flex";
+      };
+
+      window.loadUnitsForPayment = async function () {
+        const bldg = document.getElementById("pay-building").value;
+        const sel = document.getElementById("pay-unit");
+        sel.innerHTML = '<option value="">Select Unit</option>';
+        if (!bldg) return;
+        const { data } = await supabase
+          .from("units")
+          .select("id, unit_number, tenant_name, rent, floors(name)")
+          .eq("building_id", bldg)
+          .order("unit_number");
+        payUnits = data || [];
+        payUnits.forEach((u) => {
+          const opt = document.createElement("option");
+          opt.value = u.id;
+          opt.textContent = `${u.unit_number}${
+            u.tenant_name ? " — " + u.tenant_name : ""
+          }`;
+          sel.appendChild(opt);
+        });
+      };
+
+      window.autoFillPayment = function () {
+        const unitId = document.getElementById("pay-unit").value;
+        const unit = payUnits.find((u) => u.id === unitId);
+        if (!unit) return;
+        document.getElementById("pay-tenant").value = unit.tenant_name || "";
+        document.getElementById("pay-amount").value = unit.rent || "";
+      };
+
+      window.savePayment = async function () {
+        const bldg = document.getElementById("pay-building").value;
+        const unitId = document.getElementById("pay-unit").value;
+        const amount = parseFloat(document.getElementById("pay-amount").value);
+        const date = document.getElementById("pay-date").value;
+        const method = document.getElementById("pay-method").value;
+
+        if (!bldg || !unitId || !amount || !date) {
+          showToast("Building, Unit, Amount and Date are required.", "error");
+          return;
+        }
+
+        const { error } = await supabase.from("payment_log").insert({
+          building_id: bldg,
+          unit_id: unitId,
+          tenant_name:
+            document.getElementById("pay-tenant").value.trim() || null,
+          amount,
+          payment_date: date,
+          payment_method: method,
+          reference: document.getElementById("pay-ref").value.trim() || null,
+          notes: document.getElementById("pay-notes").value.trim() || null,
+        });
+
+        if (error) {
+          showToast("Error saving payment.", "error");
+          return;
+        }
+        closeModal("modal-payment");
+        showToast("Payment logged!");
+        loadTenantHistory();
+      };
+
+      // ── Excel Export ──────────────────────────────────────────────────
+      window.exportMonthlyExcel = async function () {
+        const monthVal = document.getElementById("report-month").value;
+        if (!monthVal) {
+          showToast("Select a month first.", "error");
+          return;
+        }
+
+        const [year, month] = monthVal.split("-").map(Number);
+        const firstDay = `${year}-${String(month).padStart(2, "0")}-01`;
+        const lastDay = new Date(year, month, 0).toISOString().split("T")[0];
+
+        showToast("Preparing report...");
+
+        const [invoicesRes, expensesRes, chequesRes, paymentsRes] =
+          await Promise.all([
+            supabase
+              .from("invoices")
+              .select("*")
+              .gte("created_at", firstDay)
+              .lte("created_at", lastDay + "T23:59:59"),
+            supabase
+              .from("expenses")
+              .select("*, buildings(name)")
+              .gte("expense_date", firstDay)
+              .lte("expense_date", lastDay),
+            supabase
+              .from("cheques")
+              .select("*")
+              .gte("cheque_date", firstDay)
+              .lte("cheque_date", lastDay),
+            supabase
+              .from("payment_log")
+              .select("*")
+              .gte("payment_date", firstDay)
+              .lte("payment_date", lastDay),
+          ]);
+
+        const wb = XLSX.utils.book_new();
+        const monthName = new Date(year, month - 1, 1).toLocaleDateString(
+          "en-GB",
+          { month: "long", year: "numeric" },
+        );
+
+        const addSheet = (name, data) => {
+          const ws = XLSX.utils.json_to_sheet(data.length ? data : [{}]);
+          XLSX.utils.book_append_sheet(wb, ws, name);
+        };
+
+        addSheet("Invoices", invoicesRes.data || []);
+        addSheet("Expenses", expensesRes.data || []);
+        addSheet("Cheques", chequesRes.data || []);
+        addSheet("Payments", paymentsRes.data || []);
+
+        XLSX.writeFile(wb, `ASRE_Financial_Report_${monthVal}.xlsx`);
+        showToast(`Monthly report exported!`);
+      };
+
+      window.closeModal = function (id) {
+        document.getElementById(id).style.display = "none";
+      };
+
+      document.querySelectorAll(".modal-overlay").forEach((o) => {
+        o.addEventListener("click", (e) => {
+          if (e.target === o) o.style.display = "none";
+        });
+      });
+
+      init();
+    </script>
+  </body>
+</html>

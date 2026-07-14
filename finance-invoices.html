@@ -1,0 +1,452 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link
+      rel="icon"
+      href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📄</text></svg>"
+    />
+    <title>ASRE — Finance Invoices</title>
+    <link rel="stylesheet" href="css/main.css" />
+    <style>
+      .summary-bar {
+        display: flex;
+        gap: 20px;
+        background: var(--bg-card);
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        padding: 16px 24px;
+        margin-bottom: 24px;
+        flex-wrap: wrap;
+      }
+      .summary-item-num {
+        font-size: 1.4rem;
+        font-weight: 800;
+      }
+      .summary-item-label {
+        font-size: 0.72rem;
+        color: var(--text-muted);
+        text-transform: uppercase;
+        letter-spacing: 0.4px;
+      }
+      .inv-type-badge {
+        font-size: 0.7rem;
+        font-weight: 700;
+        letter-spacing: 0.5px;
+        padding: 3px 8px;
+        border-radius: 4px;
+        background: rgba(42, 85, 144, 0.2);
+        color: #6fa3e0;
+      }
+    </style>
+  </head>
+  <body>
+    <nav id="main-nav"></nav>
+
+    <div class="page-wrapper">
+      <div class="container">
+        <div class="page-header">
+          <div>
+            <div class="page-title">Invoice <span>History</span></div>
+            <div class="page-subtitle">
+              All generated invoices with VAT breakdown
+            </div>
+          </div>
+          <div style="display: flex; gap: 10px">
+            <button class="btn btn-outline" onclick="exportQB()">
+              📊 Export to QuickBooks
+            </button>
+            <a href="invoices.html" class="btn btn-green">
+              + Generate Invoice
+            </a>
+          </div>
+        </div>
+
+        <!-- Summary -->
+        <div class="summary-bar">
+          <div class="summary-item">
+            <div
+              class="summary-item-num"
+              style="color: var(--green)"
+              id="s-total-invoices"
+            >
+              —
+            </div>
+            <div class="summary-item-label">Total Invoices</div>
+          </div>
+          <div class="summary-item">
+            <div
+              class="summary-item-num"
+              style="color: var(--white)"
+              id="s-total-amount"
+            >
+              —
+            </div>
+            <div class="summary-item-label">Total Amount</div>
+          </div>
+          <div class="summary-item">
+            <div
+              class="summary-item-num"
+              style="color: var(--blue-light)"
+              id="s-total-vat"
+            >
+              —
+            </div>
+            <div class="summary-item-label">Total VAT</div>
+          </div>
+          <div class="summary-item">
+            <div
+              class="summary-item-num"
+              style="color: var(--green)"
+              id="s-this-month"
+            >
+              —
+            </div>
+            <div class="summary-item-label">This Month</div>
+          </div>
+        </div>
+
+        <!-- Filters -->
+        <div class="filter-bar">
+          <input
+            type="text"
+            class="form-control"
+            id="search-input"
+            placeholder="🔍  Search invoice # or tenant..."
+            oninput="applyFilters()"
+            style="flex: 1; min-width: 200px"
+          />
+          <select
+            class="form-control"
+            id="filter-type"
+            onchange="applyFilters()"
+            style="min-width: 200px"
+          >
+            <option value="">All Types</option>
+            <option value="renewal">Renewal Fee</option>
+            <option value="ejari">Ejari Fee</option>
+            <option value="maintenance">Maintenance Quotation</option>
+            <option value="checkhold">Check Hold Fee</option>
+            <option value="bouncedpenalty">Bounced Check Penalty</option>
+            <option value="checkswap">Check Swap Fee</option>
+            <option value="commission">Commission</option>
+            <option value="checkreceived">Check Received</option>
+            <option value="acknowledgement">Acknowledgement</option>
+          </select>
+          <input
+            type="date"
+            class="form-control"
+            id="filter-from"
+            onchange="applyFilters()"
+            style="min-width: 150px"
+          />
+          <input
+            type="date"
+            class="form-control"
+            id="filter-to"
+            onchange="applyFilters()"
+            style="min-width: 150px"
+          />
+        </div>
+
+        <!-- Invoices Table -->
+        <div id="invoices-container">
+          <div class="loading-state">
+            <div class="spinner"></div>
+            <p>Loading invoices...</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- QB Modal -->
+    <div class="modal-overlay" id="modal-qb" style="display: none">
+      <div class="modal">
+        <div class="modal-header">
+          <div class="modal-title">Export to QuickBooks CSV</div>
+          <button class="modal-close" onclick="closeModal('modal-qb')">
+            ×
+          </button>
+        </div>
+        <div class="modal-body">
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">From Date</label>
+              <input type="date" id="qb-from" class="form-control" />
+            </div>
+            <div class="form-group">
+              <label class="form-label">To Date</label>
+              <input type="date" id="qb-to" class="form-control" />
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button class="btn btn-outline" onclick="closeModal('modal-qb')">
+            Cancel
+          </button>
+          <button class="btn btn-green" onclick="downloadQB()">
+            Download CSV
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <script type="module">
+      import { requireFinanceOrAdmin } from "./js/auth.js";
+      import {
+        renderNav,
+        showToast,
+        showConfirm,
+        formatCurrency,
+        formatDate,
+      } from "./js/shared.js";
+      import { supabase } from "./js/supabase.js";
+
+      const session = requireFinanceOrAdmin();
+      if (!session) throw new Error("Not authenticated");
+      renderNav("finance-invoices");
+
+      const TYPE_CODES = {
+        renewal: "ASRE-RE",
+        ejari: "ASRE-EJ",
+        maintenance: "ASRE-MQ",
+        checkhold: "ASRE-CH",
+        bouncedpenalty: "ASRE-BP",
+        checkswap: "ASRE-CS",
+        commission: "ASRE-CM",
+        checkreceived: "ASRE-CR",
+        acknowledgement: "ASRE-AC",
+      };
+
+      let allInvoices = [];
+
+      async function loadInvoices() {
+        const { data } = await supabase
+          .from("invoices")
+          .select("*")
+          .order("created_at", { ascending: false });
+
+        allInvoices = data || [];
+        updateSummary();
+        applyFilters();
+      }
+
+      function updateSummary() {
+        const today = new Date();
+        const thisMonth = allInvoices.filter((i) => {
+          const d = new Date(i.created_at);
+          return (
+            d.getMonth() === today.getMonth() &&
+            d.getFullYear() === today.getFullYear()
+          );
+        });
+
+        const totalAmt = allInvoices.reduce(
+          (s, i) => s + (parseFloat(i.total) || 0),
+          0,
+        );
+        const totalVAT = allInvoices.reduce(
+          (s, i) => s + (parseFloat(i.vat_amount) || 0),
+          0,
+        );
+
+        document.getElementById("s-total-invoices").textContent =
+          allInvoices.length;
+        document.getElementById("s-total-amount").textContent =
+          "AED " +
+          totalAmt.toLocaleString("en-AE", { minimumFractionDigits: 2 });
+        document.getElementById("s-total-vat").textContent =
+          "AED " +
+          totalVAT.toLocaleString("en-AE", { minimumFractionDigits: 2 });
+        document.getElementById("s-this-month").textContent = thisMonth.length;
+      }
+
+      window.applyFilters = function () {
+        const search = document
+          .getElementById("search-input")
+          .value.toLowerCase();
+        const type = document.getElementById("filter-type").value;
+        const from = document.getElementById("filter-from").value;
+        const to = document.getElementById("filter-to").value;
+
+        let filtered = allInvoices;
+        if (type) filtered = filtered.filter((i) => i.type === type);
+        if (from) filtered = filtered.filter((i) => i.created_at >= from);
+        if (to)
+          filtered = filtered.filter((i) => i.created_at <= to + "T23:59:59");
+        if (search) {
+          filtered = filtered.filter(
+            (i) =>
+              i.invoice_number?.toLowerCase().includes(search) ||
+              i.tenant_name?.toLowerCase().includes(search),
+          );
+        }
+
+        renderInvoices(filtered);
+      };
+
+      function renderInvoices(invoices) {
+        const container = document.getElementById("invoices-container");
+        if (!invoices.length) {
+          container.innerHTML = `
+        <div class="empty-state">
+          <div class="empty-state-icon">📄</div>
+          <div class="empty-state-title">No invoices found</div>
+        </div>`;
+          return;
+        }
+
+        container.innerHTML = `
+      <div class="table-wrapper">
+        <table>
+          <thead>
+            <tr>
+              <th>Invoice #</th>
+              <th>Type</th>
+              <th>Tenant</th>
+              <th>Subtotal</th>
+              <th>VAT</th>
+              <th>Total</th>
+              <th>Date</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${invoices
+              .map(
+                (i) => `
+              <tr>
+                <td style="font-weight:700;color:var(--green)">
+                  ${i.invoice_number}
+                </td>
+                <td>
+                  <span class="inv-type-badge">
+                    ${TYPE_CODES[i.type] || i.type}
+                  </span>
+                </td>
+                <td>${i.tenant_name || "—"}</td>
+                <td>${formatCurrency(i.amount)}</td>
+                <td style="color:var(--blue-light)">
+                  ${formatCurrency(i.vat_amount)}
+                </td>
+                <td style="font-weight:700;color:var(--green)">
+                  ${formatCurrency(i.total)}
+                </td>
+                <td>${formatDate(i.created_at)}</td>
+              </tr>`,
+              )
+              .join("")}
+          </tbody>
+        </table>
+      </div>`;
+      }
+
+      window.exportQB = function () {
+        const today = new Date().toISOString().split("T")[0];
+        const first = today.slice(0, 8) + "01";
+        document.getElementById("qb-from").value = first;
+        document.getElementById("qb-to").value = today;
+        document.getElementById("modal-qb").style.display = "flex";
+      };
+
+      window.downloadQB = async function () {
+        const from = document.getElementById("qb-from").value;
+        const to = document.getElementById("qb-to").value;
+        if (!from || !to) {
+          showToast("Please select both dates.", "error");
+          return;
+        }
+
+        const { data: invoices } = await supabase
+          .from("invoices")
+          .select("*")
+          .gte("created_at", from)
+          .lte("created_at", to + "T23:59:59")
+          .order("created_at");
+
+        if (!invoices?.length) {
+          showToast("No invoices in that range.", "warning");
+          closeModal("modal-qb");
+          return;
+        }
+
+        const rows = [
+          [
+            "InvoiceNo",
+            "Customer",
+            "InvoiceDate",
+            "DueDate",
+            "Description",
+            "Qty",
+            "UnitPrice",
+            "VAT",
+            "Amount",
+            "Currency",
+          ],
+        ];
+
+        invoices.forEach((inv) => {
+          const items = Array.isArray(inv.line_items) ? inv.line_items : [];
+          const date = inv.created_at?.split("T")[0] || "";
+          if (!items.length) {
+            rows.push([
+              inv.invoice_number,
+              inv.tenant_name || "—",
+              date,
+              date,
+              inv.invoice_number,
+              1,
+              (inv.amount || 0).toFixed(2),
+              (inv.vat_amount || 0).toFixed(2),
+              (inv.total || 0).toFixed(2),
+              "AED",
+            ]);
+          } else {
+            items.forEach((item) => {
+              rows.push([
+                inv.invoice_number,
+                inv.tenant_name || "—",
+                date,
+                date,
+                item.description || "—",
+                item.qty || 1,
+                (item.rate || 0).toFixed(2),
+                (item.vat || 0).toFixed(2),
+                (item.total || 0).toFixed(2),
+                "AED",
+              ]);
+            });
+          }
+        });
+
+        const csv = rows
+          .map((r) =>
+            r.map((v) => `"${String(v).replace(/"/g, '""')}"`).join(","),
+          )
+          .join("\n");
+
+        const blob = new Blob([csv], { type: "text/csv" });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = `ASRE_QB_${from}_to_${to}.csv`;
+        a.click();
+        URL.revokeObjectURL(url);
+        showToast(`Exported ${invoices.length} invoices!`);
+        closeModal("modal-qb");
+      };
+
+      window.closeModal = function (id) {
+        document.getElementById(id).style.display = "none";
+      };
+
+      document.querySelectorAll(".modal-overlay").forEach((o) => {
+        o.addEventListener("click", (e) => {
+          if (e.target === o) o.style.display = "none";
+        });
+      });
+
+      loadInvoices();
+    </script>
+  </body>
+</html>

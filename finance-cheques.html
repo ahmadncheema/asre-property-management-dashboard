@@ -1,0 +1,696 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link
+      rel="icon"
+      href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🏦</text></svg>"
+    />
+    <title>ASRE — Cheque Management</title>
+    <link rel="stylesheet" href="css/main.css" />
+    <style>
+      .cheque-card {
+        background: var(--bg-card);
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        padding: 18px 20px;
+        margin-bottom: 10px;
+        transition: var(--transition);
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        gap: 12px;
+      }
+
+      .cheque-card:hover {
+        box-shadow: var(--shadow-sm);
+      }
+
+      .cheque-card.held {
+        border-left: 4px solid var(--blue);
+      }
+      .cheque-card.deposited {
+        border-left: 4px solid var(--green);
+        opacity: 0.8;
+      }
+      .cheque-card.bounced {
+        border-left: 4px solid var(--danger);
+      }
+      .cheque-card.cancelled {
+        border-left: 4px solid var(--text-muted);
+        opacity: 0.6;
+      }
+
+      .cheque-main {
+        flex: 1;
+        min-width: 200px;
+      }
+      .cheque-tenant {
+        font-size: 0.95rem;
+        font-weight: 700;
+        color: var(--white);
+      }
+      .cheque-meta {
+        font-size: 0.78rem;
+        color: var(--text-muted);
+        margin-top: 3px;
+      }
+
+      .cheque-amount {
+        font-size: 1.2rem;
+        font-weight: 800;
+        color: var(--green);
+        text-align: right;
+      }
+
+      .cheque-dates {
+        font-size: 0.78rem;
+        color: var(--text-muted);
+        text-align: right;
+        margin-top: 3px;
+      }
+
+      .tab-bar {
+        display: flex;
+        gap: 4px;
+        margin-bottom: 24px;
+        background: var(--bg-card);
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        padding: 6px;
+      }
+
+      .tab-btn {
+        flex: 1;
+        padding: 8px 16px;
+        border-radius: var(--radius-sm);
+        border: none;
+        background: transparent;
+        color: var(--text-muted);
+        font-size: 0.85rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: var(--transition);
+        font-family: inherit;
+      }
+
+      .tab-btn.active {
+        background: var(--blue);
+        color: var(--white);
+      }
+
+      .summary-bar {
+        display: flex;
+        gap: 20px;
+        background: var(--bg-card);
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        padding: 16px 24px;
+        margin-bottom: 24px;
+        flex-wrap: wrap;
+      }
+
+      .summary-item-num {
+        font-size: 1.4rem;
+        font-weight: 800;
+      }
+      .summary-item-label {
+        font-size: 0.72rem;
+        color: var(--text-muted);
+        text-transform: uppercase;
+        letter-spacing: 0.4px;
+      }
+    </style>
+  </head>
+  <body>
+    <nav id="main-nav"></nav>
+
+    <div class="page-wrapper">
+      <div class="container">
+        <div class="page-header">
+          <div>
+            <div class="page-title">Cheque <span>Management</span></div>
+            <div class="page-subtitle">
+              PDC tracking, deposit schedule, bounced cheques
+            </div>
+          </div>
+          <button class="btn btn-green" onclick="openAddCheque()">
+            + Add Cheque
+          </button>
+        </div>
+
+        <!-- Summary Bar -->
+        <div class="summary-bar">
+          <div class="summary-item">
+            <div
+              class="summary-item-num"
+              style="color: var(--blue-light)"
+              id="s-held"
+            >
+              —
+            </div>
+            <div class="summary-item-label">Held</div>
+          </div>
+          <div class="summary-item">
+            <div
+              class="summary-item-num"
+              style="color: var(--green)"
+              id="s-deposited"
+            >
+              —
+            </div>
+            <div class="summary-item-label">Deposited</div>
+          </div>
+          <div class="summary-item">
+            <div
+              class="summary-item-num"
+              style="color: var(--danger)"
+              id="s-bounced"
+            >
+              —
+            </div>
+            <div class="summary-item-label">Bounced</div>
+          </div>
+          <div class="summary-item">
+            <div
+              class="summary-item-num"
+              style="color: var(--warning)"
+              id="s-upcoming"
+            >
+              —
+            </div>
+            <div class="summary-item-label">Due This Week</div>
+          </div>
+          <div class="summary-item">
+            <div
+              class="summary-item-num"
+              style="color: var(--green)"
+              id="s-total-amount"
+            >
+              —
+            </div>
+            <div class="summary-item-label">Total Held (AED)</div>
+          </div>
+        </div>
+
+        <!-- Filter Bar -->
+        <div class="filter-bar">
+          <input
+            type="text"
+            class="form-control"
+            id="search-input"
+            placeholder="🔍  Search tenant, cheque # or bank..."
+            oninput="applyFilters()"
+            style="flex: 1; min-width: 200px"
+          />
+          <select
+            class="form-control"
+            id="filter-building"
+            onchange="applyFilters()"
+            style="min-width: 200px"
+          >
+            <option value="">All Buildings</option>
+          </select>
+          <select
+            class="form-control"
+            id="filter-status"
+            onchange="applyFilters()"
+            style="min-width: 160px"
+          >
+            <option value="">All Status</option>
+            <option value="held">Held</option>
+            <option value="deposited">Deposited</option>
+            <option value="bounced">Bounced</option>
+            <option value="cancelled">Cancelled</option>
+          </select>
+        </div>
+
+        <!-- Cheque List -->
+        <div id="cheques-container">
+          <div class="loading-state">
+            <div class="spinner"></div>
+            <p>Loading cheques...</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Add/Edit Cheque Modal -->
+    <div class="modal-overlay" id="modal-cheque" style="display: none">
+      <div class="modal modal-lg">
+        <div class="modal-header">
+          <div class="modal-title" id="cheque-modal-title">Add Cheque</div>
+          <button class="modal-close" onclick="closeModal('modal-cheque')">
+            ×
+          </button>
+        </div>
+        <div class="modal-body">
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Building *</label>
+              <select
+                id="ch-building"
+                class="form-control"
+                onchange="loadUnitsForCheque()"
+              >
+                <option value="">Select Building</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Unit *</label>
+              <select
+                id="ch-unit"
+                class="form-control"
+                onchange="autoFillCheque()"
+              >
+                <option value="">Select Unit</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Tenant Name</label>
+              <input
+                type="text"
+                id="ch-tenant"
+                class="form-control"
+                placeholder="Auto-filled from unit"
+              />
+            </div>
+            <div class="form-group">
+              <label class="form-label">Amount (AED) *</label>
+              <input
+                type="number"
+                id="ch-amount"
+                class="form-control"
+                placeholder="0.00"
+              />
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Cheque Number</label>
+              <input
+                type="text"
+                id="ch-number"
+                class="form-control"
+                placeholder="e.g. 000123"
+              />
+            </div>
+            <div class="form-group">
+              <label class="form-label">Bank Name</label>
+              <input
+                type="text"
+                id="ch-bank"
+                class="form-control"
+                placeholder="e.g. Emirates NBD"
+              />
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Cheque Date *</label>
+              <input type="date" id="ch-date" class="form-control" />
+            </div>
+            <div class="form-group">
+              <label class="form-label">Deposit Date</label>
+              <input type="date" id="ch-deposit-date" class="form-control" />
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Status</label>
+            <select id="ch-status" class="form-control">
+              <option value="held">Held</option>
+              <option value="deposited">Deposited</option>
+              <option value="bounced">Bounced</option>
+              <option value="cancelled">Cancelled</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Remarks</label>
+            <textarea
+              id="ch-remarks"
+              class="form-control"
+              rows="2"
+              placeholder="Additional notes..."
+            ></textarea>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button class="btn btn-outline" onclick="closeModal('modal-cheque')">
+            Cancel
+          </button>
+          <button
+            class="btn btn-green"
+            id="cheque-save-btn"
+            onclick="saveCheque()"
+          >
+            Save Cheque
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <script type="module">
+      import { requireFinanceOrAdmin } from "./js/auth.js";
+      import {
+        renderNav,
+        showToast,
+        showConfirm,
+        formatCurrency,
+        formatDate,
+      } from "./js/shared.js";
+      import { supabase } from "./js/supabase.js";
+
+      const session = requireFinanceOrAdmin();
+      if (!session) throw new Error("Not authenticated");
+      renderNav("finance-cheques");
+
+      let allCheques = [];
+      let allBuildings = [];
+      let allUnits = [];
+      let editingId = null;
+
+      async function loadCheques() {
+        const [buildingsRes, chequesRes] = await Promise.all([
+          supabase.from("buildings").select("*").order("name"),
+          supabase
+            .from("cheques")
+            .select("*, units(unit_number), buildings(name)")
+            .order("cheque_date", { ascending: false }),
+        ]);
+
+        allBuildings = buildingsRes.data || [];
+        allCheques = chequesRes.data || [];
+
+        const filterSel = document.getElementById("filter-building");
+        filterSel.innerHTML =
+          '<option value="">All Buildings</option>' +
+          allBuildings
+            .map((b) => `<option value="${b.id}">${b.name}</option>`)
+            .join("");
+
+        updateSummary();
+        applyFilters();
+      }
+
+      function updateSummary() {
+        const today = new Date().toISOString().split("T")[0];
+        const next7 = new Date(Date.now() + 7 * 86400000)
+          .toISOString()
+          .split("T")[0];
+
+        const held = allCheques.filter((c) => c.status === "held");
+        const deposited = allCheques.filter((c) => c.status === "deposited");
+        const bounced = allCheques.filter((c) => c.status === "bounced");
+        const upcoming = held.filter(
+          (c) =>
+            c.deposit_date &&
+            c.deposit_date >= today &&
+            c.deposit_date <= next7,
+        );
+        const totalHeld = held.reduce(
+          (s, c) => s + (parseFloat(c.amount) || 0),
+          0,
+        );
+
+        document.getElementById("s-held").textContent = held.length;
+        document.getElementById("s-deposited").textContent = deposited.length;
+        document.getElementById("s-bounced").textContent = bounced.length;
+        document.getElementById("s-upcoming").textContent = upcoming.length;
+        document.getElementById("s-total-amount").textContent =
+          "AED " +
+          totalHeld.toLocaleString("en-AE", { minimumFractionDigits: 2 });
+      }
+
+      window.applyFilters = function () {
+        const search = document
+          .getElementById("search-input")
+          .value.toLowerCase();
+        const bldg = document.getElementById("filter-building").value;
+        const status = document.getElementById("filter-status").value;
+
+        let filtered = allCheques;
+        if (bldg) filtered = filtered.filter((c) => c.building_id === bldg);
+        if (status) filtered = filtered.filter((c) => c.status === status);
+        if (search) {
+          filtered = filtered.filter(
+            (c) =>
+              c.tenant_name?.toLowerCase().includes(search) ||
+              c.cheque_number?.toLowerCase().includes(search) ||
+              c.bank_name?.toLowerCase().includes(search),
+          );
+        }
+
+        renderCheques(filtered);
+      };
+
+      function renderCheques(cheques) {
+        const container = document.getElementById("cheques-container");
+        if (!cheques.length) {
+          container.innerHTML = `
+        <div class="empty-state">
+          <div class="empty-state-icon">🏦</div>
+          <div class="empty-state-title">No cheques found</div>
+          <div class="empty-state-text">
+            Click "+ Add Cheque" to log a cheque.
+          </div>
+        </div>`;
+          return;
+        }
+
+        const statusBadge = {
+          held: "badge-blue",
+          deposited: "badge-green",
+          bounced: "badge-red",
+          cancelled: "badge-grey",
+        };
+
+        container.innerHTML = cheques
+          .map(
+            (c) => `
+      <div class="cheque-card ${c.status}">
+        <div class="cheque-main">
+          <div class="cheque-tenant">${c.tenant_name || "—"}</div>
+          <div class="cheque-meta">
+            ${c.buildings?.name || "—"} · 
+            Unit ${c.units?.unit_number || "—"} · 
+            ${c.bank_name || "—"} · 
+            #${c.cheque_number || "—"}
+          </div>
+          ${
+            c.remarks
+              ? `
+            <div style="font-size:0.78rem;color:var(--text-muted);margin-top:4px">
+              ${c.remarks}
+            </div>`
+              : ""
+          }
+        </div>
+        <div style="text-align:right">
+          <div class="cheque-amount">${formatCurrency(c.amount)}</div>
+          <div class="cheque-dates">
+            Cheque: ${formatDate(c.cheque_date)}<br>
+            ${c.deposit_date ? `Deposit: ${formatDate(c.deposit_date)}` : ""}
+          </div>
+          <span class="badge ${statusBadge[c.status] || "badge-grey"}"
+            style="margin-top:6px;display:inline-block">
+            ${c.status}
+          </span>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:6px">
+          ${
+            c.status === "held"
+              ? `
+            <button class="btn btn-green btn-sm"
+              onclick="updateStatus('${c.id}','deposited')">
+              ✅ Mark Deposited
+            </button>
+            <button class="btn btn-danger btn-sm"
+              onclick="updateStatus('${c.id}','bounced')">
+              ⚠️ Mark Bounced
+            </button>`
+              : ""
+          }
+          <button class="btn btn-outline btn-sm"
+            onclick="openEditCheque('${c.id}')">✏️ Edit</button>
+          <button class="btn btn-danger btn-sm"
+            onclick="deleteCheque('${c.id}')">🗑️</button>
+        </div>
+      </div>`,
+          )
+          .join("");
+      }
+
+      window.updateStatus = async function (id, status) {
+        const { error } = await supabase
+          .from("cheques")
+          .update({ status })
+          .eq("id", id);
+        if (error) {
+          showToast("Error updating status.", "error");
+          return;
+        }
+        showToast(`Cheque marked as ${status}!`);
+        loadCheques();
+      };
+
+      window.deleteCheque = async function (id) {
+        const ok = await showConfirm("Delete this cheque record?");
+        if (!ok) return;
+        await supabase.from("cheques").delete().eq("id", id);
+        showToast("Cheque deleted.");
+        loadCheques();
+      };
+
+      window.openAddCheque = function () {
+        editingId = null;
+        document.getElementById("cheque-modal-title").textContent =
+          "Add Cheque";
+        document.getElementById("cheque-save-btn").textContent = "Save Cheque";
+        clearForm();
+        populateBuildings();
+        document.getElementById("modal-cheque").style.display = "flex";
+      };
+
+      window.openEditCheque = async function (id) {
+        const c = allCheques.find((x) => x.id === id);
+        if (!c) return;
+        editingId = id;
+        document.getElementById("cheque-modal-title").textContent =
+          "Edit Cheque";
+        document.getElementById("cheque-save-btn").textContent = "Save Changes";
+        await populateBuildings();
+        document.getElementById("ch-building").value = c.building_id || "";
+        await loadUnitsForCheque();
+        document.getElementById("ch-unit").value = c.unit_id || "";
+        document.getElementById("ch-tenant").value = c.tenant_name || "";
+        document.getElementById("ch-amount").value = c.amount || "";
+        document.getElementById("ch-number").value = c.cheque_number || "";
+        document.getElementById("ch-bank").value = c.bank_name || "";
+        document.getElementById("ch-date").value = c.cheque_date || "";
+        document.getElementById("ch-deposit-date").value = c.deposit_date || "";
+        document.getElementById("ch-status").value = c.status || "held";
+        document.getElementById("ch-remarks").value = c.remarks || "";
+        document.getElementById("modal-cheque").style.display = "flex";
+      };
+
+      function clearForm() {
+        [
+          "ch-building",
+          "ch-unit",
+          "ch-tenant",
+          "ch-amount",
+          "ch-number",
+          "ch-bank",
+          "ch-date",
+          "ch-deposit-date",
+          "ch-remarks",
+        ].forEach((id) => {
+          document.getElementById(id).value = "";
+        });
+        document.getElementById("ch-status").value = "held";
+        document.getElementById("ch-unit").innerHTML =
+          '<option value="">Select Unit</option>';
+      }
+
+      async function populateBuildings() {
+        const sel = document.getElementById("ch-building");
+        sel.innerHTML =
+          '<option value="">Select Building</option>' +
+          allBuildings
+            .map((b) => `<option value="${b.id}">${b.name}</option>`)
+            .join("");
+      }
+
+      window.loadUnitsForCheque = async function () {
+        const bldg = document.getElementById("ch-building").value;
+        const sel = document.getElementById("ch-unit");
+        sel.innerHTML = '<option value="">Select Unit</option>';
+        if (!bldg) return;
+        const { data } = await supabase
+          .from("units")
+          .select("id, unit_number, tenant_name, rent, floors(name)")
+          .eq("building_id", bldg)
+          .order("unit_number");
+        allUnits = data || [];
+        allUnits.forEach((u) => {
+          const opt = document.createElement("option");
+          opt.value = u.id;
+          opt.textContent = `${u.unit_number}${
+            u.floors?.name ? " — " + u.floors.name : ""
+          }${u.tenant_name ? " (" + u.tenant_name + ")" : ""}`;
+          sel.appendChild(opt);
+        });
+      };
+
+      window.autoFillCheque = function () {
+        const unitId = document.getElementById("ch-unit").value;
+        const unit = allUnits.find((u) => u.id === unitId);
+        if (!unit) return;
+        document.getElementById("ch-tenant").value = unit.tenant_name || "";
+        document.getElementById("ch-amount").value = unit.rent || "";
+      };
+
+      window.saveCheque = async function () {
+        const bldg = document.getElementById("ch-building").value;
+        const unitId = document.getElementById("ch-unit").value;
+        const date = document.getElementById("ch-date").value;
+        const amount = parseFloat(document.getElementById("ch-amount").value);
+
+        if (!bldg || !unitId || !date || !amount) {
+          showToast("Building, Unit, Date and Amount are required.", "error");
+          return;
+        }
+
+        const payload = {
+          building_id: bldg,
+          unit_id: unitId,
+          tenant_name:
+            document.getElementById("ch-tenant").value.trim() || null,
+          amount,
+          cheque_number:
+            document.getElementById("ch-number").value.trim() || null,
+          bank_name: document.getElementById("ch-bank").value.trim() || null,
+          cheque_date: date,
+          deposit_date:
+            document.getElementById("ch-deposit-date").value || null,
+          status: document.getElementById("ch-status").value,
+          remarks: document.getElementById("ch-remarks").value.trim() || null,
+        };
+
+        let error;
+        if (editingId) {
+          ({ error } = await supabase
+            .from("cheques")
+            .update(payload)
+            .eq("id", editingId));
+        } else {
+          ({ error } = await supabase.from("cheques").insert(payload));
+        }
+
+        if (error) {
+          showToast("Error saving cheque.", "error");
+          return;
+        }
+        closeModal("modal-cheque");
+        showToast(editingId ? "Cheque updated!" : "Cheque added!");
+        loadCheques();
+      };
+
+      window.closeModal = function (id) {
+        document.getElementById(id).style.display = "none";
+      };
+
+      document.querySelectorAll(".modal-overlay").forEach((o) => {
+        o.addEventListener("click", (e) => {
+          if (e.target === o) o.style.display = "none";
+        });
+      });
+
+      loadCheques();
+    </script>
+  </body>
+</html>

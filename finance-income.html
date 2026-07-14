@@ -1,0 +1,528 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link
+      rel="icon"
+      href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>💰</text></svg>"
+    />
+    <title>ASRE — Income Overview</title>
+    <link rel="stylesheet" href="css/main.css" />
+    <style>
+      .building-income-card {
+        background: var(--bg-card);
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        padding: 20px;
+        margin-bottom: 16px;
+        border-left: 4px solid var(--green);
+        transition: var(--transition);
+      }
+
+      .building-income-card:hover {
+        box-shadow: var(--shadow);
+      }
+
+      .building-income-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        margin-bottom: 16px;
+        flex-wrap: wrap;
+        gap: 10px;
+      }
+
+      .building-income-name {
+        font-size: 1.1rem;
+        font-weight: 700;
+        color: var(--white);
+      }
+
+      .building-income-total {
+        font-size: 1.3rem;
+        font-weight: 800;
+        color: var(--green);
+      }
+
+      .income-stats {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+        gap: 12px;
+        margin-bottom: 16px;
+      }
+
+      .income-stat {
+        background: var(--bg);
+        border-radius: var(--radius-sm);
+        padding: 10px 14px;
+        border: 1px solid var(--border);
+      }
+
+      .income-stat-num {
+        font-size: 1.1rem;
+        font-weight: 700;
+        color: var(--white);
+      }
+
+      .income-stat-label {
+        font-size: 0.72rem;
+        color: var(--text-muted);
+        text-transform: uppercase;
+        letter-spacing: 0.3px;
+        margin-top: 2px;
+      }
+
+      .summary-total {
+        background: rgba(62, 173, 130, 0.1);
+        border: 1px solid rgba(62, 173, 130, 0.3);
+        border-radius: var(--radius);
+        padding: 20px 24px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 28px;
+        flex-wrap: wrap;
+        gap: 16px;
+      }
+
+      .expense-form {
+        background: var(--bg-card);
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        padding: 24px;
+        margin-top: 32px;
+      }
+    </style>
+  </head>
+  <body>
+    <nav id="main-nav"></nav>
+
+    <div class="page-wrapper">
+      <div class="container">
+        <div class="page-header">
+          <div>
+            <div class="page-title">Rental Income <span>Overview</span></div>
+            <div class="page-subtitle">
+              Monthly revenue estimate per building
+            </div>
+          </div>
+          <button class="btn btn-green" onclick="openAddExpense()">
+            + Log Expense
+          </button>
+        </div>
+
+        <!-- Summary Total -->
+        <div class="summary-total">
+          <div>
+            <div
+              style="
+                font-size: 0.82rem;
+                color: var(--text-muted);
+                text-transform: uppercase;
+                letter-spacing: 0.4px;
+                margin-bottom: 4px;
+              "
+            >
+              Total Monthly Revenue Estimate
+            </div>
+            <div
+              style="font-size: 0.82rem; color: var(--text-muted)"
+              id="income-summary-sub"
+            ></div>
+          </div>
+          <div
+            style="font-size: 2rem; font-weight: 800; color: var(--green)"
+            id="income-total"
+          >
+            —
+          </div>
+        </div>
+
+        <!-- Building Income Cards -->
+        <div id="income-container">
+          <div class="loading-state">
+            <div class="spinner"></div>
+            <p>Loading income data...</p>
+          </div>
+        </div>
+
+        <!-- Expected vs Actual -->
+        <div
+          class="section-header"
+          style="margin-top: 40px; margin-bottom: 16px"
+        >
+          <div class="section-title">Expected vs Actual Rent</div>
+        </div>
+        <div id="expected-vs-actual">
+          <div class="loading-state"><div class="spinner"></div></div>
+        </div>
+
+        <!-- Expense Log -->
+        <div
+          class="section-header"
+          style="margin-top: 40px; margin-bottom: 16px"
+        >
+          <div class="section-title">Expense Log</div>
+          <button class="btn btn-outline btn-sm" onclick="openAddExpense()">
+            + Add Expense
+          </button>
+        </div>
+        <div id="expense-list">
+          <div class="loading-state"><div class="spinner"></div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Add Expense Modal -->
+    <div class="modal-overlay" id="modal-expense" style="display: none">
+      <div class="modal">
+        <div class="modal-header">
+          <div class="modal-title">Log Expense</div>
+          <button class="modal-close" onclick="closeModal('modal-expense')">
+            ×
+          </button>
+        </div>
+        <div class="modal-body">
+          <div class="form-group">
+            <label class="form-label">Building</label>
+            <select id="exp-building" class="form-control">
+              <option value="">All Buildings / General</option>
+            </select>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Category *</label>
+              <select id="exp-category" class="form-control">
+                <option value="">Select Category</option>
+                <option value="Maintenance">Maintenance</option>
+                <option value="Utilities">Utilities</option>
+                <option value="Cleaning">Cleaning</option>
+                <option value="Insurance">Insurance</option>
+                <option value="Management Fee">Management Fee</option>
+                <option value="Repairs">Repairs</option>
+                <option value="Legal">Legal</option>
+                <option value="Other">Other</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Amount (AED) *</label>
+              <input
+                type="number"
+                id="exp-amount"
+                class="form-control"
+                placeholder="0.00"
+              />
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Description *</label>
+            <input
+              type="text"
+              id="exp-desc"
+              class="form-control"
+              placeholder="Brief description of expense"
+            />
+          </div>
+          <div class="form-group">
+            <label class="form-label">Date *</label>
+            <input type="date" id="exp-date" class="form-control" />
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button class="btn btn-outline" onclick="closeModal('modal-expense')">
+            Cancel
+          </button>
+          <button class="btn btn-green" onclick="saveExpense()">
+            Save Expense
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <script type="module">
+      import { requireFinanceOrAdmin } from "./js/auth.js";
+      import {
+        renderNav,
+        showToast,
+        showConfirm,
+        formatCurrency,
+        formatDate,
+      } from "./js/shared.js";
+      import { supabase } from "./js/supabase.js";
+
+      const session = requireFinanceOrAdmin();
+      if (!session) throw new Error("Not authenticated");
+      renderNav("finance-income");
+
+      let allBuildings = [];
+
+      async function loadIncome() {
+        const [buildingsRes, unitsRes] = await Promise.all([
+          supabase.from("buildings").select("*").order("name"),
+          supabase.from("units").select("*"),
+        ]);
+
+        allBuildings = buildingsRes.data || [];
+        const units = unitsRes.data || [];
+
+        // Populate expense building dropdown
+        const expBldg = document.getElementById("exp-building");
+        expBldg.innerHTML =
+          '<option value="">All Buildings / General</option>' +
+          allBuildings
+            .map((b) => `<option value="${b.id}">${b.name}</option>`)
+            .join("");
+
+        let grandMonthly = 0;
+        let grandOccupied = 0;
+        let grandTotal = allBuildings.length > 0 ? units.length : 0;
+
+        const container = document.getElementById("income-container");
+        container.innerHTML = allBuildings
+          .map((b) => {
+            const bUnits = units.filter((u) => u.building_id === b.id);
+            const occupied = bUnits.filter(
+              (u) => u.tenant_name && u.tenant_name.trim() !== "",
+            );
+            const vacant = bUnits.length - occupied.length;
+            const annual = occupied.reduce(
+              (s, u) => s + (parseFloat(u.rent) || 0),
+              0,
+            );
+            const monthly = Math.round(annual / 12);
+            const expAnnual = occupied.reduce(
+              (s, u) => s + (parseFloat(u.expected_rent) || 0),
+              0,
+            );
+            const expMonthly = Math.round(expAnnual / 12);
+            const pct =
+              bUnits.length > 0
+                ? Math.round((occupied.length / bUnits.length) * 100)
+                : 0;
+
+            grandMonthly += monthly;
+            grandOccupied += occupied.length;
+
+            return `
+        <div class="building-income-card">
+          <div class="building-income-header">
+            <div>
+              <div class="building-income-name">🏢 ${b.name}</div>
+              <div style="font-size:0.82rem;color:var(--text-muted);margin-top:2px">
+                ${b.address}
+              </div>
+            </div>
+            <div class="building-income-total">
+              AED ${monthly.toLocaleString("en-AE")}
+              <span style="font-size:0.75rem;color:var(--text-muted);
+                font-weight:400">/month</span>
+            </div>
+          </div>
+          <div class="income-stats">
+            <div class="income-stat">
+              <div class="income-stat-num">${occupied.length}</div>
+              <div class="income-stat-label">Occupied</div>
+            </div>
+            <div class="income-stat">
+              <div class="income-stat-num" style="color:var(--warning)">
+                ${vacant}
+              </div>
+              <div class="income-stat-label">Vacant</div>
+            </div>
+            <div class="income-stat">
+              <div class="income-stat-num">${pct}%</div>
+              <div class="income-stat-label">Occupancy</div>
+            </div>
+            <div class="income-stat">
+              <div class="income-stat-num" style="color:var(--text-muted)">
+                AED ${expMonthly.toLocaleString("en-AE")}
+              </div>
+              <div class="income-stat-label">Expected/Month</div>
+            </div>
+          </div>
+          <div style="background:var(--bg);border-radius:4px;
+            height:8px;overflow:hidden">
+            <div style="height:100%;width:${pct}%;
+              background:var(--green);border-radius:4px"></div>
+          </div>
+        </div>`;
+          })
+          .join("");
+
+        document.getElementById("income-total").textContent =
+          "AED " + grandMonthly.toLocaleString("en-AE");
+        document.getElementById("income-summary-sub").textContent =
+          `${grandOccupied} occupied units across ${allBuildings.length} buildings`;
+
+        loadExpectedVsActual(units);
+        loadExpenses();
+      }
+
+      function loadExpectedVsActual(units) {
+        const occupied = units.filter(
+          (u) =>
+            u.tenant_name && u.tenant_name.trim() !== "" && u.expected_rent,
+        );
+
+        const container = document.getElementById("expected-vs-actual");
+        if (!occupied.length) {
+          container.innerHTML = `
+        <div class="empty-state" style="padding:20px">
+          <div class="empty-state-title">No expected rent data available</div>
+        </div>`;
+          return;
+        }
+
+        container.innerHTML = `
+      <div class="table-wrapper">
+        <table>
+          <thead>
+            <tr>
+              <th>Unit</th>
+              <th>Tenant</th>
+              <th>Expected Rent</th>
+              <th>Actual Rent</th>
+              <th>Difference</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${occupied
+              .map((u) => {
+                const diff =
+                  (parseFloat(u.rent) || 0) -
+                  (parseFloat(u.expected_rent) || 0);
+                const diffColor = diff >= 0 ? "var(--green)" : "var(--danger)";
+                return `
+                <tr>
+                  <td style="font-weight:600">Unit ${u.unit_number}</td>
+                  <td>${u.tenant_name}</td>
+                  <td>${formatCurrency(u.expected_rent)}</td>
+                  <td>${formatCurrency(u.rent)}</td>
+                  <td style="font-weight:700;color:${diffColor}">
+                    ${diff >= 0 ? "+" : ""}${formatCurrency(diff)}
+                  </td>
+                </tr>`;
+              })
+              .join("")}
+          </tbody>
+        </table>
+      </div>`;
+      }
+
+      async function loadExpenses() {
+        const { data: expenses } = await supabase
+          .from("expenses")
+          .select("*, buildings(name)")
+          .order("expense_date", { ascending: false });
+
+        const container = document.getElementById("expense-list");
+        if (!expenses?.length) {
+          container.innerHTML = `
+        <div class="empty-state" style="padding:20px">
+          <div class="empty-state-title">No expenses logged yet</div>
+        </div>`;
+          return;
+        }
+
+        container.innerHTML = `
+      <div class="table-wrapper">
+        <table>
+          <thead>
+            <tr>
+              <th>Date</th>
+              <th>Building</th>
+              <th>Category</th>
+              <th>Description</th>
+              <th>Amount</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+            ${expenses
+              .map(
+                (e) => `
+              <tr>
+                <td>${formatDate(e.expense_date)}</td>
+                <td>${e.buildings?.name || "General"}</td>
+                <td>
+                  <span class="badge badge-blue">${e.category || "—"}</span>
+                </td>
+                <td>${e.description || "—"}</td>
+                <td style="font-weight:700;color:var(--danger)">
+                  ${formatCurrency(e.amount)}
+                </td>
+                <td>
+                  <button class="btn btn-danger btn-sm"
+                    onclick="deleteExpense('${e.id}')">🗑️</button>
+                </td>
+              </tr>`,
+              )
+              .join("")}
+          </tbody>
+        </table>
+      </div>`;
+      }
+
+      window.openAddExpense = function () {
+        document.getElementById("exp-category").value = "";
+        document.getElementById("exp-amount").value = "";
+        document.getElementById("exp-desc").value = "";
+        document.getElementById("exp-date").value = new Date()
+          .toISOString()
+          .split("T")[0];
+        document.getElementById("modal-expense").style.display = "flex";
+      };
+
+      window.saveExpense = async function () {
+        const category = document.getElementById("exp-category").value;
+        const amount = parseFloat(document.getElementById("exp-amount").value);
+        const desc = document.getElementById("exp-desc").value.trim();
+        const date = document.getElementById("exp-date").value;
+        const bldg = document.getElementById("exp-building").value;
+
+        if (!category || !amount || !desc || !date) {
+          showToast("Please fill all required fields.", "error");
+          return;
+        }
+
+        const { error } = await supabase.from("expenses").insert({
+          building_id: bldg || null,
+          category,
+          description: desc,
+          amount,
+          expense_date: date,
+          added_by: session.full_name,
+        });
+
+        if (error) {
+          showToast("Error saving expense.", "error");
+          return;
+        }
+        closeModal("modal-expense");
+        showToast("Expense logged!");
+        loadExpenses();
+      };
+
+      window.deleteExpense = async function (id) {
+        const ok = await showConfirm("Delete this expense record?");
+        if (!ok) return;
+        await supabase.from("expenses").delete().eq("id", id);
+        showToast("Expense deleted.");
+        loadExpenses();
+      };
+
+      window.closeModal = function (id) {
+        document.getElementById(id).style.display = "none";
+      };
+
+      document.querySelectorAll(".modal-overlay").forEach((o) => {
+        o.addEventListener("click", (e) => {
+          if (e.target === o) o.style.display = "none";
+        });
+      });
+
+      loadIncome();
+    </script>
+  </body>
+</html>
