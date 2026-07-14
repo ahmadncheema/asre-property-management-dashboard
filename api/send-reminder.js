@@ -266,13 +266,13 @@ module.exports = async function handler(req, res) {
 
               <!-- Contact Section -->
               <table width="100%" cellpadding="0" cellspacing="0"
-                style="background:#1a1a2e;border-radius:10px;
-                margin-bottom:28px;overflow:hidden;">
+                style="background:#f0f4ff;border:1px solid #d0ddf0;
+                border-radius:10px;margin-bottom:28px;overflow:hidden;">
                 <tr>
-                  <td style="padding:14px 24px;
-                    border-bottom:1px solid rgba(255,255,255,0.08);">
+                  <td style="padding:14px 24px;background:#2a5590;
+                    border-bottom:1px solid #d0ddf0;">
                     <span style="font-size:11px;font-weight:700;
-                      color:rgba(255,255,255,0.5);letter-spacing:1px;
+                      color:#ffffff;letter-spacing:1px;
                       text-transform:uppercase;">
                       Contact Our Leasing Team
                     </span>
@@ -289,14 +289,13 @@ module.exports = async function handler(req, res) {
                           <span style="font-size:18px;">📧</span>
                         </td>
                         <td style="padding:10px 0;
-                          border-bottom:1px solid rgba(255,255,255,0.06);
+                          border-bottom:1px solid #e0e8f5;
                           vertical-align:middle;">
-                          <div style="font-size:11px;
-                            color:rgba(255,255,255,0.4);
+                          <div style="font-size:11px;color:#8896a8;
                             text-transform:uppercase;letter-spacing:0.5px;
                             margin-bottom:3px;">Email</div>
                           <a href="mailto:leasing@alsheebanirealestate.ae"
-                            style="font-size:14px;color:#3ead82;
+                            style="font-size:14px;color:#2a5590;
                             text-decoration:none;font-weight:600;">
                             leasing@alsheebanirealestate.ae
                           </a>
@@ -310,14 +309,13 @@ module.exports = async function handler(req, res) {
                           <span style="font-size:18px;">📞</span>
                         </td>
                         <td style="padding:10px 0;
-                          border-bottom:1px solid rgba(255,255,255,0.06);
+                          border-bottom:1px solid #e0e8f5;
                           vertical-align:middle;">
-                          <div style="font-size:11px;
-                            color:rgba(255,255,255,0.4);
+                          <div style="font-size:11px;color:#8896a8;
                             text-transform:uppercase;letter-spacing:0.5px;
                             margin-bottom:3px;">Phone</div>
                           <a href="tel:+97142945001"
-                            style="font-size:14px;color:#3ead82;
+                            style="font-size:14px;color:#2a5590;
                             text-decoration:none;font-weight:600;">
                             +971 4 294 5001
                           </a>
@@ -331,14 +329,13 @@ module.exports = async function handler(req, res) {
                           <span style="font-size:18px;">🌐</span>
                         </td>
                         <td style="padding:10px 0;
-                          border-bottom:1px solid rgba(255,255,255,0.06);
+                          border-bottom:1px solid #e0e8f5;
                           vertical-align:middle;">
-                          <div style="font-size:11px;
-                            color:rgba(255,255,255,0.4);
+                          <div style="font-size:11px;color:#8896a8;
                             text-transform:uppercase;letter-spacing:0.5px;
                             margin-bottom:3px;">Website</div>
                           <a href="https://www.alsheebani-realestate.com"
-                            style="font-size:14px;color:#3ead82;
+                            style="font-size:14px;color:#2a5590;
                             text-decoration:none;font-weight:600;">
                             www.alsheebani-realestate.com
                           </a>
@@ -352,11 +349,10 @@ module.exports = async function handler(req, res) {
                           <span style="font-size:18px;">📍</span>
                         </td>
                         <td style="padding:10px 0;vertical-align:middle;">
-                          <div style="font-size:11px;
-                            color:rgba(255,255,255,0.4);
+                          <div style="font-size:11px;color:#8896a8;
                             text-transform:uppercase;letter-spacing:0.5px;
                             margin-bottom:3px;">Address</div>
-                          <span style="font-size:14px;color:#ffffff;
+                          <span style="font-size:14px;color:#1a1a2e;
                             font-weight:600;line-height:1.5;">
                             Office 502, Ithraa Tower,
                             Al Garhoud, Dubai, UAE
