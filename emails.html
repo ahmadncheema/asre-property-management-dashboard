@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link
       rel="icon"
-      href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🏢</text></svg>"
+      href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📧</text></svg>"
     />
     <title>ASRE — Email Reminders</title>
     <link rel="stylesheet" href="css/main.css" />
@@ -155,28 +155,6 @@
         letter-spacing: 0.4px;
       }
 
-      .phase2-banner {
-        background: rgba(240, 165, 0, 0.08);
-        border: 1px solid rgba(240, 165, 0, 0.25);
-        border-radius: var(--radius);
-        padding: 16px 20px;
-        margin-bottom: 28px;
-        display: flex;
-        align-items: center;
-        gap: 14px;
-        font-size: 0.88rem;
-        color: #f0c060;
-      }
-
-      .phase2-banner-icon {
-        font-size: 1.5rem;
-        flex-shrink: 0;
-      }
-
-      .phase2-banner strong {
-        color: #f0d090;
-      }
-
       .days-badge {
         font-size: 0.78rem;
         font-weight: 700;
@@ -188,12 +166,10 @@
         background: rgba(229, 83, 83, 0.15);
         color: #f08080;
       }
-
       .days-60 {
         background: rgba(240, 165, 0, 0.15);
         color: #f0c060;
       }
-
       .days-90 {
         background: rgba(62, 173, 130, 0.15);
         color: var(--green-light);
@@ -227,6 +203,35 @@
         color: var(--text-muted);
         font-style: italic;
       }
+
+      .sending-progress {
+        background: var(--bg-card);
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        padding: 20px 24px;
+        margin-bottom: 20px;
+        display: none;
+      }
+
+      .sending-progress.active {
+        display: block;
+      }
+
+      .progress-bar-wrap {
+        background: var(--bg);
+        border-radius: 4px;
+        height: 8px;
+        margin-top: 10px;
+        overflow: hidden;
+      }
+
+      .progress-bar {
+        height: 100%;
+        background: var(--green);
+        border-radius: 4px;
+        transition: width 0.3s ease;
+        width: 0%;
+      }
     </style>
   </head>
   <body>
@@ -248,18 +253,6 @@
           >
             📧 Send All Reminders
           </button>
-        </div>
-
-        <!-- Phase 2 Banner -->
-        <div class="phase2-banner">
-          <div class="phase2-banner-icon">📡</div>
-          <div>
-            <strong>Email sending is not yet activated.</strong>
-            Reminders will be logged but not delivered until Resend.com domain
-            verification is complete for
-            <strong>alsheebanirealestate.ae</strong>. All other features on this
-            page are fully functional.
-          </div>
         </div>
 
         <!-- Summary Bar -->
@@ -309,6 +302,31 @@
               —
             </div>
             <div class="summary-item-label">No Email on File</div>
+          </div>
+        </div>
+
+        <!-- Sending Progress -->
+        <div class="sending-progress" id="sending-progress">
+          <div
+            style="
+              display: flex;
+              justify-content: space-between;
+              align-items: center;
+              margin-bottom: 6px;
+            "
+          >
+            <span
+              style="font-size: 0.88rem; font-weight: 600; color: var(--white)"
+              id="progress-label"
+              >Sending reminders...</span
+            >
+            <span
+              style="font-size: 0.82rem; color: var(--text-muted)"
+              id="progress-count"
+            ></span>
+          </div>
+          <div class="progress-bar-wrap">
+            <div class="progress-bar" id="progress-bar"></div>
           </div>
         </div>
 
@@ -382,9 +400,6 @@
       }
       renderNav("emails");
 
-      // Phase 2 flag — set to true when Resend is activated
-      const EMAIL_ENABLED = false;
-
       let allUpcoming = [];
       let filtered = [];
 
@@ -402,14 +417,12 @@
           return;
         }
 
-        // Filter to 90 days
         allUpcoming = (units || []).filter((u) => {
           if (!u.tenant_name || u.tenant_name.trim() === "") return false;
           const days = daysUntil(u.end_date);
           return days !== null && days >= 0 && days <= 90;
         });
 
-        // Sort urgent first
         allUpcoming.sort(
           (a, b) => daysUntil(a.end_date) - daysUntil(b.end_date),
         );
@@ -475,7 +488,7 @@
       function renderEmails(units) {
         const container = document.getElementById("emails-container");
 
-        if (units.length === 0) {
+        if (!units.length) {
           container.innerHTML = `
         <div class="empty-state">
           <div class="empty-state-icon">📭</div>
@@ -487,7 +500,6 @@
           return;
         }
 
-        // Group by building
         const grouped = {};
         units.forEach((u) => {
           const bName = u.buildings?.name || "Unknown Building";
@@ -512,8 +524,7 @@
           </div>
         </div>
         ${bUnits.map((u) => renderEmailCard(u)).join("")}
-      </div>
-    `,
+      </div>`,
           )
           .join("");
       }
@@ -574,8 +585,7 @@
         ${
           u.remarks
             ? `
-          <div style="font-size:0.82rem;color:var(--text-muted);
-            margin-bottom:12px">
+          <div style="font-size:0.82rem;color:var(--text-muted);margin-bottom:12px">
             <strong>Remarks:</strong> ${u.remarks}
           </div>`
             : ""
@@ -585,8 +595,10 @@
           ${
             hasEmail
               ? `<button class="btn btn-green btn-sm"
-                onclick="sendSingleReminder('${u.id}',
-                  '${u.tenant_name}',
+                id="btn-${u.id}"
+                onclick="sendSingleReminder(
+                  '${u.id}',
+                  '${u.tenant_name.replace(/'/g, "\\'")}',
                   '${u.tenant_email}',
                   '${stage}')">
                 📧 Send Reminder
@@ -603,46 +615,77 @@
 
       // ── Send Single Reminder ──────────────────────────────────────────
       window.sendSingleReminder = async function (unitId, name, email, stage) {
+        const unit = allUpcoming.find((u) => u.id === unitId);
+        if (!unit) return;
+
         const ok = await showConfirm(
           `Send a ${stage.replace("d", " day")} reminder to ${name} at ${email}?`,
         );
         if (!ok) return;
 
+        const btn = document.getElementById(`btn-${unitId}`);
         const statusEl = document.getElementById(`status-${unitId}`);
-        if (statusEl) statusEl.textContent = "Sending...";
 
-        if (EMAIL_ENABLED) {
-          // Phase 2: actual Resend API call goes here
-          await sendViaResend(email, name, stage);
+        if (btn) {
+          btn.disabled = true;
+          btn.textContent = "⏳ Sending...";
+        }
+        if (statusEl) statusEl.textContent = "";
+
+        let sendSuccess = true;
+        let errorMsg = null;
+
+        try {
+          const response = await fetch("/api/send-reminder", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              tenantName: unit.tenant_name,
+              tenantEmail: unit.tenant_email,
+              unitNumber: unit.unit_number,
+              buildingName: unit.buildings?.name || "—",
+              floorName: unit.floors?.name || "—",
+              endDate: unit.end_date,
+              daysRemaining: daysUntil(unit.end_date),
+              stage,
+            }),
+          });
+
+          const result = await response.json();
+          if (!response.ok) {
+            sendSuccess = false;
+            errorMsg = result.error || "Failed to send";
+          }
+        } catch (err) {
+          sendSuccess = false;
+          errorMsg = err.message;
         }
 
-        // Log the reminder
-        const { error } = await supabase.from("email_logs").insert({
+        // Log to database
+        await supabase.from("email_logs").insert({
           unit_id: unitId,
           tenant_name: name,
           tenant_email: email,
           reminder_stage: stage,
-          status: EMAIL_ENABLED ? "sent" : "sent",
-          error_message: EMAIL_ENABLED ? null : null,
+          status: sendSuccess ? "sent" : "failed",
+          error_message: errorMsg,
         });
 
-        if (error) {
-          if (statusEl) statusEl.textContent = "✗ Error";
-          showToast("Error logging reminder.", "error");
-          return;
+        if (btn) {
+          btn.disabled = false;
+          btn.textContent = "📧 Send Reminder";
         }
 
         if (statusEl) {
-          statusEl.textContent = EMAIL_ENABLED
-            ? "✓ Sent!"
-            : "✓ Logged (email inactive)";
-          statusEl.style.color = "var(--green)";
+          statusEl.textContent = sendSuccess ? "✓ Sent!" : "✗ Failed";
+          statusEl.style.color = sendSuccess ? "var(--green)" : "var(--danger)";
         }
 
         showToast(
-          EMAIL_ENABLED
-            ? `Reminder sent to ${name}!`
-            : `Reminder logged for ${name}. Activate email to send.`,
+          sendSuccess
+            ? `✅ Reminder sent to ${name}!`
+            : `❌ Failed: ${errorMsg}`,
+          sendSuccess ? "success" : "error",
         );
 
         loadEmailLog();
@@ -657,7 +700,7 @@
             u.tenant_email.trim() !== "",
         );
 
-        if (bUnits.length === 0) {
+        if (!bUnits.length) {
           showToast(
             "No tenants with email addresses in this building.",
             "warning",
@@ -666,25 +709,70 @@
         }
 
         const ok = await showConfirm(
-          `Send reminders to all ${bUnits.length} tenant(s) with email ` +
-            `addresses in ${buildingName}?`,
+          `Send reminders to all ${bUnits.length} tenant(s) in ${buildingName}? Emails will be delivered.`,
         );
         if (!ok) return;
 
+        showProgress(0, bUnits.length);
+
         let success = 0;
-        for (const u of bUnits) {
+        let failed = 0;
+
+        for (let i = 0; i < bUnits.length; i++) {
+          const u = bUnits[i];
           const stage = getReminderStage(u.end_date) || "90d";
-          const { error } = await supabase.from("email_logs").insert({
+
+          updateProgress(i + 1, bUnits.length, u.tenant_name);
+
+          let sendSuccess = true;
+          let errorMsg = null;
+
+          try {
+            const response = await fetch("/api/send-reminder", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({
+                tenantName: u.tenant_name,
+                tenantEmail: u.tenant_email,
+                unitNumber: u.unit_number,
+                buildingName: u.buildings?.name || "—",
+                floorName: u.floors?.name || "—",
+                endDate: u.end_date,
+                daysRemaining: daysUntil(u.end_date),
+                stage,
+              }),
+            });
+            const result = await response.json();
+            if (!response.ok) {
+              sendSuccess = false;
+              errorMsg = result.error || "Failed";
+            }
+          } catch (err) {
+            sendSuccess = false;
+            errorMsg = err.message;
+          }
+
+          await supabase.from("email_logs").insert({
             unit_id: u.id,
             tenant_name: u.tenant_name,
             tenant_email: u.tenant_email,
             reminder_stage: stage,
-            status: "sent",
+            status: sendSuccess ? "sent" : "failed",
+            error_message: errorMsg,
           });
-          if (!error) success++;
+
+          if (sendSuccess) success++;
+          else failed++;
+
+          // Small delay to avoid rate limiting
+          await new Promise((r) => setTimeout(r, 300));
         }
 
-        showToast(`${success} reminder(s) logged for ${buildingName}.`);
+        hideProgress();
+        showToast(
+          `✅ ${success} sent${failed > 0 ? ` · ❌ ${failed} failed` : ""}`,
+          failed > 0 ? "warning" : "success",
+        );
         loadEmailLog();
       };
 
@@ -694,7 +782,7 @@
           (u) => u.tenant_email && u.tenant_email.trim() !== "",
         );
 
-        if (withEmail.length === 0) {
+        if (!withEmail.length) {
           showToast(
             "No tenants with email addresses in current view.",
             "warning",
@@ -703,39 +791,93 @@
         }
 
         const ok = await showConfirm(
-          `Send reminders to ALL ${withEmail.length} tenant(s) with ` +
-            `email addresses across all buildings in the current view?\n\n` +
-            `${
-              EMAIL_ENABLED
-                ? "Emails will be delivered."
-                : "Note: Email sending is not yet activated — reminders will be logged only."
-            }`,
+          `Send reminders to ALL ${withEmail.length} tenant(s) with email addresses?\n\nEmails will be delivered to each tenant.`,
         );
         if (!ok) return;
+
+        showProgress(0, withEmail.length);
 
         let success = 0;
         let failed = 0;
 
-        for (const u of withEmail) {
+        for (let i = 0; i < withEmail.length; i++) {
+          const u = withEmail[i];
           const stage = getReminderStage(u.end_date) || "90d";
-          const { error } = await supabase.from("email_logs").insert({
+
+          updateProgress(i + 1, withEmail.length, u.tenant_name);
+
+          let sendSuccess = true;
+          let errorMsg = null;
+
+          try {
+            const response = await fetch("/api/send-reminder", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({
+                tenantName: u.tenant_name,
+                tenantEmail: u.tenant_email,
+                unitNumber: u.unit_number,
+                buildingName: u.buildings?.name || "—",
+                floorName: u.floors?.name || "—",
+                endDate: u.end_date,
+                daysRemaining: daysUntil(u.end_date),
+                stage,
+              }),
+            });
+            const result = await response.json();
+            if (!response.ok) {
+              sendSuccess = false;
+              errorMsg = result.error || "Failed";
+            }
+          } catch (err) {
+            sendSuccess = false;
+            errorMsg = err.message;
+          }
+
+          await supabase.from("email_logs").insert({
             unit_id: u.id,
             tenant_name: u.tenant_name,
             tenant_email: u.tenant_email,
             reminder_stage: stage,
-            status: "sent",
+            status: sendSuccess ? "sent" : "failed",
+            error_message: errorMsg,
           });
-          if (error) failed++;
-          else success++;
+
+          if (sendSuccess) success++;
+          else failed++;
+          await new Promise((r) => setTimeout(r, 300));
         }
 
+        hideProgress();
         showToast(
-          `${success} reminder(s) logged.` +
-            `${failed > 0 ? ` ${failed} failed.` : ""}` +
-            `${!EMAIL_ENABLED ? " Activate email to deliver." : ""}`,
+          `✅ ${success} sent${failed > 0 ? ` · ❌ ${failed} failed` : ""}`,
+          failed > 0 ? "warning" : "success",
         );
         loadEmailLog();
       };
+
+      // ── Progress Bar ──────────────────────────────────────────────────
+      function showProgress(current, total) {
+        const el = document.getElementById("sending-progress");
+        el.classList.add("active");
+        updateProgress(current, total, "");
+      }
+
+      function updateProgress(current, total, name) {
+        document.getElementById("progress-label").textContent = name
+          ? `Sending to ${name}...`
+          : "Preparing...";
+        document.getElementById("progress-count").textContent =
+          `${current} / ${total}`;
+        document.getElementById("progress-bar").style.width =
+          `${Math.round((current / total) * 100)}%`;
+      }
+
+      function hideProgress() {
+        const el = document.getElementById("sending-progress");
+        el.classList.remove("active");
+        document.getElementById("progress-bar").style.width = "0%";
+      }
 
       // ── Prompt Add Email ─────────────────────────────────────────────
       window.promptAddEmail = function (unitId) {
@@ -744,17 +886,6 @@
           "warning",
         );
       };
-
-      // ── Phase 2: Resend API ──────────────────────────────────────────
-      async function sendViaResend(email, name, stage) {
-        // Will be implemented when Resend domain is verified
-        // const res = await fetch('/api/send-reminder', {
-        //   method: 'POST',
-        //   headers: { 'Content-Type': 'application/json' },
-        //   body: JSON.stringify({ email, name, stage })
-        // });
-        console.log("Resend Phase 2 — not yet active");
-      }
 
       // ── Email Log ────────────────────────────────────────────────────
       async function loadEmailLog() {
@@ -769,12 +900,35 @@
         if (error || !logs?.length) {
           container.innerHTML = `
         <div class="empty-state" style="padding:30px">
-          <div class="empty-state-title">No reminders logged yet</div>
+          <div class="empty-state-title">No reminders sent yet</div>
         </div>`;
           return;
         }
 
+        const sent = logs.filter((l) => l.status === "sent").length;
+        const failed = logs.filter((l) => l.status === "failed").length;
+
         container.innerHTML = `
+      <div style="display:flex;gap:12px;flex-wrap:wrap;margin-bottom:16px">
+        <div style="background:var(--bg-card);border:1px solid var(--border);
+          border-radius:var(--radius-sm);padding:10px 16px">
+          <div style="font-size:1.2rem;font-weight:800;color:var(--green)">${sent}</div>
+          <div style="font-size:0.72rem;color:var(--text-muted);
+            text-transform:uppercase">Sent</div>
+        </div>
+        <div style="background:var(--bg-card);border:1px solid var(--border);
+          border-radius:var(--radius-sm);padding:10px 16px">
+          <div style="font-size:1.2rem;font-weight:800;color:var(--danger)">${failed}</div>
+          <div style="font-size:0.72rem;color:var(--text-muted);
+            text-transform:uppercase">Failed</div>
+        </div>
+        <div style="background:var(--bg-card);border:1px solid var(--border);
+          border-radius:var(--radius-sm);padding:10px 16px">
+          <div style="font-size:1.2rem;font-weight:800;color:var(--text)">${logs.length}</div>
+          <div style="font-size:0.72rem;color:var(--text-muted);
+            text-transform:uppercase">Total Logged</div>
+        </div>
+      </div>
       <div class="table-wrapper">
         <table>
           <thead>
@@ -782,8 +936,9 @@
               <th>Tenant</th>
               <th>Email</th>
               <th>Stage</th>
-              <th>Logged At</th>
+              <th>Sent At</th>
               <th>Status</th>
+              <th>Error</th>
             </tr>
           </thead>
           <tbody>
@@ -791,12 +946,8 @@
               .map(
                 (l) => `
               <tr>
-                <td style="font-weight:600">
-                  ${l.tenant_name || "—"}
-                </td>
-                <td style="color:var(--text-muted)">
-                  ${l.tenant_email || "—"}
-                </td>
+                <td style="font-weight:600">${l.tenant_name || "—"}</td>
+                <td style="color:var(--text-muted)">${l.tenant_email || "—"}</td>
                 <td>
                   <span class="badge stage-${l.reminder_stage}">
                     ${l.reminder_stage?.replace("d", " Days") || "—"}
@@ -810,6 +961,9 @@
                     ${l.status}
                   </span>
                 </td>
+                <td style="color:var(--danger);font-size:0.8rem">
+                  ${l.error_message || "—"}
+                </td>
               </tr>`,
               )
               .join("")}
@@ -820,7 +974,6 @@
 
       window.loadEmailLog = loadEmailLog;
 
-      // ── Init ─────────────────────────────────────────────────────────
       loadUpcoming();
     </script>
   </body>
