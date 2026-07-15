@@ -114,6 +114,11 @@ export function renderNav(activePage) {
     { href: "/maintenance.html", label: "Maintenance", key: "maintenance" },
     { href: "/invoices.html", label: "Invoices", key: "invoices" },
     { href: "/emails.html", label: "Emails", key: "emails" },
+    {
+      href: "/announcements.html",
+      label: "Announcements",
+      key: "announcements",
+    },
     { href: "/finance.html", label: "Finance", key: "finance" },
     { href: "/admin.html", label: "Admin", key: "admin" },
   ];

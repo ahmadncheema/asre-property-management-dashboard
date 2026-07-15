@@ -1,0 +1,1093 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link
+      rel="icon"
+      href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📢</text></svg>"
+    />
+    <title>ASRE — Announcements</title>
+    <link rel="stylesheet" href="css/main.css" />
+    <style>
+      .announcement-type-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+        gap: 10px;
+        margin-bottom: 24px;
+      }
+
+      .type-btn {
+        background: var(--bg-card);
+        border: 1px solid var(--border);
+        border-radius: var(--radius-sm);
+        padding: 12px 16px;
+        cursor: pointer;
+        transition: var(--transition);
+        text-align: center;
+        color: var(--text-muted);
+        font-family: inherit;
+        font-size: 0.85rem;
+        font-weight: 600;
+      }
+
+      .type-btn:hover {
+        border-color: var(--blue-light);
+        color: var(--text);
+        background: var(--bg-hover);
+      }
+
+      .type-btn.active {
+        border-color: var(--green);
+        background: rgba(62, 173, 130, 0.1);
+        color: var(--white);
+      }
+
+      .type-btn .type-icon {
+        font-size: 1.4rem;
+        display: block;
+        margin-bottom: 6px;
+      }
+
+      .tenant-list {
+        max-height: 320px;
+        overflow-y: auto;
+        border: 1px solid var(--border);
+        border-radius: var(--radius-sm);
+        background: var(--bg);
+      }
+
+      .tenant-item {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 12px 16px;
+        border-bottom: 1px solid var(--border);
+        transition: var(--transition);
+        cursor: pointer;
+      }
+
+      .tenant-item:last-child {
+        border-bottom: none;
+      }
+      .tenant-item:hover {
+        background: var(--bg-hover);
+      }
+
+      .tenant-item input[type="checkbox"] {
+        accent-color: var(--green);
+        width: 16px;
+        height: 16px;
+        flex-shrink: 0;
+        cursor: pointer;
+      }
+
+      .tenant-item-info {
+        flex: 1;
+      }
+
+      .tenant-item-name {
+        font-size: 0.9rem;
+        font-weight: 600;
+        color: var(--white);
+      }
+
+      .tenant-item-meta {
+        font-size: 0.75rem;
+        color: var(--text-muted);
+        margin-top: 2px;
+      }
+
+      .tenant-item-email {
+        font-size: 0.75rem;
+        color: var(--green);
+        margin-top: 2px;
+      }
+
+      .no-email-tag {
+        font-size: 0.72rem;
+        color: var(--danger);
+        background: rgba(229, 83, 83, 0.1);
+        padding: 2px 8px;
+        border-radius: 10px;
+        border: 1px solid rgba(229, 83, 83, 0.2);
+      }
+
+      .select-bar {
+        display: flex;
+        gap: 8px;
+        padding: 10px 16px;
+        background: var(--bg-card);
+        border-bottom: 1px solid var(--border);
+        align-items: center;
+      }
+
+      .preview-box {
+        background: var(--bg);
+        border: 1px solid var(--border);
+        border-radius: var(--radius-sm);
+        padding: 20px;
+        margin-top: 16px;
+        font-size: 0.88rem;
+        color: var(--text);
+        line-height: 1.7;
+        white-space: pre-wrap;
+        min-height: 120px;
+      }
+
+      .step-header {
+        font-size: 0.78rem;
+        font-weight: 700;
+        color: var(--text-muted);
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        margin-bottom: 12px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+
+      .step-num {
+        width: 22px;
+        height: 22px;
+        background: var(--blue);
+        color: var(--white);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 0.72rem;
+        font-weight: 700;
+        flex-shrink: 0;
+      }
+
+      .announcement-builder {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 24px;
+        align-items: start;
+      }
+
+      @media (max-width: 1024px) {
+        .announcement-builder {
+          grid-template-columns: 1fr;
+        }
+      }
+
+      .sending-progress {
+        background: var(--bg-card);
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        padding: 20px 24px;
+        margin-bottom: 20px;
+        display: none;
+      }
+
+      .sending-progress.active {
+        display: block;
+      }
+
+      .progress-bar-wrap {
+        background: var(--bg);
+        border-radius: 4px;
+        height: 8px;
+        margin-top: 10px;
+        overflow: hidden;
+      }
+
+      .progress-bar {
+        height: 100%;
+        background: var(--green);
+        border-radius: 4px;
+        transition: width 0.3s ease;
+        width: 0%;
+      }
+
+      .log-card {
+        background: var(--bg-card);
+        border: 1px solid var(--border);
+        border-left: 4px solid var(--green);
+        border-radius: var(--radius);
+        padding: 16px 20px;
+        margin-bottom: 10px;
+        transition: var(--transition);
+      }
+
+      .log-card:hover {
+        box-shadow: var(--shadow-sm);
+      }
+
+      .log-card-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        margin-bottom: 8px;
+        flex-wrap: wrap;
+        gap: 8px;
+      }
+
+      .log-card-type {
+        font-size: 0.88rem;
+        font-weight: 700;
+        color: var(--white);
+      }
+
+      .log-card-meta {
+        font-size: 0.78rem;
+        color: var(--text-muted);
+      }
+
+      .log-card-message {
+        font-size: 0.82rem;
+        color: var(--text-muted);
+        line-height: 1.5;
+        margin-top: 6px;
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+      }
+
+      .char-count {
+        font-size: 0.75rem;
+        color: var(--text-muted);
+        text-align: right;
+        margin-top: 4px;
+      }
+
+      .recipient-summary {
+        background: rgba(62, 173, 130, 0.08);
+        border: 1px solid rgba(62, 173, 130, 0.2);
+        border-radius: var(--radius-sm);
+        padding: 10px 14px;
+        font-size: 0.85rem;
+        color: var(--green);
+        margin-bottom: 16px;
+        display: none;
+      }
+
+      .recipient-summary.show {
+        display: block;
+      }
+    </style>
+  </head>
+  <body>
+    <nav id="main-nav"></nav>
+
+    <div class="page-wrapper">
+      <div class="container">
+        <div class="page-header">
+          <div>
+            <div class="page-title">📢 <span>Announcements</span></div>
+            <div class="page-subtitle">
+              Send official notices to tenants across your properties
+            </div>
+          </div>
+        </div>
+
+        <!-- Sending Progress -->
+        <div class="sending-progress" id="sending-progress">
+          <div
+            style="
+              display: flex;
+              justify-content: space-between;
+              align-items: center;
+              margin-bottom: 6px;
+            "
+          >
+            <span
+              style="font-size: 0.88rem; font-weight: 600; color: var(--white)"
+              id="progress-label"
+              >Sending announcements...</span
+            >
+            <span
+              style="font-size: 0.82rem; color: var(--text-muted)"
+              id="progress-count"
+            ></span>
+          </div>
+          <div class="progress-bar-wrap">
+            <div class="progress-bar" id="progress-bar"></div>
+          </div>
+        </div>
+
+        <div class="announcement-builder">
+          <!-- Left: Builder -->
+          <div>
+            <!-- Step 1: Building -->
+            <div class="card" style="margin-bottom: 20px">
+              <div class="step-header">
+                <div class="step-num">1</div>
+                Select Building
+              </div>
+              <div class="form-group" style="margin-bottom: 0">
+                <select
+                  id="ann-building"
+                  class="form-control"
+                  onchange="loadBuildingTenants()"
+                >
+                  <option value="">Select Building</option>
+                </select>
+              </div>
+            </div>
+
+            <!-- Step 2: Recipients -->
+            <div
+              class="card"
+              style="margin-bottom: 20px"
+              id="step-recipients"
+              style="display: none"
+            >
+              <div class="step-header">
+                <div class="step-num">2</div>
+                Select Recipients
+              </div>
+
+              <div class="recipient-summary" id="recipient-summary"></div>
+
+              <div
+                class="select-bar"
+                style="
+                  border-radius: var(--radius-sm) var(--radius-sm) 0 0;
+                  border: 1px solid var(--border);
+                "
+              >
+                <input
+                  type="checkbox"
+                  id="select-all"
+                  onchange="toggleSelectAll()"
+                  style="
+                    accent-color: var(--green);
+                    width: 16px;
+                    height: 16px;
+                    cursor: pointer;
+                  "
+                />
+                <label
+                  for="select-all"
+                  style="
+                    font-size: 0.85rem;
+                    color: var(--text-muted);
+                    cursor: pointer;
+                    flex: 1;
+                  "
+                >
+                  Select All Tenants with Email
+                </label>
+                <span
+                  id="selected-count"
+                  style="
+                    font-size: 0.78rem;
+                    color: var(--green);
+                    font-weight: 600;
+                  "
+                  >0 selected</span
+                >
+              </div>
+
+              <div class="tenant-list" id="tenant-list">
+                <div class="tenant-item">
+                  <span style="color: var(--text-muted); font-size: 0.85rem">
+                    Select a building first
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Step 3: Type -->
+            <div class="card" style="margin-bottom: 20px">
+              <div class="step-header">
+                <div class="step-num">3</div>
+                Announcement Type
+              </div>
+              <div class="announcement-type-grid" id="type-grid"></div>
+            </div>
+
+            <!-- Step 4: Message -->
+            <div class="card" style="margin-bottom: 20px">
+              <div class="step-header">
+                <div class="step-num">4</div>
+                Subject & Message
+              </div>
+
+              <div class="form-group">
+                <label class="form-label">Subject *</label>
+                <input
+                  type="text"
+                  id="ann-subject"
+                  class="form-control"
+                  placeholder="Email subject line"
+                />
+              </div>
+
+              <div class="form-group" style="margin-bottom: 4px">
+                <label class="form-label">Message *</label>
+                <textarea
+                  id="ann-message"
+                  class="form-control"
+                  rows="8"
+                  placeholder="Type your announcement here..."
+                  oninput="
+                    updateCharCount();
+                    updatePreview();
+                  "
+                ></textarea>
+              </div>
+              <div class="char-count" id="char-count">0 characters</div>
+            </div>
+
+            <!-- Send Button -->
+            <button
+              class="btn btn-green"
+              style="width: 100%; padding: 14px; font-size: 1rem"
+              id="send-btn"
+              onclick="sendAnnouncement()"
+            >
+              📧 Send Announcement
+            </button>
+          </div>
+
+          <!-- Right: Preview + Log -->
+          <div>
+            <!-- Preview -->
+            <div class="card" style="margin-bottom: 20px">
+              <div class="step-header">
+                <div class="step-num">👁</div>
+                Message Preview
+              </div>
+              <div
+                style="
+                  font-size: 0.78rem;
+                  color: var(--text-muted);
+                  margin-bottom: 8px;
+                "
+              >
+                Subject:
+                <span id="preview-subject" style="color: var(--text)">—</span>
+              </div>
+              <div
+                style="
+                  font-size: 0.78rem;
+                  color: var(--text-muted);
+                  margin-bottom: 8px;
+                "
+              >
+                Type:
+                <span id="preview-type" style="color: var(--green)">—</span>
+              </div>
+              <div
+                style="
+                  font-size: 0.78rem;
+                  color: var(--text-muted);
+                  margin-bottom: 4px;
+                "
+              >
+                Message:
+              </div>
+              <div class="preview-box" id="preview-message">
+                Your message will appear here...
+              </div>
+            </div>
+
+            <!-- Premade Templates -->
+            <div class="card" style="margin-bottom: 20px">
+              <div class="step-header">
+                <div class="step-num">📋</div>
+                Premade Templates
+              </div>
+              <div
+                style="
+                  font-size: 0.82rem;
+                  color: var(--text-muted);
+                  margin-bottom: 14px;
+                "
+              >
+                Click a template to auto-fill the message.
+              </div>
+              <div
+                style="display: flex; flex-direction: column; gap: 8px"
+                id="templates-list"
+              ></div>
+            </div>
+
+            <!-- Recent Log -->
+            <div class="card">
+              <div class="section-header" style="margin-bottom: 16px">
+                <div class="section-title">Recent Announcements</div>
+                <button class="btn btn-outline btn-sm" onclick="loadLog()">
+                  🔄
+                </button>
+              </div>
+              <div id="log-container">
+                <div class="loading-state">
+                  <div class="spinner"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script type="module">
+      import { requireAuth } from "./js/auth.js";
+      import {
+        renderNav,
+        showToast,
+        showConfirm,
+        formatDate,
+      } from "./js/shared.js";
+      import { supabase } from "./js/supabase.js";
+
+      const session = requireAuth();
+      if (!session) throw new Error("Not authenticated");
+      if (session.role === "finance") {
+        window.location.href = "/finance.html";
+        throw new Error("Access denied");
+      }
+      renderNav("announcements");
+
+      // ── Announcement Types ────────────────────────────────────────────
+      const TYPES = [
+        { label: "Routine Maintenance", icon: "🔧" },
+        { label: "Pest Control", icon: "🐛" },
+        { label: "Water Interruption", icon: "💧" },
+        { label: "Electricity Interruption", icon: "⚡" },
+        { label: "Building Inspection", icon: "🔍" },
+        { label: "General Notice", icon: "📢" },
+        { label: "Holiday Greetings", icon: "🎉" },
+        { label: "Parking Notice", icon: "🚗" },
+        { label: "Custom", icon: "📝" },
+      ];
+
+      // ── Premade Templates ─────────────────────────────────────────────
+      const TEMPLATES = {
+        "Routine Maintenance": {
+          subject: "Routine Maintenance Notice — [Building Name]",
+          message: `Dear Resident,
+
+We wish to inform you that routine maintenance will be carried out in [Building Name] on [Date] from [Start Time] to [End Time].
+
+During this period, there may be brief interruptions to [specify: water/electricity/elevator/etc.]. We apologize for any inconvenience caused.
+
+Our maintenance team will work diligently to complete all work as quickly as possible.
+
+Thank you for your understanding and cooperation.`,
+        },
+        "Pest Control": {
+          subject: "Pest Control Treatment Notice — [Building Name]",
+          message: `Dear Resident,
+
+Please be advised that pest control treatment will be conducted in [Building Name] on [Date] from [Start Time] to [End Time].
+
+We kindly request that you:
+- Ensure your unit is vacated during the treatment period
+- Remove all food items and cover kitchen surfaces
+- Keep pets secured or remove them from the premises
+
+The treatment is essential to maintain a clean and healthy living environment for all residents.
+
+Thank you for your cooperation.`,
+        },
+        "Water Interruption": {
+          subject: "Water Supply Interruption Notice — [Building Name]",
+          message: `Dear Resident,
+
+Please be advised that the water supply to [Building Name] will be temporarily interrupted on [Date] from [Start Time] to [End Time] due to maintenance work on the water system.
+
+We recommend storing sufficient water before the interruption begins.
+
+We apologize for any inconvenience and assure you that services will be restored as quickly as possible.
+
+Thank you for your patience and understanding.`,
+        },
+        "Electricity Interruption": {
+          subject: "Electricity Supply Interruption Notice — [Building Name]",
+          message: `Dear Resident,
+
+Please be advised that the electricity supply to [Building Name] will be temporarily interrupted on [Date] from [Start Time] to [End Time] for essential maintenance work.
+
+We recommend:
+- Saving any important work on your devices before the scheduled time
+- Ensuring backup lighting is available
+- Switching off sensitive electrical appliances
+
+We apologize for the inconvenience and will work to restore power as quickly as possible.
+
+Thank you for your understanding.`,
+        },
+        "Building Inspection": {
+          subject: "Routine Building Inspection Notice — [Building Name]",
+          message: `Dear Resident,
+
+Please be informed that a routine building inspection will be conducted at [Building Name] on [Date] between [Start Time] and [End Time].
+
+Our inspection team may need access to common areas and building facilities during this time. Unit inspections, if required, will be arranged separately with prior notice.
+
+Your cooperation is greatly appreciated.
+
+Thank you for being a valued resident.`,
+        },
+        "General Notice": {
+          subject: "Important Notice — [Building Name]",
+          message: `Dear Resident,
+
+We would like to bring the following to your attention:
+
+[Write your notice here]
+
+Please feel free to contact our office if you have any questions or concerns.
+
+Thank you for your cooperation.`,
+        },
+        "Holiday Greetings": {
+          subject: "Season's Greetings from Ahmed Al Sheebani Real Estate",
+          message: `Dear Resident,
+
+On behalf of the entire team at Ahmed Al Sheebani Real Estate, we would like to extend our warmest greetings to you and your family on this joyous occasion.
+
+We are grateful for your continued trust and wish you a wonderful celebration filled with joy, peace, and prosperity.
+
+Eid Mubarak / Best Wishes,
+Ahmed Al Sheebani Real Estate
+Property Management Team`,
+        },
+        "Parking Notice": {
+          subject: "Parking Notice — [Building Name]",
+          message: `Dear Resident,
+
+We would like to remind all residents of [Building Name] regarding the parking regulations:
+
+[Add parking notice details here]
+
+Vehicles found violating parking regulations may be subject to clamping or removal without prior notice.
+
+We appreciate your cooperation in keeping the parking area safe and accessible for all residents.
+
+Thank you.`,
+        },
+        Custom: {
+          subject: "",
+          message: "",
+        },
+      };
+
+      let selectedType = "";
+      let selectedTenants = new Set();
+      let allBuildingTenants = [];
+      let allBuildings = [];
+
+      // ── Init ──────────────────────────────────────────────────────────
+      async function init() {
+        renderTypeGrid();
+        renderTemplates();
+        loadBuildings();
+        loadLog();
+      }
+
+      // ── Load Buildings ────────────────────────────────────────────────
+      async function loadBuildings() {
+        const { data } = await supabase
+          .from("buildings")
+          .select("*")
+          .order("name");
+        allBuildings = data || [];
+
+        const sel = document.getElementById("ann-building");
+        sel.innerHTML =
+          '<option value="">Select Building</option>' +
+          allBuildings
+            .map((b) => `<option value="${b.id}">${b.name}</option>`)
+            .join("");
+      }
+
+      // ── Load Tenants for Building ─────────────────────────────────────
+      window.loadBuildingTenants = async function () {
+        const bldgId = document.getElementById("ann-building").value;
+        if (!bldgId) return;
+
+        const { data: units } = await supabase
+          .from("units")
+          .select("id, unit_number, tenant_name, tenant_email, floors(name)")
+          .eq("building_id", bldgId)
+          .not("tenant_name", "is", null)
+          .order("unit_number");
+
+        allBuildingTenants = (units || []).filter(
+          (u) => u.tenant_name && u.tenant_name.trim() !== "",
+        );
+
+        selectedTenants.clear();
+        document.getElementById("select-all").checked = false;
+        updateSelectedCount();
+        renderTenantList();
+        document.getElementById("step-recipients").style.display = "block";
+      };
+
+      function renderTenantList() {
+        const container = document.getElementById("tenant-list");
+
+        if (!allBuildingTenants.length) {
+          container.innerHTML = `
+        <div class="tenant-item">
+          <span style="color:var(--text-muted);font-size:0.85rem">
+            No tenants found in this building.
+          </span>
+        </div>`;
+          return;
+        }
+
+        container.innerHTML = allBuildingTenants
+          .map((u) => {
+            const hasEmail = u.tenant_email && u.tenant_email.trim() !== "";
+            return `
+        <div class="tenant-item" onclick="toggleTenant('${u.id}', ${hasEmail})">
+          <input type="checkbox" id="chk-${u.id}"
+            ${!hasEmail ? "disabled" : ""}
+            onchange="toggleTenant('${u.id}', ${hasEmail})"
+            onclick="event.stopPropagation()"
+            style="accent-color:var(--green);width:16px;height:16px;
+            cursor:${hasEmail ? "pointer" : "not-allowed"}" />
+          <div class="tenant-item-info">
+            <div class="tenant-item-name">${u.tenant_name}</div>
+            <div class="tenant-item-meta">
+              Unit ${u.unit_number}
+              ${u.floors?.name ? " — Floor " + u.floors.name : ""}
+            </div>
+            ${
+              hasEmail
+                ? `<div class="tenant-item-email">${u.tenant_email}</div>`
+                : `<div style="margin-top:3px">
+                  <span class="no-email-tag">⚠️ No email</span>
+                </div>`
+            }
+          </div>
+        </div>`;
+          })
+          .join("");
+      }
+
+      window.toggleTenant = function (id, hasEmail) {
+        if (!hasEmail) return;
+        const chk = document.getElementById(`chk-${id}`);
+        if (selectedTenants.has(id)) {
+          selectedTenants.delete(id);
+          if (chk) chk.checked = false;
+        } else {
+          selectedTenants.add(id);
+          if (chk) chk.checked = true;
+        }
+        updateSelectedCount();
+      };
+
+      window.toggleSelectAll = function () {
+        const checked = document.getElementById("select-all").checked;
+        selectedTenants.clear();
+
+        allBuildingTenants.forEach((u) => {
+          if (u.tenant_email && u.tenant_email.trim() !== "") {
+            const chk = document.getElementById(`chk-${u.id}`);
+            if (checked) {
+              selectedTenants.add(u.id);
+              if (chk) chk.checked = true;
+            } else {
+              if (chk) chk.checked = false;
+            }
+          }
+        });
+
+        updateSelectedCount();
+      };
+
+      function updateSelectedCount() {
+        const count = selectedTenants.size;
+        const summary = document.getElementById("recipient-summary");
+        document.getElementById("selected-count").textContent =
+          `${count} selected`;
+
+        if (count > 0) {
+          summary.textContent = `✅ ${count} tenant${count !== 1 ? "s" : ""} selected to receive this announcement.`;
+          summary.classList.add("show");
+        } else {
+          summary.classList.remove("show");
+        }
+      }
+
+      // ── Render Type Grid ──────────────────────────────────────────────
+      function renderTypeGrid() {
+        document.getElementById("type-grid").innerHTML = TYPES.map(
+          (t) => `
+      <button class="type-btn" onclick="selectType('${t.label}')">
+        <span class="type-icon">${t.icon}</span>
+        ${t.label}
+      </button>`,
+        ).join("");
+      }
+
+      window.selectType = function (label) {
+        selectedType = label;
+        document.querySelectorAll(".type-btn").forEach((b) => {
+          b.classList.toggle("active", b.textContent.trim().includes(label));
+        });
+
+        const tmpl = TEMPLATES[label];
+        if (tmpl) {
+          if (tmpl.subject) {
+            document.getElementById("ann-subject").value = tmpl.subject;
+          }
+          if (tmpl.message) {
+            document.getElementById("ann-message").value = tmpl.message;
+          }
+          updateCharCount();
+          updatePreview();
+        }
+
+        document.getElementById("preview-type").textContent = label;
+      };
+
+      // ── Templates List ────────────────────────────────────────────────
+      function renderTemplates() {
+        const container = document.getElementById("templates-list");
+        container.innerHTML = TYPES.filter((t) => t.label !== "Custom")
+          .map(
+            (t) => `
+      <button class="btn btn-outline btn-sm"
+        style="text-align:left;justify-content:flex-start;gap:8px"
+        onclick="selectType('${t.label}')">
+        ${t.icon} ${t.label}
+      </button>`,
+          )
+          .join("");
+      }
+
+      // ── Preview & Char Count ──────────────────────────────────────────
+      window.updatePreview = function () {
+        const msg = document.getElementById("ann-message").value;
+        const sub = document.getElementById("ann-subject").value;
+        document.getElementById("preview-message").textContent =
+          msg || "Your message will appear here...";
+        document.getElementById("preview-subject").textContent = sub || "—";
+      };
+
+      window.updateCharCount = function () {
+        const len = document.getElementById("ann-message").value.length;
+        document.getElementById("char-count").textContent =
+          `${len} character${len !== 1 ? "s" : ""}`;
+      };
+
+      // ── Send Announcement ─────────────────────────────────────────────
+      window.sendAnnouncement = async function () {
+        const bldgId = document.getElementById("ann-building").value;
+        const subject = document.getElementById("ann-subject").value.trim();
+        const message = document.getElementById("ann-message").value.trim();
+
+        if (!bldgId) {
+          showToast("Please select a building.", "error");
+          return;
+        }
+        if (selectedTenants.size === 0) {
+          showToast("Please select at least one tenant.", "error");
+          return;
+        }
+        if (!selectedType) {
+          showToast("Please select an announcement type.", "error");
+          return;
+        }
+        if (!subject) {
+          showToast("Please enter a subject.", "error");
+          return;
+        }
+        if (!message) {
+          showToast("Please enter a message.", "error");
+          return;
+        }
+
+        const building = allBuildings.find((b) => b.id === bldgId);
+        const tenants = allBuildingTenants.filter((u) =>
+          selectedTenants.has(u.id),
+        );
+
+        const ok = await showConfirm(
+          `Send "${subject}" to ${tenants.length} tenant${tenants.length !== 1 ? "s" : ""} in ${building?.name}?`,
+        );
+        if (!ok) return;
+
+        showProgress(0, tenants.length);
+
+        const btn = document.getElementById("send-btn");
+        btn.disabled = true;
+
+        let success = 0;
+        let failed = 0;
+        const results = [];
+
+        for (let i = 0; i < tenants.length; i++) {
+          const u = tenants[i];
+          updateProgress(i + 1, tenants.length, u.tenant_name);
+
+          let sendSuccess = true;
+          let errorMsg = null;
+
+          try {
+            const response = await fetch("/api/send-announcement", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({
+                tenantName: u.tenant_name,
+                tenantEmail: u.tenant_email,
+                buildingName: building?.name || "—",
+                announcementType: selectedType,
+                subject,
+                message,
+                senderName: session.full_name,
+              }),
+            });
+
+            const text = await response.text();
+            let data = {};
+            try {
+              data = JSON.parse(text);
+            } catch {
+              sendSuccess = false;
+              errorMsg = "Invalid server response";
+            }
+
+            if (response.ok && data.success) {
+              sendSuccess = true;
+            } else if (sendSuccess) {
+              sendSuccess = false;
+              errorMsg = data.error || "Failed to send";
+            }
+          } catch (err) {
+            sendSuccess = false;
+            errorMsg = err.message;
+          }
+
+          results.push({
+            tenant_name: u.tenant_name,
+            tenant_email: u.tenant_email,
+            success: sendSuccess,
+            error: errorMsg,
+          });
+
+          if (sendSuccess) success++;
+          else failed++;
+
+          // Small delay to avoid rate limiting
+          await new Promise((r) => setTimeout(r, 300));
+        }
+
+        // Log to announcements_log
+        const status =
+          failed === 0 ? "sent" : success === 0 ? "failed" : "partial";
+
+        await supabase.from("announcements_log").insert({
+          building_id: bldgId,
+          building_name: building?.name || "—",
+          announcement_type: selectedType,
+          subject,
+          message,
+          recipients: results,
+          recipient_count: tenants.length,
+          sent_by: session.full_name,
+          status,
+          sent_at: new Date().toISOString(),
+        });
+
+        hideProgress();
+        btn.disabled = false;
+
+        showToast(
+          `✅ ${success} sent${failed > 0 ? ` · ❌ ${failed} failed` : ""}`,
+          failed > 0 ? "warning" : "success",
+        );
+
+        // Reset form
+        selectedTenants.clear();
+        document
+          .querySelectorAll('.tenant-item input[type="checkbox"]')
+          .forEach((c) => (c.checked = false));
+        document.getElementById("select-all").checked = false;
+        updateSelectedCount();
+
+        loadLog();
+      };
+
+      // ── Progress ──────────────────────────────────────────────────────
+      function showProgress(current, total) {
+        document.getElementById("sending-progress").classList.add("active");
+        updateProgress(current, total, "");
+      }
+
+      function updateProgress(current, total, name) {
+        document.getElementById("progress-label").textContent = name
+          ? `Sending to ${name}...`
+          : "Preparing...";
+        document.getElementById("progress-count").textContent =
+          `${current} / ${total}`;
+        document.getElementById("progress-bar").style.width =
+          `${Math.round((current / total) * 100)}%`;
+      }
+
+      function hideProgress() {
+        document.getElementById("sending-progress").classList.remove("active");
+        document.getElementById("progress-bar").style.width = "0%";
+      }
+
+      // ── Load Log ──────────────────────────────────────────────────────
+      async function loadLog() {
+        const { data: logs } = await supabase
+          .from("announcements_log")
+          .select("*")
+          .order("created_at", { ascending: false })
+          .limit(20);
+
+        const container = document.getElementById("log-container");
+
+        if (!logs?.length) {
+          container.innerHTML = `
+        <div class="empty-state" style="padding:20px">
+          <div class="empty-state-title">No announcements sent yet</div>
+        </div>`;
+          return;
+        }
+
+        const statusBadge = {
+          sent: "badge-green",
+          failed: "badge-red",
+          partial: "badge-orange",
+        };
+
+        container.innerHTML = logs
+          .map(
+            (l) => `
+      <div class="log-card">
+        <div class="log-card-header">
+          <div>
+            <div class="log-card-type">
+              ${l.announcement_type} — ${l.building_name || "—"}
+            </div>
+            <div class="log-card-meta">
+              By ${l.sent_by || "—"} · ${formatDate(l.sent_at)} ·
+              ${l.recipient_count} recipient${l.recipient_count !== 1 ? "s" : ""}
+            </div>
+          </div>
+          <span class="badge ${statusBadge[l.status] || "badge-grey"}">
+            ${l.status}
+          </span>
+        </div>
+        <div style="font-size:0.78rem;font-weight:600;
+          color:var(--text-muted);margin-bottom:4px">
+          ${l.subject}
+        </div>
+        <div class="log-card-message">${l.message}</div>
+      </div>`,
+          )
+          .join("");
+      }
+
+      window.loadLog = loadLog;
+
+      init();
+    </script>
+  </body>
+</html>
