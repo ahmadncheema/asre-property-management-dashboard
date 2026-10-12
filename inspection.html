@@ -1,0 +1,1289 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link
+      rel="icon"
+      href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📋</text></svg>"
+    />
+    <title>ASRE — Inspections</title>
+    <link rel="stylesheet" href="css/main.css" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <style>
+      .insp-card {
+        background: var(--bg-card);
+        border: 1px solid var(--border);
+        border-left: 4px solid var(--blue);
+        border-radius: var(--radius);
+        padding: 16px 18px;
+        margin-bottom: 12px;
+      }
+      .insp-card.out {
+        border-left-color: var(--warning);
+      }
+      .insp-card-top {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        gap: 10px;
+        flex-wrap: wrap;
+      }
+      .insp-title {
+        font-weight: 700;
+        color: var(--white);
+        font-size: 1rem;
+      }
+      .insp-meta {
+        font-size: 0.8rem;
+        color: var(--text-muted);
+        margin-top: 4px;
+      }
+      .insp-actions {
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap;
+        margin-top: 12px;
+      }
+      .filter-bar {
+        display: flex;
+        gap: 12px;
+        margin-bottom: 20px;
+        flex-wrap: wrap;
+      }
+      .filter-bar select {
+        min-width: 180px;
+        flex: 1;
+      }
+
+      .form-section {
+        background: var(--bg-card);
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        padding: 18px;
+        margin-bottom: 16px;
+      }
+      .form-section h3 {
+        margin: 0 0 14px;
+        font-size: 0.95rem;
+        color: var(--blue-light);
+      }
+      .grid-2 {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 12px;
+      }
+      .type-toggle {
+        display: flex;
+        gap: 10px;
+      }
+      .type-toggle button {
+        flex: 1;
+        padding: 14px;
+        border-radius: var(--radius-sm);
+        border: 2px solid var(--border);
+        background: var(--bg);
+        color: var(--text);
+        font-weight: 700;
+        cursor: pointer;
+        font-size: 0.95rem;
+      }
+      .type-toggle button.on {
+        border-color: var(--green);
+        color: var(--green);
+        background: rgba(62, 173, 130, 0.1);
+      }
+      .build-row {
+        display: flex;
+        gap: 12px;
+        flex-wrap: wrap;
+        align-items: flex-end;
+      }
+      .build-row .form-group {
+        margin: 0;
+        min-width: 110px;
+      }
+      .build-row label.chk {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        font-size: 0.85rem;
+        padding-bottom: 10px;
+      }
+
+      .room {
+        background: var(--bg-card);
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        margin-bottom: 14px;
+        overflow: hidden;
+      }
+      .room-head {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        background: rgba(42, 85, 144, 0.18);
+        padding: 12px 16px;
+        gap: 10px;
+      }
+      .room-head input {
+        background: transparent;
+        border: none;
+        color: var(--white);
+        font-weight: 700;
+        font-size: 0.98rem;
+        flex: 1;
+        min-width: 0;
+      }
+      .room-body {
+        padding: 12px 16px 16px;
+      }
+      .item {
+        padding: 10px 0;
+        border-bottom: 1px solid var(--border);
+      }
+      .item-row {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 10px;
+      }
+      .item-name {
+        font-size: 0.9rem;
+        flex: 1;
+      }
+      .cond {
+        display: flex;
+        gap: 4px;
+      }
+      .cond button {
+        border: 1px solid var(--border);
+        background: var(--bg);
+        color: var(--text-muted);
+        padding: 7px 9px;
+        font-size: 0.74rem;
+        border-radius: 6px;
+        cursor: pointer;
+        font-weight: 600;
+      }
+      .cond button.on-Good {
+        background: rgba(62, 173, 130, 0.2);
+        color: var(--green);
+        border-color: var(--green);
+      }
+      .cond button.on-Fair {
+        background: rgba(240, 165, 0, 0.2);
+        color: var(--warning);
+        border-color: var(--warning);
+      }
+      .cond button.on-Damaged,
+      .cond button.on-Missing {
+        background: rgba(229, 83, 83, 0.2);
+        color: var(--danger);
+        border-color: var(--danger);
+      }
+      .item-note {
+        margin-top: 8px;
+      }
+      .was {
+        font-size: 0.74rem;
+        color: var(--text-muted);
+        margin-top: 4px;
+      }
+      .was.worse {
+        color: var(--danger);
+        font-weight: 600;
+      }
+      .photos {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        margin-top: 12px;
+      }
+      .photo {
+        position: relative;
+        width: 84px;
+        height: 84px;
+        border-radius: 8px;
+        overflow: hidden;
+        border: 1px solid var(--border);
+      }
+      .photo img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+      }
+      .photo button {
+        position: absolute;
+        top: 2px;
+        right: 2px;
+        width: 24px;
+        height: 24px;
+        border-radius: 50%;
+        border: none;
+        background: rgba(0, 0, 0, 0.7);
+        color: #fff;
+        cursor: pointer;
+        line-height: 1;
+      }
+      .add-photo {
+        width: 84px;
+        height: 84px;
+        border-radius: 8px;
+        border: 2px dashed var(--border);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        font-size: 0.72rem;
+        color: var(--text-muted);
+        cursor: pointer;
+        text-align: center;
+      }
+      .sig-wrap {
+        border: 2px dashed var(--border);
+        border-radius: var(--radius-sm);
+        background: #fff;
+      }
+      #sig-canvas {
+        width: 100%;
+        height: 170px;
+        display: block;
+        touch-action: none;
+      }
+      .sticky-bar {
+        position: sticky;
+        bottom: 0;
+        background: var(--bg);
+        border-top: 1px solid var(--border);
+        padding: 12px 0;
+        display: flex;
+        gap: 10px;
+        justify-content: flex-end;
+        flex-wrap: wrap;
+        z-index: 5;
+      }
+      fieldset {
+        border: none;
+        padding: 0;
+        margin: 0;
+        min-width: 0;
+      }
+      .notice {
+        background: rgba(240, 165, 0, 0.12);
+        border: 1px solid var(--warning);
+        border-radius: var(--radius-sm);
+        padding: 10px 14px;
+        font-size: 0.85rem;
+        margin-bottom: 16px;
+      }
+
+      @media (max-width: 640px) {
+        .grid-2 {
+          grid-template-columns: 1fr;
+        }
+        .item-row {
+          flex-direction: column;
+          align-items: flex-start;
+        }
+        .cond {
+          width: 100%;
+        }
+        .cond button {
+          flex: 1;
+          padding: 10px 4px;
+        }
+        .sticky-bar .btn {
+          flex: 1;
+        }
+        .insp-actions .btn {
+          flex: 1;
+        }
+        .page-header {
+          flex-direction: column;
+          align-items: stretch;
+          gap: 12px;
+        }
+        .page-header .btn {
+          width: 100%;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <nav id="main-nav"></nav>
+    <div class="page-wrapper">
+      <div class="container">
+        <!-- ═════════ LIST ═════════ -->
+        <div id="list-view">
+          <div class="page-header">
+            <div>
+              <div class="page-title">Apartment <span>Inspections</span></div>
+              <div class="page-subtitle">
+                Move-in and move-out condition reports with photos
+              </div>
+            </div>
+            <button class="btn btn-green" onclick="newInspection()">
+              + New Inspection
+            </button>
+          </div>
+          <div class="filter-bar">
+            <select
+              class="form-control"
+              id="f-building"
+              onchange="renderList()"
+            >
+              <option value="">All Buildings</option>
+            </select>
+            <select class="form-control" id="f-type" onchange="renderList()">
+              <option value="">Move-In and Move-Out</option>
+              <option value="move_in">Move-In only</option>
+              <option value="move_out">Move-Out only</option>
+            </select>
+            <input
+              class="form-control"
+              id="f-search"
+              placeholder="🔍 Search unit or tenant..."
+              oninput="renderList()"
+              style="flex: 1; min-width: 160px"
+            />
+          </div>
+          <div id="list">
+            <div class="loading-state">
+              <div class="spinner"></div>
+              <p>Loading...</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- ═════════ FORM ═════════ -->
+        <div id="form-view" style="display: none">
+          <div class="page-header">
+            <div>
+              <div class="page-title" id="form-title">
+                New <span>Inspection</span>
+              </div>
+              <div class="page-subtitle" id="form-sub"></div>
+            </div>
+            <button class="btn btn-outline" onclick="backToList()">
+              ← Back
+            </button>
+          </div>
+          <div id="signed-notice" class="notice" style="display: none">
+            🔒 This report has been signed by the tenant, so it can no longer be
+            edited. You can still download or email it.
+          </div>
+
+          <fieldset id="form-fs">
+            <div class="form-section">
+              <h3>1. Details</h3>
+              <div class="type-toggle" style="margin-bottom: 14px">
+                <button type="button" id="t-in" onclick="setType('move_in')">
+                  Move-In
+                </button>
+                <button type="button" id="t-out" onclick="setType('move_out')">
+                  Move-Out
+                </button>
+              </div>
+              <div class="grid-2">
+                <div class="form-group">
+                  <label class="form-label">Building *</label>
+                  <select
+                    class="form-control"
+                    id="f-b"
+                    onchange="pickBuilding()"
+                  ></select>
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Unit *</label>
+                  <select
+                    class="form-control"
+                    id="f-u"
+                    onchange="pickUnit()"
+                  ></select>
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Inspection date *</label>
+                  <input type="date" class="form-control" id="f-date" />
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Inspector</label>
+                  <input class="form-control" id="f-inspector" />
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Tenant name</label>
+                  <input class="form-control" id="f-tname" />
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Tenant email</label>
+                  <input type="email" class="form-control" id="f-temail" />
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Electricity meter reading</label>
+                  <input class="form-control" id="f-elec" inputmode="decimal" />
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Water meter reading</label>
+                  <input
+                    class="form-control"
+                    id="f-water"
+                    inputmode="decimal"
+                  />
+                </div>
+              </div>
+              <div class="form-group">
+                <label class="form-label"
+                  >Keys / access cards handed over</label
+                >
+                <input
+                  class="form-control"
+                  id="f-keys"
+                  placeholder="e.g. 2 keys, 1 access card, 1 parking card"
+                />
+              </div>
+              <div id="baseline-note" class="was" style="display: none"></div>
+            </div>
+
+            <div class="form-section">
+              <h3>2. Rooms</h3>
+              <div class="build-row">
+                <div class="form-group">
+                  <label class="form-label">Bedrooms</label
+                  ><input
+                    type="number"
+                    min="0"
+                    max="10"
+                    class="form-control"
+                    id="b-bed"
+                    value="1"
+                  />
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Bathrooms</label
+                  ><input
+                    type="number"
+                    min="0"
+                    max="10"
+                    class="form-control"
+                    id="b-bath"
+                    value="1"
+                  />
+                </div>
+                <label class="chk"
+                  ><input type="checkbox" id="b-balc" checked /> Balcony</label
+                >
+                <label class="chk"
+                  ><input type="checkbox" id="b-maid" /> Maid room</label
+                >
+                <label class="chk"
+                  ><input type="checkbox" id="b-laundry" /> Laundry</label
+                >
+                <button
+                  type="button"
+                  class="btn btn-outline"
+                  onclick="buildRooms()"
+                >
+                  Build rooms
+                </button>
+              </div>
+              <div class="was" style="margin-top: 8px">
+                Tip: everything starts as "Good". Only change the items that are
+                not.
+              </div>
+            </div>
+
+            <div id="rooms"></div>
+
+            <div style="margin-bottom: 16px">
+              <select
+                class="form-control"
+                id="add-room-type"
+                style="max-width: 260px; display: inline-block"
+              ></select>
+              <button type="button" class="btn btn-outline" onclick="addRoom()">
+                + Add room
+              </button>
+            </div>
+
+            <div class="form-section">
+              <h3>3. General notes</h3>
+              <textarea
+                class="form-control"
+                id="f-notes"
+                rows="3"
+                placeholder="Anything else worth recording..."
+              ></textarea>
+            </div>
+          </fieldset>
+
+          <div class="form-section">
+            <h3>4. Tenant signature</h3>
+            <div class="sig-wrap"><canvas id="sig-canvas"></canvas></div>
+            <div style="margin-top: 8px" id="sig-tools">
+              <button
+                type="button"
+                class="btn btn-outline btn-sm"
+                onclick="clearSig()"
+              >
+                Clear signature
+              </button>
+              <span class="was" style="margin-left: 8px"
+                >Optional. Once signed and saved, the report is locked.</span
+              >
+            </div>
+          </div>
+
+          <div class="sticky-bar">
+            <button class="btn btn-outline" onclick="downloadPdf()">
+              ⬇ PDF
+            </button>
+            <button class="btn btn-outline" onclick="emailCurrent()">
+              ✉ Email tenant
+            </button>
+            <button
+              class="btn btn-green"
+              id="btn-save"
+              onclick="saveInspection()"
+            >
+              Save
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script type="module">
+      import { requireAuth } from "./js/auth.js";
+      import {
+        renderNav,
+        showToast,
+        showConfirm,
+        formatDate,
+      } from "./js/shared.js";
+      import { supabase } from "./js/supabase.js";
+      import {
+        buildInspectionPdf,
+        inspectionFilename,
+        CONDITIONS,
+        rank,
+      } from "./js/inspection-pdf.js";
+
+      const session = requireAuth();
+      if (!session) throw new Error("Not authenticated");
+      if (session.role === "finance") {
+        window.location.href = "/finance.html";
+        throw new Error("Access denied");
+      }
+      renderNav("inspection");
+
+      // ── Room templates ────────────────────────────────────────────
+      const BASIC = [
+        "Walls",
+        "Ceiling",
+        "Floor",
+        "Door and lock",
+        "Lights and sockets",
+      ];
+      const ROOM_TYPES = {
+        entrance: {
+          label: "Entrance / Hallway",
+          items: [...BASIC, "Intercom / doorbell"],
+        },
+        living: {
+          label: "Living / Dining Room",
+          items: [
+            ...BASIC,
+            "Windows and curtain rails",
+            "Air conditioning",
+            "Balcony door",
+          ],
+        },
+        kitchen: {
+          label: "Kitchen",
+          items: [
+            "Walls and tiles",
+            "Ceiling",
+            "Floor",
+            "Cabinets",
+            "Countertop",
+            "Sink and tap",
+            "Hob / cooker",
+            "Oven",
+            "Extractor hood",
+            "Lights and sockets",
+            "Windows",
+          ],
+        },
+        bedroom: {
+          label: "Bedroom",
+          items: [
+            ...BASIC,
+            "Wardrobe",
+            "Windows and curtain rails",
+            "Air conditioning",
+          ],
+        },
+        bathroom: {
+          label: "Bathroom",
+          items: [
+            "Walls and tiles",
+            "Ceiling",
+            "Floor",
+            "Door and lock",
+            "Toilet",
+            "Washbasin and tap",
+            "Shower / bathtub",
+            "Mirror",
+            "Exhaust fan",
+            "Lights and sockets",
+          ],
+        },
+        balcony: {
+          label: "Balcony",
+          items: ["Floor", "Railing", "Sliding door", "Drain", "Lights"],
+        },
+        maid: {
+          label: "Maid Room",
+          items: [...BASIC, "Windows", "Attached bathroom"],
+        },
+        laundry: {
+          label: "Laundry / Store",
+          items: [
+            "Walls",
+            "Floor",
+            "Door",
+            "Water connection",
+            "Lights and sockets",
+          ],
+        },
+        other: {
+          label: "Other area",
+          items: ["Walls", "Floor", "Ceiling", "Lights and sockets"],
+        },
+      };
+
+      // ── State ─────────────────────────────────────────────────────
+      let buildings = [],
+        units = [],
+        inspections = [];
+      let cur = null; // the inspection being edited
+      let baseline = null; // move-in inspection used for comparison
+      let locked = false;
+      let sigDirty = false;
+      const esc = (s) =>
+        String(s ?? "").replace(
+          /[&<>"']/g,
+          (c) =>
+            ({
+              "&": "&amp;",
+              "<": "&lt;",
+              ">": "&gt;",
+              '"': "&quot;",
+              "'": "&#39;",
+            })[c],
+        );
+      const $ = (id) => document.getElementById(id);
+      const byNum = (a, b) =>
+        String(a).localeCompare(String(b), undefined, { numeric: true });
+      const today = () => {
+        const d = new Date();
+        return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+      };
+      const bName = (id) => buildings.find((b) => b.id === id)?.name || "?";
+      const uNo = (id) => units.find((u) => u.id === id)?.unit_number || "?";
+
+      // ── Load + list ───────────────────────────────────────────────
+      async function init() {
+        const [b, u] = await Promise.all([
+          supabase.from("buildings").select("id, name").order("name"),
+          supabase
+            .from("units")
+            .select("id, building_id, unit_number, tenant_name, tenant_email"),
+        ]);
+        buildings = b.data || [];
+        units = u.data || [];
+        $("f-building").innerHTML =
+          '<option value="">All Buildings</option>' +
+          buildings
+            .map((x) => `<option value="${x.id}">${esc(x.name)}</option>`)
+            .join("");
+        $("f-b").innerHTML =
+          '<option value="">Select building...</option>' +
+          buildings
+            .map((x) => `<option value="${x.id}">${esc(x.name)}</option>`)
+            .join("");
+        $("add-room-type").innerHTML = Object.entries(ROOM_TYPES)
+          .map(([k, v]) => `<option value="${k}">${v.label}</option>`)
+          .join("");
+        await loadList();
+      }
+
+      async function loadList() {
+        const { data, error } = await supabase
+          .from("inspections")
+          .select("*")
+          .order("created_at", { ascending: false });
+        if (error) {
+          $("list").innerHTML =
+            `<p style="color:var(--danger)">Could not load inspections. Has the inspections table been created in Supabase? (${esc(error.message)})</p>`;
+          return;
+        }
+        inspections = data || [];
+        renderList();
+      }
+
+      window.renderList = function () {
+        const fb = $("f-building").value,
+          ft = $("f-type").value,
+          q = $("f-search").value.toLowerCase().trim();
+        const list = inspections.filter(
+          (i) =>
+            (!fb || i.building_id === fb) &&
+            (!ft || i.type === ft) &&
+            (!q ||
+              uNo(i.unit_id).toLowerCase().includes(q) ||
+              (i.tenant_name || "").toLowerCase().includes(q)),
+        );
+        if (!list.length) {
+          $("list").innerHTML =
+            '<div class="empty-state"><div class="empty-state-icon">📋</div><div class="empty-state-title">No inspections yet</div><div class="empty-state-text">Tap "+ New Inspection" to record a move-in or move-out.</div></div>';
+          return;
+        }
+        $("list").innerHTML = list
+          .map((i) => {
+            const out = i.type === "move_out";
+            const photos = (i.rooms || []).reduce(
+              (n, r) => n + (r.photos || []).length,
+              0,
+            );
+            return `<div class="insp-card ${out ? "out" : ""}">
+            <div class="insp-card-top">
+              <div>
+                <div class="insp-title">${esc(bName(i.building_id))} — Unit ${esc(uNo(i.unit_id))}</div>
+                <div class="insp-meta">${esc(i.tenant_name || "No tenant name")} · ${formatDate(i.inspection_date)} · ${(i.rooms || []).length} rooms · ${photos} photos</div>
+              </div>
+              <div>
+                <span class="badge ${out ? "badge-orange" : "badge-blue"}">${out ? "Move-Out" : "Move-In"}</span>
+                <span class="badge ${i.status === "signed" ? "badge-green" : "badge-grey"}">${i.status === "signed" ? "Signed" : "Draft"}</span>
+                ${i.emailed_at ? '<span class="badge badge-green">Emailed</span>' : ""}
+              </div>
+            </div>
+            <div class="insp-actions">
+              <button class="btn btn-outline btn-sm" onclick="openInspection('${i.id}')">${i.status === "signed" ? "View" : "Open / Edit"}</button>
+              <button class="btn btn-outline btn-sm" onclick="pdfFor('${i.id}')">⬇ PDF</button>
+              <button class="btn btn-outline btn-sm" onclick="emailFor('${i.id}')">✉ Email</button>
+              ${i.status !== "signed" ? `<button class="btn btn-danger btn-sm" onclick="deleteInspection('${i.id}')">Delete</button>` : ""}
+            </div>
+          </div>`;
+          })
+          .join("");
+      };
+
+      // ── Open / create ─────────────────────────────────────────────
+      function show(view) {
+        $("list-view").style.display = view === "list" ? "" : "none";
+        $("form-view").style.display = view === "form" ? "" : "none";
+        window.scrollTo(0, 0);
+      }
+      window.backToList = function () {
+        show("list");
+        loadList();
+      };
+
+      window.newInspection = function () {
+        cur = {
+          id: crypto.randomUUID(),
+          isNew: true,
+          type: "move_in",
+          rooms: [],
+          tenant_signature: null,
+        };
+        baseline = null;
+        locked = false;
+        sigDirty = false;
+        fillForm();
+        show("form");
+        initSig();
+      };
+
+      window.openInspection = async function (id) {
+        const i = inspections.find((x) => x.id === id);
+        if (!i) return;
+        cur = JSON.parse(JSON.stringify(i));
+        cur.isNew = false;
+        locked = i.status === "signed";
+        sigDirty = false;
+        fillForm();
+        show("form");
+        initSig();
+        await findBaseline();
+        renderRooms();
+      };
+
+      function fillForm() {
+        const c = cur;
+        $("form-title").innerHTML = c.isNew
+          ? "New <span>Inspection</span>"
+          : "Inspection <span>Report</span>";
+        $("form-sub").textContent = "";
+        $("f-b").value = c.building_id || "";
+        fillUnits();
+        $("f-u").value = c.unit_id || "";
+        $("f-date").value = (c.inspection_date || today()).slice(0, 10);
+        $("f-inspector").value = c.inspector ?? session.full_name ?? "";
+        $("f-tname").value = c.tenant_name || "";
+        $("f-temail").value = c.tenant_email || "";
+        $("f-elec").value = c.electricity_meter || "";
+        $("f-water").value = c.water_meter || "";
+        $("f-keys").value = c.keys_count || "";
+        $("f-notes").value = c.general_notes || "";
+        setType(c.type);
+        $("form-fs").disabled = locked;
+        $("signed-notice").style.display = locked ? "" : "none";
+        $("btn-save").style.display = locked ? "none" : "";
+        $("sig-tools").style.display = locked ? "none" : "";
+        $("baseline-note").style.display = "none";
+        renderRooms();
+      }
+
+      function fillUnits() {
+        const b = $("f-b").value;
+        const list = units
+          .filter((u) => u.building_id === b)
+          .sort((x, y) => byNum(x.unit_number, y.unit_number));
+        $("f-u").innerHTML =
+          '<option value="">Select unit...</option>' +
+          list
+            .map(
+              (u) =>
+                `<option value="${u.id}">${esc(u.unit_number)} — ${esc(u.tenant_name || "Vacant")}</option>`,
+            )
+            .join("");
+      }
+
+      window.pickBuilding = function () {
+        fillUnits();
+        cur.unit_id = "";
+        baseline = null;
+        renderRooms();
+      };
+      window.pickUnit = async function () {
+        const u = units.find((x) => x.id === $("f-u").value);
+        if (u) {
+          if (!$("f-tname").value) $("f-tname").value = u.tenant_name || "";
+          if (!$("f-temail").value) $("f-temail").value = u.tenant_email || "";
+        }
+        await findBaseline();
+        renderRooms();
+      };
+      window.setType = async function (t) {
+        cur.type = t;
+        $("t-in").classList.toggle("on", t === "move_in");
+        $("t-out").classList.toggle("on", t === "move_out");
+        await findBaseline();
+        renderRooms();
+      };
+
+      // For a move-out, find the unit's latest move-in report to compare against
+      async function findBaseline() {
+        baseline = null;
+        const note = $("baseline-note");
+        note.style.display = "none";
+        const uid = $("f-u").value;
+        if (cur.type !== "move_out" || !uid) return;
+        const { data } = await supabase
+          .from("inspections")
+          .select("*")
+          .eq("unit_id", uid)
+          .eq("type", "move_in")
+          .order("inspection_date", { ascending: false })
+          .limit(1);
+        baseline = data && data[0] ? data[0] : null;
+        note.style.display = "";
+        note.textContent = baseline
+          ? `Comparing with the move-in report dated ${formatDate(baseline.inspection_date)}. Items that got worse are marked in red.`
+          : "No move-in report found for this unit, so there is nothing to compare with.";
+      }
+
+      // ── Rooms ─────────────────────────────────────────────────────
+      const mkRoom = (type, name) => ({
+        id: crypto.randomUUID(),
+        name: name || ROOM_TYPES[type].label,
+        type,
+        items: ROOM_TYPES[type].items.map((n) => ({
+          name: n,
+          cond: "Good",
+          note: "",
+        })),
+        photos: [],
+        note: "",
+      });
+
+      window.buildRooms = async function () {
+        if (
+          cur.rooms.length &&
+          !(await showConfirm(
+            "This replaces the current rooms and anything you entered in them. Continue?",
+          ))
+        )
+          return;
+        const bed = Math.max(0, parseInt($("b-bed").value) || 0);
+        const bath = Math.max(0, parseInt($("b-bath").value) || 0);
+        const r = [mkRoom("entrance"), mkRoom("living"), mkRoom("kitchen")];
+        if (bed === 0) r.push(mkRoom("bedroom", "Studio Room"));
+        for (let i = 1; i <= bed; i++)
+          r.push(
+            mkRoom("bedroom", i === 1 ? "Master Bedroom" : "Bedroom " + i),
+          );
+        for (let i = 1; i <= bath; i++)
+          r.push(mkRoom("bathroom", bath > 1 ? "Bathroom " + i : "Bathroom"));
+        if ($("b-balc").checked) r.push(mkRoom("balcony"));
+        if ($("b-maid").checked) r.push(mkRoom("maid"));
+        if ($("b-laundry").checked) r.push(mkRoom("laundry"));
+        cur.rooms = r;
+        renderRooms();
+      };
+      window.addRoom = function () {
+        cur.rooms.push(mkRoom($("add-room-type").value));
+        renderRooms();
+      };
+      window.removeRoom = async function (ri) {
+        if (!(await showConfirm("Remove this room?"))) return;
+        cur.rooms.splice(ri, 1);
+        renderRooms();
+      };
+
+      const baseItem = (room, item) => {
+        if (!baseline) return null;
+        const br = (baseline.rooms || []).find((r) => r.name === room.name);
+        return br ? (br.items || []).find((i) => i.name === item.name) : null;
+      };
+
+      function renderRooms() {
+        if (!cur) return;
+        $("rooms").innerHTML = cur.rooms
+          .map(
+            (r, ri) => `
+          <div class="room">
+            <div class="room-head">
+              <input value="${esc(r.name)}" onchange="cur_room(${ri}).name=this.value" />
+              <button type="button" class="btn btn-outline btn-sm" onclick="removeRoom(${ri})">Remove</button>
+            </div>
+            <div class="room-body">
+              ${r.items
+                .map((it, ii) => {
+                  const b = baseItem(r, it);
+                  const worse = b && rank(it.cond) > rank(b.cond);
+                  return `<div class="item">
+                  <div class="item-row">
+                    <div class="item-name">${esc(it.name)}</div>
+                    <div class="cond">${CONDITIONS.map((c) => `<button type="button" class="${it.cond === c ? "on-" + c : ""}" onclick="setCond(${ri},${ii},'${c}')">${c}</button>`).join("")}</div>
+                  </div>
+                  ${b ? `<div class="was ${worse ? "worse" : ""}">Move-in: ${esc(b.cond)}${b.note ? " — " + esc(b.note) : ""}${worse ? "  ⚠ worse now" : ""}</div>` : ""}
+                  ${it.cond !== "Good" ? `<input class="form-control item-note" placeholder="Describe the damage / issue..." value="${esc(it.note)}" onchange="cur_item(${ri},${ii}).note=this.value" />` : ""}
+                </div>`;
+                })
+                .join("")}
+              <textarea class="form-control" rows="2" style="margin-top:12px" placeholder="Notes for this room (optional)" onchange="cur_room(${ri}).note=this.value">${esc(r.note)}</textarea>
+              <div class="photos">
+                ${(r.photos || []).map((p, pi) => `<div class="photo"><img src="${esc(p.url || p.data)}" alt="" />${locked ? "" : `<button type="button" onclick="removePhoto(${ri},${pi})">×</button>`}</div>`).join("")}
+                ${locked ? "" : `<label class="add-photo"><span style="font-size:1.4rem">📷</span>Add photos<input type="file" accept="image/*" multiple hidden onchange="addPhotos(${ri}, this)" /></label>`}
+              </div>
+            </div>
+          </div>`,
+          )
+          .join("");
+      }
+      window.cur_room = (ri) => cur.rooms[ri];
+      window.cur_item = (ri, ii) => cur.rooms[ri].items[ii];
+      window.setCond = function (ri, ii, c) {
+        cur.rooms[ri].items[ii].cond = c;
+        if (c === "Good") cur.rooms[ri].items[ii].note = "";
+        renderRooms();
+      };
+
+      // ── Photos: shrink on the phone before anything is sent ───────
+      async function compress(file, max = 1200) {
+        const url = URL.createObjectURL(file);
+        const img = await new Promise((res, rej) => {
+          const i = new Image();
+          i.onload = () => res(i);
+          i.onerror = rej;
+          i.src = url;
+        });
+        const k = Math.min(1, max / Math.max(img.width, img.height));
+        const c = document.createElement("canvas");
+        c.width = Math.round(img.width * k);
+        c.height = Math.round(img.height * k);
+        c.getContext("2d").drawImage(img, 0, 0, c.width, c.height);
+        URL.revokeObjectURL(url);
+        let q = 0.78,
+          out = c.toDataURL("image/jpeg", q);
+        while (out.length * 0.75 > 300 * 1024 && q > 0.4) {
+          q -= 0.08;
+          out = c.toDataURL("image/jpeg", q);
+        }
+        return out;
+      }
+      window.addPhotos = async function (ri, input) {
+        const files = [...input.files];
+        input.value = "";
+        for (const f of files) {
+          try {
+            cur.rooms[ri].photos.push({ data: await compress(f) });
+          } catch (e) {
+            showToast("Could not read one of the photos.", "error");
+          }
+        }
+        renderRooms();
+      };
+      window.removePhoto = function (ri, pi) {
+        cur.rooms[ri].photos.splice(pi, 1);
+        renderRooms();
+      };
+
+      // ── Signature pad ─────────────────────────────────────────────
+      let sigCtx,
+        drawing = false;
+      function initSig() {
+        const c = $("sig-canvas");
+        const r = c.getBoundingClientRect();
+        c.width = Math.round(r.width * 2);
+        c.height = Math.round(r.height * 2);
+        sigCtx = c.getContext("2d");
+        sigCtx.scale(2, 2);
+        sigCtx.lineWidth = 2.2;
+        sigCtx.lineCap = "round";
+        sigCtx.strokeStyle = "#111";
+        sigCtx.clearRect(0, 0, c.width, c.height);
+        if (cur.tenant_signature) {
+          const img = new Image();
+          img.onload = () => sigCtx.drawImage(img, 0, 0, r.width, r.height);
+          img.src = cur.tenant_signature;
+        }
+        if (!c.dataset.bound) {
+          c.dataset.bound = "1";
+          const pos = (e) => {
+            const b = c.getBoundingClientRect();
+            return [e.clientX - b.left, e.clientY - b.top];
+          };
+          c.addEventListener("pointerdown", (e) => {
+            if (locked) return;
+            drawing = true;
+            c.setPointerCapture(e.pointerId);
+            const [x, y] = pos(e);
+            sigCtx.beginPath();
+            sigCtx.moveTo(x, y);
+          });
+          c.addEventListener("pointermove", (e) => {
+            if (!drawing) return;
+            const [x, y] = pos(e);
+            sigCtx.lineTo(x, y);
+            sigCtx.stroke();
+            sigDirty = true;
+          });
+          const end = () => {
+            drawing = false;
+          };
+          c.addEventListener("pointerup", end);
+          c.addEventListener("pointercancel", end);
+        }
+      }
+      window.clearSig = function () {
+        const c = $("sig-canvas");
+        sigCtx.clearRect(0, 0, c.width, c.height);
+        cur.tenant_signature = null;
+        sigDirty = false;
+      };
+      function currentSignature() {
+        if (sigDirty) return $("sig-canvas").toDataURL("image/png");
+        return cur.tenant_signature || null;
+      }
+
+      // ── Read the form into an inspection object ───────────────────
+      function collect() {
+        const sig = currentSignature();
+        return {
+          id: cur.id,
+          building_id: $("f-b").value,
+          unit_id: $("f-u").value,
+          type: cur.type,
+          inspection_date: $("f-date").value,
+          inspector: $("f-inspector").value.trim() || null,
+          tenant_name: $("f-tname").value.trim() || null,
+          tenant_email: $("f-temail").value.trim() || null,
+          electricity_meter: $("f-elec").value.trim() || null,
+          water_meter: $("f-water").value.trim() || null,
+          keys_count: $("f-keys").value.trim() || null,
+          general_notes: $("f-notes").value.trim() || null,
+          rooms: cur.rooms,
+          tenant_signature: sig,
+          signed_at: sig
+            ? cur.signed_at && !sigDirty
+              ? cur.signed_at
+              : new Date().toISOString()
+            : null,
+          status: sig ? "signed" : "draft",
+        };
+      }
+
+      // ── Save ──────────────────────────────────────────────────────
+      window.saveInspection = async function () {
+        const row = collect();
+        if (!row.building_id || !row.unit_id || !row.inspection_date) {
+          showToast("Choose a building, unit and date.", "error");
+          return;
+        }
+        if (!row.rooms.length) {
+          showToast("Build or add at least one room first.", "error");
+          return;
+        }
+        if (
+          row.status === "signed" &&
+          !(await showConfirm(
+            "Saving with a signature locks this report. Continue?",
+          ))
+        )
+          return;
+        const btn = $("btn-save");
+        btn.disabled = true;
+        try {
+          // 1. Upload new photos to the server
+          let n = 0;
+          const total = row.rooms.reduce(
+            (s, r) => s + r.photos.filter((p) => !p.url).length,
+            0,
+          );
+          for (const r of row.rooms)
+            for (const p of r.photos) {
+              if (p.url) continue;
+              btn.textContent = `Uploading photo ${++n} of ${total}...`;
+              const res = await fetch("/api/inspection-photo", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ inspectionId: row.id, data: p.data }),
+              });
+              const j = await res.json().catch(() => ({}));
+              if (!res.ok || !j.url)
+                throw new Error(
+                  j.error ||
+                    "Photo upload failed (photos can only be saved on the live server)",
+                );
+              p.url = j.url;
+              delete p.data;
+            }
+          // 2. Save the report
+          btn.textContent = "Saving...";
+          const payload = { ...row, created_by: session.full_name };
+          const q = cur.isNew
+            ? supabase.from("inspections").insert(payload)
+            : supabase.from("inspections").update(payload).eq("id", row.id);
+          const { error } = await q;
+          if (error) throw new Error(error.message);
+          showToast("Inspection saved.");
+          backToList();
+        } catch (err) {
+          console.error(err);
+          showToast(err.message, "error");
+          renderRooms();
+        }
+        btn.disabled = false;
+        btn.textContent = "Save";
+      };
+
+      window.deleteInspection = async function (id) {
+        if (
+          !(await showConfirm("Delete this inspection? This cannot be undone."))
+        )
+          return;
+        await supabase.from("inspections").delete().eq("id", id);
+        showToast("Deleted.");
+        loadList();
+      };
+
+      // ── PDF + email ───────────────────────────────────────────────
+      async function pdfData(insp) {
+        let base = null;
+        if (insp.type === "move_out") {
+          const { data } = await supabase
+            .from("inspections")
+            .select("*")
+            .eq("unit_id", insp.unit_id)
+            .eq("type", "move_in")
+            .order("inspection_date", { ascending: false })
+            .limit(1);
+          base = data && data[0] ? data[0] : null;
+        }
+        const ctx = {
+          buildingName: bName(insp.building_id),
+          unitNumber: uNo(insp.unit_id),
+          baseline: base,
+        };
+        return { doc: await buildInspectionPdf(insp, ctx), ctx };
+      }
+      async function doPdf(insp) {
+        showToast("Building PDF...");
+        try {
+          const { doc, ctx } = await pdfData(insp);
+          doc.save(inspectionFilename(insp, ctx));
+        } catch (e) {
+          console.error(e);
+          showToast("Could not build the PDF: " + e.message, "error");
+        }
+      }
+      async function doEmail(insp) {
+        let to =
+          insp.tenant_email || window.prompt("Tenant email address:", "");
+        if (!to) return;
+        to = to.trim();
+        showToast("Preparing email...");
+        try {
+          const { doc, ctx } = await pdfData(insp);
+          const b64 = doc.output("datauristring").split(",")[1];
+          const res = await fetch("/api/send-inspection", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              to,
+              tenantName: insp.tenant_name,
+              buildingName: ctx.buildingName,
+              unitNumber: ctx.unitNumber,
+              type: insp.type,
+              date: insp.inspection_date,
+              pdfBase64: b64,
+              filename: inspectionFilename(insp, ctx),
+            }),
+          });
+          const j = await res.json().catch(() => ({}));
+          if (!res.ok)
+            throw new Error(
+              j.error || "Email failed (emails only work on the live server)",
+            );
+          await supabase
+            .from("inspections")
+            .update({ emailed_at: new Date().toISOString(), tenant_email: to })
+            .eq("id", insp.id);
+          insp.emailed_at = new Date().toISOString();
+          showToast("Report emailed to " + to);
+        } catch (e) {
+          console.error(e);
+          showToast(e.message, "error");
+        }
+      }
+      window.pdfFor = (id) => doPdf(inspections.find((x) => x.id === id));
+      window.emailFor = (id) => doEmail(inspections.find((x) => x.id === id));
+      // From inside the form: use what is on screen (photos not yet saved are included)
+      window.downloadPdf = () =>
+        doPdf({ ...collect(), emailed_at: cur.emailed_at });
+      window.emailCurrent = async () => {
+        if (cur.isNew || !inspections.find((x) => x.id === cur.id)) {
+          showToast("Save the inspection first, then email it.", "error");
+          return;
+        }
+        doEmail(inspections.find((x) => x.id === cur.id));
+      };
+
+      init();
+    </script>
+  </body>
+</html>

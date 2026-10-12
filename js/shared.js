@@ -60,7 +60,8 @@ export function whatsappLink(rawNumber, message) {
   if (d.startsWith("00")) d = d.slice(2); // 00971... -> 971...
   if (d.startsWith("9710")) d = "971" + d.slice(4); // +971 (0) 50... -> 971 50...
   if (!d.startsWith("971")) {
-    if (d.startsWith("0")) d = "971" + d.slice(1); // 050... -> 97150...
+    if (d.startsWith("0"))
+      d = "971" + d.slice(1); // 050... -> 97150...
     else if (d.length === 9 && d.startsWith("5")) d = "971" + d; // 50... -> 97150...
   }
   if (d.length < 10 || d.length > 15) return null;
@@ -129,6 +130,7 @@ export function renderNav(activePage) {
     { href: "/upcoming.html", label: "Upcoming", key: "upcoming" },
     { href: "/bounce.html", label: "Bounce Check", key: "bounce" },
     { href: "/maintenance.html", label: "Maintenance", key: "maintenance" },
+    { href: "/inspection.html", label: "Inspections", key: "inspection" },
     { href: "/invoices.html", label: "Invoices", key: "invoices" },
     {
       href: "/announcements.html",
@@ -179,6 +181,7 @@ export function renderNav(activePage) {
       label: "Operations",
       children: [
         byKey("maintenance"),
+        byKey("inspection"),
         byKey("invoices"),
         byKey("announcements"),
         byKey("emails"),
