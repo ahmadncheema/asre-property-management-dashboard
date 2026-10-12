@@ -1395,7 +1395,11 @@
         const box = document.getElementById("contract-list");
         try {
           const res = await fetch(
-            "/api/contracts/" + encodeURIComponent(contractUnit),
+            "/api/contracts/" +
+              encodeURIComponent(contractUnit) +
+              "?t=" +
+              Date.now(),
+            { cache: "no-store" },
           );
           if (!res.ok) throw new Error();
           const { files } = await res.json();
