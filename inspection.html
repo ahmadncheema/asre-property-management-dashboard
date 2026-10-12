@@ -19,9 +19,6 @@
         padding: 16px 18px;
         margin-bottom: 12px;
       }
-      .insp-card.out {
-        border-left-color: var(--warning);
-      }
       .insp-card-top {
         display: flex;
         justify-content: space-between;
@@ -56,6 +53,40 @@
         flex: 1;
       }
 
+      .phase-bar {
+        position: sticky;
+        top: 0;
+        z-index: 6;
+        background: var(--bg);
+        padding: 10px 0;
+        display: flex;
+        gap: 10px;
+        margin-bottom: 8px;
+      }
+      .phase-bar button {
+        flex: 1;
+        padding: 13px 8px;
+        border-radius: var(--radius-sm);
+        border: 2px solid var(--border);
+        background: var(--bg-card);
+        color: var(--text);
+        font-weight: 700;
+        cursor: pointer;
+        font-size: 0.92rem;
+      }
+      .phase-bar button.on {
+        border-color: var(--green);
+        color: var(--green);
+        background: rgba(62, 173, 130, 0.1);
+      }
+      .phase-bar small {
+        display: block;
+        font-weight: 500;
+        font-size: 0.7rem;
+        color: var(--text-muted);
+        margin-top: 2px;
+      }
+
       .form-section {
         background: var(--bg-card);
         border: 1px solid var(--border);
@@ -64,135 +95,146 @@
         margin-bottom: 16px;
       }
       .form-section h3 {
-        margin: 0 0 14px;
+        margin: 0 0 6px;
         font-size: 0.95rem;
         color: var(--blue-light);
+        text-transform: uppercase;
+        letter-spacing: 0.3px;
+      }
+      .form-section .hint {
+        font-size: 0.78rem;
+        color: var(--text-muted);
+        margin-bottom: 14px;
+        font-style: italic;
       }
       .grid-2 {
         display: grid;
         grid-template-columns: 1fr 1fr;
         gap: 12px;
       }
-      .type-toggle {
+      .grid-2 .full {
+        grid-column: 1 / -1;
+      }
+      .grid-2 .form-group {
+        margin: 0;
+      }
+
+      .row-card {
+        border-top: 1px solid var(--border);
+        padding: 12px 0;
+      }
+      .row-card:first-of-type {
+        border-top: none;
+      }
+      .row-name {
+        font-weight: 600;
+        font-size: 0.9rem;
+        margin-bottom: 8px;
+        display: flex;
+        justify-content: space-between;
+        gap: 8px;
+        align-items: center;
+      }
+      .row-name input {
+        background: transparent;
+        border: none;
+        color: var(--white);
+        font-weight: 700;
+        font-size: 0.95rem;
+        flex: 1;
+        min-width: 0;
+        padding: 0;
+      }
+      .row-fields {
         display: flex;
         gap: 10px;
+        flex-wrap: wrap;
+        align-items: center;
       }
-      .type-toggle button {
+      .row-fields .form-control {
         flex: 1;
-        padding: 14px;
-        border-radius: var(--radius-sm);
-        border: 2px solid var(--border);
-        background: var(--bg);
-        color: var(--text);
-        font-weight: 700;
-        cursor: pointer;
-        font-size: 0.95rem;
+        min-width: 120px;
       }
-      .type-toggle button.on {
-        border-color: var(--green);
+      .seg {
+        display: flex;
+        gap: 4px;
+        flex-wrap: wrap;
+      }
+      .seg button {
+        border: 1px solid var(--border);
+        background: var(--bg);
+        color: var(--text-muted);
+        padding: 8px 12px;
+        font-size: 0.78rem;
+        border-radius: 6px;
+        cursor: pointer;
+        font-weight: 600;
+        min-width: 52px;
+      }
+      .seg button.on-G,
+      .seg button.on-Y {
+        background: rgba(62, 173, 130, 0.2);
         color: var(--green);
-        background: rgba(62, 173, 130, 0.1);
+        border-color: var(--green);
+      }
+      .seg button.on-F {
+        background: rgba(240, 165, 0, 0.2);
+        color: var(--warning);
+        border-color: var(--warning);
+      }
+      .seg button.on-P,
+      .seg button.on-N {
+        background: rgba(229, 83, 83, 0.2);
+        color: var(--danger);
+        border-color: var(--danger);
+      }
+      .seg button.on-NA {
+        background: rgba(136, 150, 168, 0.2);
+        color: var(--text);
+        border-color: var(--text-muted);
+      }
+      .chk {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        font-size: 0.82rem;
+        white-space: nowrap;
+      }
+      .other {
+        font-size: 0.76rem;
+        color: var(--text-muted);
+        margin-top: 6px;
+      }
+      .other b {
+        color: var(--text);
+      }
+      .num-row {
+        display: flex;
+        gap: 8px;
+        align-items: center;
+        margin-bottom: 8px;
+      }
+      .num-row span.n {
+        width: 22px;
+        color: var(--text-muted);
+        font-size: 0.82rem;
+        text-align: right;
+        flex-shrink: 0;
+      }
+      .num-row .form-control {
+        flex: 1;
+        min-width: 0;
       }
       .build-row {
         display: flex;
         gap: 12px;
         flex-wrap: wrap;
         align-items: flex-end;
+        margin-bottom: 14px;
       }
       .build-row .form-group {
         margin: 0;
-        min-width: 110px;
-      }
-      .build-row label.chk {
-        display: flex;
-        align-items: center;
-        gap: 6px;
-        font-size: 0.85rem;
-        padding-bottom: 10px;
-      }
-
-      .room {
-        background: var(--bg-card);
-        border: 1px solid var(--border);
-        border-radius: var(--radius);
-        margin-bottom: 14px;
-        overflow: hidden;
-      }
-      .room-head {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        background: rgba(42, 85, 144, 0.18);
-        padding: 12px 16px;
-        gap: 10px;
-      }
-      .room-head input {
-        background: transparent;
-        border: none;
-        color: var(--white);
-        font-weight: 700;
-        font-size: 0.98rem;
-        flex: 1;
-        min-width: 0;
-      }
-      .room-body {
-        padding: 12px 16px 16px;
-      }
-      .item {
-        padding: 10px 0;
-        border-bottom: 1px solid var(--border);
-      }
-      .item-row {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        gap: 10px;
-      }
-      .item-name {
-        font-size: 0.9rem;
-        flex: 1;
-      }
-      .cond {
-        display: flex;
-        gap: 4px;
-      }
-      .cond button {
-        border: 1px solid var(--border);
-        background: var(--bg);
-        color: var(--text-muted);
-        padding: 7px 9px;
-        font-size: 0.74rem;
-        border-radius: 6px;
-        cursor: pointer;
-        font-weight: 600;
-      }
-      .cond button.on-Good {
-        background: rgba(62, 173, 130, 0.2);
-        color: var(--green);
-        border-color: var(--green);
-      }
-      .cond button.on-Fair {
-        background: rgba(240, 165, 0, 0.2);
-        color: var(--warning);
-        border-color: var(--warning);
-      }
-      .cond button.on-Damaged,
-      .cond button.on-Missing {
-        background: rgba(229, 83, 83, 0.2);
-        color: var(--danger);
-        border-color: var(--danger);
-      }
-      .item-note {
-        margin-top: 8px;
-      }
-      .was {
-        font-size: 0.74rem;
-        color: var(--text-muted);
-        margin-top: 4px;
-      }
-      .was.worse {
-        color: var(--danger);
-        font-weight: 600;
+        width: 100px;
       }
       .photos {
         display: flex;
@@ -226,6 +268,17 @@
         cursor: pointer;
         line-height: 1;
       }
+      .photo i {
+        position: absolute;
+        left: 3px;
+        bottom: 3px;
+        font-style: normal;
+        font-size: 0.62rem;
+        background: rgba(0, 0, 0, 0.7);
+        color: #fff;
+        padding: 1px 5px;
+        border-radius: 4px;
+      }
       .add-photo {
         width: 84px;
         height: 84px;
@@ -240,17 +293,6 @@
         cursor: pointer;
         text-align: center;
       }
-      .sig-wrap {
-        border: 2px dashed var(--border);
-        border-radius: var(--radius-sm);
-        background: #fff;
-      }
-      #sig-canvas {
-        width: 100%;
-        height: 170px;
-        display: block;
-        touch-action: none;
-      }
       .sticky-bar {
         position: sticky;
         bottom: 0;
@@ -263,40 +305,18 @@
         flex-wrap: wrap;
         z-index: 5;
       }
-      fieldset {
-        border: none;
-        padding: 0;
-        margin: 0;
-        min-width: 0;
-      }
-      .notice {
-        background: rgba(240, 165, 0, 0.12);
-        border: 1px solid var(--warning);
-        border-radius: var(--radius-sm);
-        padding: 10px 14px;
-        font-size: 0.85rem;
-        margin-bottom: 16px;
-      }
 
       @media (max-width: 640px) {
         .grid-2 {
           grid-template-columns: 1fr;
         }
-        .item-row {
-          flex-direction: column;
-          align-items: flex-start;
-        }
-        .cond {
-          width: 100%;
-        }
-        .cond button {
-          flex: 1;
-          padding: 10px 4px;
-        }
         .sticky-bar .btn {
           flex: 1;
         }
         .insp-actions .btn {
+          flex: 1;
+        }
+        .seg button {
           flex: 1;
         }
         .page-header {
@@ -318,13 +338,16 @@
         <div id="list-view">
           <div class="page-header">
             <div>
-              <div class="page-title">Apartment <span>Inspections</span></div>
+              <div class="page-title">
+                Move-In / Move-Out <span>Inspections</span>
+              </div>
               <div class="page-subtitle">
-                Move-in and move-out condition reports with photos
+                One form per tenancy: fill Move-In at handover, Move-Out when
+                the tenant leaves
               </div>
             </div>
-            <button class="btn btn-green" onclick="newInspection()">
-              + New Inspection
+            <button class="btn btn-green" onclick="newForm()">
+              + New Inspection Form
             </button>
           </div>
           <div class="filter-bar">
@@ -335,10 +358,10 @@
             >
               <option value="">All Buildings</option>
             </select>
-            <select class="form-control" id="f-type" onchange="renderList()">
-              <option value="">Move-In and Move-Out</option>
-              <option value="move_in">Move-In only</option>
-              <option value="move_out">Move-Out only</option>
+            <select class="form-control" id="f-status" onchange="renderList()">
+              <option value="">All forms</option>
+              <option value="waiting">Waiting for Move-Out</option>
+              <option value="done">Move-Out done</option>
             </select>
             <input
               class="form-control"
@@ -361,177 +384,28 @@
           <div class="page-header">
             <div>
               <div class="page-title" id="form-title">
-                New <span>Inspection</span>
+                Inspection <span>Form</span>
               </div>
-              <div class="page-subtitle" id="form-sub"></div>
+              <div class="page-subtitle">
+                Tenant Move-In / Move-Out Inspection Form · Property Handover
+                &amp; Unit Condition Report
+              </div>
             </div>
             <button class="btn btn-outline" onclick="backToList()">
               ← Back
             </button>
           </div>
-          <div id="signed-notice" class="notice" style="display: none">
-            🔒 This report has been signed by the tenant, so it can no longer be
-            edited. You can still download or email it.
+
+          <div class="phase-bar">
+            <button type="button" id="ph-in" onclick="setPhase('in')">
+              Move-In<small>left-hand columns</small>
+            </button>
+            <button type="button" id="ph-out" onclick="setPhase('out')">
+              Move-Out<small>right-hand columns</small>
+            </button>
           </div>
 
-          <fieldset id="form-fs">
-            <div class="form-section">
-              <h3>1. Details</h3>
-              <div class="type-toggle" style="margin-bottom: 14px">
-                <button type="button" id="t-in" onclick="setType('move_in')">
-                  Move-In
-                </button>
-                <button type="button" id="t-out" onclick="setType('move_out')">
-                  Move-Out
-                </button>
-              </div>
-              <div class="grid-2">
-                <div class="form-group">
-                  <label class="form-label">Building *</label>
-                  <select
-                    class="form-control"
-                    id="f-b"
-                    onchange="pickBuilding()"
-                  ></select>
-                </div>
-                <div class="form-group">
-                  <label class="form-label">Unit *</label>
-                  <select
-                    class="form-control"
-                    id="f-u"
-                    onchange="pickUnit()"
-                  ></select>
-                </div>
-                <div class="form-group">
-                  <label class="form-label">Inspection date *</label>
-                  <input type="date" class="form-control" id="f-date" />
-                </div>
-                <div class="form-group">
-                  <label class="form-label">Inspector</label>
-                  <input class="form-control" id="f-inspector" />
-                </div>
-                <div class="form-group">
-                  <label class="form-label">Tenant name</label>
-                  <input class="form-control" id="f-tname" />
-                </div>
-                <div class="form-group">
-                  <label class="form-label">Tenant email</label>
-                  <input type="email" class="form-control" id="f-temail" />
-                </div>
-                <div class="form-group">
-                  <label class="form-label">Electricity meter reading</label>
-                  <input class="form-control" id="f-elec" inputmode="decimal" />
-                </div>
-                <div class="form-group">
-                  <label class="form-label">Water meter reading</label>
-                  <input
-                    class="form-control"
-                    id="f-water"
-                    inputmode="decimal"
-                  />
-                </div>
-              </div>
-              <div class="form-group">
-                <label class="form-label"
-                  >Keys / access cards handed over</label
-                >
-                <input
-                  class="form-control"
-                  id="f-keys"
-                  placeholder="e.g. 2 keys, 1 access card, 1 parking card"
-                />
-              </div>
-              <div id="baseline-note" class="was" style="display: none"></div>
-            </div>
-
-            <div class="form-section">
-              <h3>2. Rooms</h3>
-              <div class="build-row">
-                <div class="form-group">
-                  <label class="form-label">Bedrooms</label
-                  ><input
-                    type="number"
-                    min="0"
-                    max="10"
-                    class="form-control"
-                    id="b-bed"
-                    value="1"
-                  />
-                </div>
-                <div class="form-group">
-                  <label class="form-label">Bathrooms</label
-                  ><input
-                    type="number"
-                    min="0"
-                    max="10"
-                    class="form-control"
-                    id="b-bath"
-                    value="1"
-                  />
-                </div>
-                <label class="chk"
-                  ><input type="checkbox" id="b-balc" checked /> Balcony</label
-                >
-                <label class="chk"
-                  ><input type="checkbox" id="b-maid" /> Maid room</label
-                >
-                <label class="chk"
-                  ><input type="checkbox" id="b-laundry" /> Laundry</label
-                >
-                <button
-                  type="button"
-                  class="btn btn-outline"
-                  onclick="buildRooms()"
-                >
-                  Build rooms
-                </button>
-              </div>
-              <div class="was" style="margin-top: 8px">
-                Tip: everything starts as "Good". Only change the items that are
-                not.
-              </div>
-            </div>
-
-            <div id="rooms"></div>
-
-            <div style="margin-bottom: 16px">
-              <select
-                class="form-control"
-                id="add-room-type"
-                style="max-width: 260px; display: inline-block"
-              ></select>
-              <button type="button" class="btn btn-outline" onclick="addRoom()">
-                + Add room
-              </button>
-            </div>
-
-            <div class="form-section">
-              <h3>3. General notes</h3>
-              <textarea
-                class="form-control"
-                id="f-notes"
-                rows="3"
-                placeholder="Anything else worth recording..."
-              ></textarea>
-            </div>
-          </fieldset>
-
-          <div class="form-section">
-            <h3>4. Tenant signature</h3>
-            <div class="sig-wrap"><canvas id="sig-canvas"></canvas></div>
-            <div style="margin-top: 8px" id="sig-tools">
-              <button
-                type="button"
-                class="btn btn-outline btn-sm"
-                onclick="clearSig()"
-              >
-                Clear signature
-              </button>
-              <span class="was" style="margin-left: 8px"
-                >Optional. Once signed and saved, the report is locked.</span
-              >
-            </div>
-          </div>
+          <div id="form-body"></div>
 
           <div class="sticky-bar">
             <button class="btn btn-outline" onclick="downloadPdf()">
@@ -540,11 +414,7 @@
             <button class="btn btn-outline" onclick="emailCurrent()">
               ✉ Email tenant
             </button>
-            <button
-              class="btn btn-green"
-              id="btn-save"
-              onclick="saveInspection()"
-            >
+            <button class="btn btn-green" id="btn-save" onclick="saveForm()">
               Save
             </button>
           </div>
@@ -564,8 +434,11 @@
       import {
         buildInspectionPdf,
         inspectionFilename,
-        CONDITIONS,
-        rank,
+        emptyForm,
+        emptyArea,
+        defaultAreas,
+        COND,
+        YN,
       } from "./js/inspection-pdf.js";
 
       const session = requireAuth();
@@ -576,100 +449,13 @@
       }
       renderNav("inspection");
 
-      // ── Room templates ────────────────────────────────────────────
-      const BASIC = [
-        "Walls",
-        "Ceiling",
-        "Floor",
-        "Door and lock",
-        "Lights and sockets",
-      ];
-      const ROOM_TYPES = {
-        entrance: {
-          label: "Entrance / Hallway",
-          items: [...BASIC, "Intercom / doorbell"],
-        },
-        living: {
-          label: "Living / Dining Room",
-          items: [
-            ...BASIC,
-            "Windows and curtain rails",
-            "Air conditioning",
-            "Balcony door",
-          ],
-        },
-        kitchen: {
-          label: "Kitchen",
-          items: [
-            "Walls and tiles",
-            "Ceiling",
-            "Floor",
-            "Cabinets",
-            "Countertop",
-            "Sink and tap",
-            "Hob / cooker",
-            "Oven",
-            "Extractor hood",
-            "Lights and sockets",
-            "Windows",
-          ],
-        },
-        bedroom: {
-          label: "Bedroom",
-          items: [
-            ...BASIC,
-            "Wardrobe",
-            "Windows and curtain rails",
-            "Air conditioning",
-          ],
-        },
-        bathroom: {
-          label: "Bathroom",
-          items: [
-            "Walls and tiles",
-            "Ceiling",
-            "Floor",
-            "Door and lock",
-            "Toilet",
-            "Washbasin and tap",
-            "Shower / bathtub",
-            "Mirror",
-            "Exhaust fan",
-            "Lights and sockets",
-          ],
-        },
-        balcony: {
-          label: "Balcony",
-          items: ["Floor", "Railing", "Sliding door", "Drain", "Lights"],
-        },
-        maid: {
-          label: "Maid Room",
-          items: [...BASIC, "Windows", "Attached bathroom"],
-        },
-        laundry: {
-          label: "Laundry / Store",
-          items: [
-            "Walls",
-            "Floor",
-            "Door",
-            "Water connection",
-            "Lights and sockets",
-          ],
-        },
-        other: {
-          label: "Other area",
-          items: ["Walls", "Floor", "Ceiling", "Lights and sockets"],
-        },
-      };
-
       // ── State ─────────────────────────────────────────────────────
       let buildings = [],
         units = [],
-        inspections = [];
-      let cur = null; // the inspection being edited
-      let baseline = null; // move-in inspection used for comparison
-      let locked = false;
-      let sigDirty = false;
+        forms = [];
+      let cur = null; // the form being edited
+      let phase = "in"; // which columns are being filled: 'in' or 'out'
+      const $ = (id) => document.getElementById(id);
       const esc = (s) =>
         String(s ?? "").replace(
           /[&<>"']/g,
@@ -682,7 +468,6 @@
               "'": "&#39;",
             })[c],
         );
-      const $ = (id) => document.getElementById(id);
       const byNum = (a, b) =>
         String(a).localeCompare(String(b), undefined, { numeric: true });
       const today = () => {
@@ -691,6 +476,33 @@
       };
       const bName = (id) => buildings.find((b) => b.id === id)?.name || "?";
       const uNo = (id) => units.find((u) => u.id === id)?.unit_number || "?";
+      const other = () => (phase === "in" ? "out" : "in");
+      const PH = { in: "Move-In", out: "Move-Out" };
+
+      // Read / write a value by path, e.g. "keys.2.qty_in"
+      const getP = (p) =>
+        p.split(".").reduce((o, k) => (o == null ? o : o[k]), cur);
+      const setPv = (p, v) => {
+        const ks = p.split(".");
+        const last = ks.pop();
+        ks.reduce((o, k) => o[k], cur)[last] = v;
+      };
+      window.setP = (el) =>
+        setPv(el.dataset.p, el.type === "checkbox" ? el.checked : el.value);
+      window.setSeg = (p, v) => {
+        setPv(p, getP(p) === v ? "" : v);
+        render();
+      };
+
+      // Small builders for inputs
+      const inp = (p, o = {}) =>
+        `<input class="form-control" data-p="${p}" value="${esc(getP(p))}" ${o.type ? `type="${o.type}"` : ""} ${o.mode ? `inputmode="${o.mode}"` : ""} ${o.ph ? `placeholder="${esc(o.ph)}"` : ""} oninput="setP(this)" />`;
+      const field = (label, p, o = {}) =>
+        `<div class="form-group ${o.full ? "full" : ""}"><label class="form-label">${label}</label>${inp(p, o)}</div>`;
+      const seg = (p, opts) =>
+        `<div class="seg">${opts.map(([v, l]) => `<button type="button" class="${getP(p) === v ? "on-" + v : ""}" onclick="setSeg('${p}','${v}')">${l}</button>`).join("")}</div>`;
+      const CONDS = Object.entries(COND).map(([k, v]) => [k, v]);
+      const YNS = Object.entries(YN).map(([k, v]) => [k, v]);
 
       // ── Load + list ───────────────────────────────────────────────
       async function init() {
@@ -698,7 +510,7 @@
           supabase.from("buildings").select("id, name").order("name"),
           supabase
             .from("units")
-            .select("id, building_id, unit_number, tenant_name, tenant_email"),
+            .select("id, building_id, unit_number, tenant_name"),
         ]);
         buildings = b.data || [];
         units = u.data || [];
@@ -707,72 +519,63 @@
           buildings
             .map((x) => `<option value="${x.id}">${esc(x.name)}</option>`)
             .join("");
-        $("f-b").innerHTML =
-          '<option value="">Select building...</option>' +
-          buildings
-            .map((x) => `<option value="${x.id}">${esc(x.name)}</option>`)
-            .join("");
-        $("add-room-type").innerHTML = Object.entries(ROOM_TYPES)
-          .map(([k, v]) => `<option value="${k}">${v.label}</option>`)
-          .join("");
         await loadList();
       }
 
       async function loadList() {
         const { data, error } = await supabase
-          .from("inspections")
+          .from("inspection_forms")
           .select("*")
           .order("created_at", { ascending: false });
         if (error) {
           $("list").innerHTML =
-            `<p style="color:var(--danger)">Could not load inspections. Has the inspections table been created in Supabase? (${esc(error.message)})</p>`;
+            `<p style="color:var(--danger)">Could not load the forms. Has inspections-setup.sql been run in Supabase? (${esc(error.message)})</p>`;
           return;
         }
-        inspections = data || [];
+        forms = data || [];
         renderList();
       }
 
       window.renderList = function () {
         const fb = $("f-building").value,
-          ft = $("f-type").value,
+          fs = $("f-status").value,
           q = $("f-search").value.toLowerCase().trim();
-        const list = inspections.filter(
-          (i) =>
-            (!fb || i.building_id === fb) &&
-            (!ft || i.type === ft) &&
+        const list = forms.filter(
+          (f) =>
+            (!fb || f.building_id === fb) &&
+            (!fs || (fs === "done" ? !!f.insp_out_date : !f.insp_out_date)) &&
             (!q ||
-              uNo(i.unit_id).toLowerCase().includes(q) ||
-              (i.tenant_name || "").toLowerCase().includes(q)),
+              uNo(f.unit_id).toLowerCase().includes(q) ||
+              (f.tenant_name || "").toLowerCase().includes(q)),
         );
         if (!list.length) {
           $("list").innerHTML =
-            '<div class="empty-state"><div class="empty-state-icon">📋</div><div class="empty-state-title">No inspections yet</div><div class="empty-state-text">Tap "+ New Inspection" to record a move-in or move-out.</div></div>';
+            '<div class="empty-state"><div class="empty-state-icon">📋</div><div class="empty-state-title">No forms yet</div><div class="empty-state-text">Tap "+ New Inspection Form" when a tenant moves in.</div></div>';
           return;
         }
         $("list").innerHTML = list
-          .map((i) => {
-            const out = i.type === "move_out";
-            const photos = (i.rooms || []).reduce(
-              (n, r) => n + (r.photos || []).length,
+          .map((f) => {
+            const photos = (f.areas || []).reduce(
+              (n, a) => n + (a.photos || []).length,
               0,
             );
-            return `<div class="insp-card ${out ? "out" : ""}">
+            return `<div class="insp-card">
             <div class="insp-card-top">
               <div>
-                <div class="insp-title">${esc(bName(i.building_id))} — Unit ${esc(uNo(i.unit_id))}</div>
-                <div class="insp-meta">${esc(i.tenant_name || "No tenant name")} · ${formatDate(i.inspection_date)} · ${(i.rooms || []).length} rooms · ${photos} photos</div>
+                <div class="insp-title">${esc(bName(f.building_id))} — Unit ${esc(uNo(f.unit_id))}</div>
+                <div class="insp-meta">${esc(f.tenant_name || "No tenant name")} · ${(f.areas || []).length} areas · ${photos} photos</div>
               </div>
               <div>
-                <span class="badge ${out ? "badge-orange" : "badge-blue"}">${out ? "Move-Out" : "Move-In"}</span>
-                <span class="badge ${i.status === "signed" ? "badge-green" : "badge-grey"}">${i.status === "signed" ? "Signed" : "Draft"}</span>
-                ${i.emailed_at ? '<span class="badge badge-green">Emailed</span>' : ""}
+                <span class="badge ${f.insp_in_date ? "badge-blue" : "badge-grey"}">${f.insp_in_date ? "Move-In " + formatDate(f.insp_in_date) : "Move-In pending"}</span>
+                <span class="badge ${f.insp_out_date ? "badge-orange" : "badge-grey"}">${f.insp_out_date ? "Move-Out " + formatDate(f.insp_out_date) : "Move-Out pending"}</span>
+                ${f.emailed_at ? '<span class="badge badge-green">Emailed</span>' : ""}
               </div>
             </div>
             <div class="insp-actions">
-              <button class="btn btn-outline btn-sm" onclick="openInspection('${i.id}')">${i.status === "signed" ? "View" : "Open / Edit"}</button>
-              <button class="btn btn-outline btn-sm" onclick="pdfFor('${i.id}')">⬇ PDF</button>
-              <button class="btn btn-outline btn-sm" onclick="emailFor('${i.id}')">✉ Email</button>
-              ${i.status !== "signed" ? `<button class="btn btn-danger btn-sm" onclick="deleteInspection('${i.id}')">Delete</button>` : ""}
+              <button class="btn btn-outline btn-sm" onclick="openForm('${f.id}')">${f.insp_in_date && !f.insp_out_date ? "Do Move-Out" : "Open / Edit"}</button>
+              <button class="btn btn-outline btn-sm" onclick="pdfFor('${f.id}')">⬇ PDF</button>
+              <button class="btn btn-outline btn-sm" onclick="emailFor('${f.id}')">✉ Email</button>
+              <button class="btn btn-danger btn-sm" onclick="deleteForm('${f.id}')">Delete</button>
             </div>
           </div>`;
           })
@@ -790,216 +593,250 @@
         loadList();
       };
 
-      window.newInspection = function () {
-        cur = {
-          id: crypto.randomUUID(),
-          isNew: true,
-          type: "move_in",
-          rooms: [],
-          tenant_signature: null,
-        };
-        baseline = null;
-        locked = false;
-        sigDirty = false;
-        fillForm();
+      window.newForm = function () {
+        cur = emptyForm();
+        cur.inspector = session.full_name || "";
+        phase = "in";
         show("form");
-        initSig();
+        render();
       };
-
-      window.openInspection = async function (id) {
-        const i = inspections.find((x) => x.id === id);
-        if (!i) return;
-        cur = JSON.parse(JSON.stringify(i));
+      window.openForm = function (id) {
+        const f = forms.find((x) => x.id === id);
+        if (!f) return;
+        cur = JSON.parse(JSON.stringify(f));
         cur.isNew = false;
-        locked = i.status === "signed";
-        sigDirty = false;
-        fillForm();
+        // Show blanks (not nulls) in the inputs
+        Object.keys(cur).forEach((k) => {
+          if (cur[k] === null) cur[k] = "";
+        });
+        phase = cur.insp_in_date ? "out" : "in";
         show("form");
-        initSig();
-        await findBaseline();
-        renderRooms();
+        render();
+      };
+      window.setPhase = function (p) {
+        phase = p;
+        render();
       };
 
-      function fillForm() {
-        const c = cur;
-        $("form-title").innerHTML = c.isNew
-          ? "New <span>Inspection</span>"
-          : "Inspection <span>Report</span>";
-        $("form-sub").textContent = "";
-        $("f-b").value = c.building_id || "";
-        fillUnits();
-        $("f-u").value = c.unit_id || "";
-        $("f-date").value = (c.inspection_date || today()).slice(0, 10);
-        $("f-inspector").value = c.inspector ?? session.full_name ?? "";
-        $("f-tname").value = c.tenant_name || "";
-        $("f-temail").value = c.tenant_email || "";
-        $("f-elec").value = c.electricity_meter || "";
-        $("f-water").value = c.water_meter || "";
-        $("f-keys").value = c.keys_count || "";
-        $("f-notes").value = c.general_notes || "";
-        setType(c.type);
-        $("form-fs").disabled = locked;
-        $("signed-notice").style.display = locked ? "" : "none";
-        $("btn-save").style.display = locked ? "none" : "";
-        $("sig-tools").style.display = locked ? "none" : "";
-        $("baseline-note").style.display = "none";
-        renderRooms();
-      }
+      // ── Render the whole form ─────────────────────────────────────
+      function render() {
+        if (!cur) return;
+        $("ph-in").classList.toggle("on", phase === "in");
+        $("ph-out").classList.toggle("on", phase === "out");
+        $("form-title").innerHTML = cur.isNew
+          ? "New Inspection <span>Form</span>"
+          : `${esc(bName(cur.building_id))} <span>Unit ${esc(uNo(cur.unit_id))}</span>`;
+        const dateKey = `insp_${phase}_date`;
+        const unitList = units
+          .filter((u) => u.building_id === cur.building_id)
+          .sort((a, b) => byNum(a.unit_number, b.unit_number));
 
-      function fillUnits() {
-        const b = $("f-b").value;
-        const list = units
-          .filter((u) => u.building_id === b)
-          .sort((x, y) => byNum(x.unit_number, y.unit_number));
-        $("f-u").innerHTML =
-          '<option value="">Select unit...</option>' +
-          list
+        $("form-body").innerHTML = `
+        <div class="form-section">
+          <h3>${PH[phase]} Inspection</h3>
+          <div class="hint">Tick items as you walk through the unit. The ${PH[other()]} side of the form stays as it is.</div>
+          <div class="grid-2">
+            ${field(PH[phase] + " inspection date", dateKey, { type: "date" })}
+            ${field("Inspector", "inspector")}
+          </div>
+        </div>
+
+        <div class="form-section">
+          <h3>1. Property &amp; Tenancy Details</h3>
+          <div class="grid-2">
+            <div class="form-group"><label class="form-label">Property / Building Name *</label>
+              <select class="form-control" onchange="pickBuilding(this.value)"><option value="">Select building...</option>${buildings.map((b) => `<option value="${b.id}" ${b.id === cur.building_id ? "selected" : ""}>${esc(b.name)}</option>`).join("")}</select></div>
+            <div class="form-group"><label class="form-label">Unit No. *</label>
+              <select class="form-control" onchange="pickUnit(this.value)"><option value="">Select unit...</option>${unitList.map((u) => `<option value="${u.id}" ${u.id === cur.unit_id ? "selected" : ""}>${esc(u.unit_number)}</option>`).join("")}</select></div>
+            ${field("Location / Community", "location", { full: true })}
+            ${field("Landlord name", "landlord_name", { full: true })}
+            ${field("Landlord Emirates ID", "landlord_eid")}
+            ${field("Landlord tel", "landlord_tel", { mode: "tel" })}
+            ${field("Landlord email", "landlord_email", { type: "email", full: true })}
+            ${field("Tenant name", "tenant_name", { full: true })}
+            ${field("Tenancy contract no.", "contract_no")}
+            ${field("Ejari registration no.", "ejari_no")}
+            ${field("Contract period (from)", "contract_from", { type: "date" })}
+            ${field("Contract period (to)", "contract_to", { type: "date" })}
+            ${field("Annual rent (AED)", "annual_rent", { mode: "decimal" })}
+            ${field("Security deposit (AED)", "security_deposit", { mode: "decimal" })}
+            ${field("Move-in date", "move_in_date", { type: "date" })}
+            ${field("Move-out date", "move_out_date", { type: "date" })}
+          </div>
+        </div>
+
+        <div class="form-section">
+          <h3>2. Tenant Contact Information</h3>
+          <div class="grid-2">
+            ${field("Mobile number", "tenant_mobile", { mode: "tel" })}
+            ${field("Email address", "tenant_email", { type: "email" })}
+            ${field("Emirates ID no.", "emirates_id")}
+            ${field("Nationality", "nationality")}
+            ${field("Passport no.", "passport_no")}
+            ${field("Forwarding address (Move-Out)", "forwarding_address")}
+          </div>
+        </div>
+
+        <div class="form-section">
+          <h3>3. Occupants Residing in the Unit</h3>
+          <div class="hint">Occupancy is limited to the registered Tenant and immediate family members only.</div>
+          ${cur.occupants
             .map(
-              (u) =>
-                `<option value="${u.id}">${esc(u.unit_number)} — ${esc(u.tenant_name || "Vacant")}</option>`,
+              (o, i) => `<div class="row-card"><div class="row-fields">
+              <span class="n" style="width:20px;color:var(--text-muted)">${i + 1}</span>
+              ${inp(`occupants.${i}.name`, { ph: "Full name" })}${inp(`occupants.${i}.relationship`, { ph: "Relationship to tenant" })}${inp(`occupants.${i}.id_no`, { ph: "Emirates ID / Passport no." })}
+            </div></div>`,
             )
-            .join("");
+            .join("")}
+          <button type="button" class="btn btn-outline btn-sm" onclick="addOccupant()">+ Add occupant</button>
+        </div>
+
+        <div class="form-section">
+          <h3>4. Utility Accounts &amp; Meter Readings</h3>
+          <div class="hint">The Tenant transfers utility accounts into their own name at move-in, and settles final bills at move-out.</div>
+          ${cur.utilities
+            .map(
+              (u, i) => `<div class="row-card">
+              <div class="row-name">${esc(u.name)}</div>
+              <div class="row-fields">${inp(`utilities.${i}.account`, { ph: "Account no." })}${inp(`utilities.${i}.read_${phase}`, { ph: "Reading at " + PH[phase] })}</div>
+              ${u["read_" + other()] ? `<div class="other">${PH[other()]} reading: <b>${esc(u["read_" + other()])}</b></div>` : ""}
+            </div>`,
+            )
+            .join("")}
+        </div>
+
+        <div class="form-section">
+          <h3>5. Keys &amp; Access Devices</h3>
+          <div class="hint">${phase === "in" ? "Quantity issued to the tenant, and tick when the tenant confirms." : "Quantity returned by the tenant, and tick when confirmed."}</div>
+          ${cur.keys
+            .map(
+              (k, i) => `<div class="row-card">
+              <div class="row-name">${esc(k.item)}</div>
+              <div class="row-fields">
+                ${inp(`keys.${i}.qty_${phase}`, { mode: "numeric", ph: phase === "in" ? "Qty issued" : "Qty returned" })}
+                <label class="chk"><input type="checkbox" data-p="keys.${i}.conf_${phase}" ${k["conf_" + phase] ? "checked" : ""} onchange="setP(this)" /> Confirmed</label>
+              </div>
+              ${k["qty_" + other()] || k["conf_" + other()] ? `<div class="other">${PH[other()]}: <b>${esc(k["qty_" + other()] || "-")}</b>${k["conf_" + other()] ? " (confirmed)" : ""}</div>` : ""}
+            </div>`,
+            )
+            .join("")}
+        </div>
+
+        <div class="form-section">
+          <h3>6. Unit Condition Inspection</h3>
+          <div class="hint">Condition key: Good · Fair · Poor · N/A (area not in this unit).</div>
+          <div class="build-row">
+            <div class="form-group"><label class="form-label">Bedrooms</label><input type="number" min="0" max="10" class="form-control" id="b-bed" value="${Math.max(0, cur.areas.filter((a) => /bedroom/i.test(a.name)).length)}" /></div>
+            <div class="form-group"><label class="form-label">Bathrooms</label><input type="number" min="0" max="10" class="form-control" id="b-bath" value="${cur.areas.filter((a) => /^bathroom/i.test(a.name)).length}" /></div>
+            <button type="button" class="btn btn-outline" onclick="rebuildAreas()">Rebuild areas</button>
+          </div>
+          ${cur.areas.map((a, i) => areaHtml(a, i)).join("")}
+          <div style="margin-top:12px"><button type="button" class="btn btn-outline btn-sm" onclick="addArea()">+ Add area</button></div>
+
+          <h3 style="margin-top:22px">${PH[phase]} remarks ${phase === "in" ? "(recorded prior to handover)" : ""}</h3>
+          ${cur["remarks_" + phase].map((r, i) => `<div class="num-row"><span class="n">${i + 1}</span>${inp(`remarks_${phase}.${i}`, { ph: "Remark..." })}<button type="button" class="btn btn-outline btn-sm" onclick="delRemark(${i})">×</button></div>`).join("")}
+          <button type="button" class="btn btn-outline btn-sm" onclick="addRemark()">+ Add remark</button>
+          ${
+            cur["remarks_" + other()].some((t) => t && t.trim())
+              ? `<div class="other" style="margin-top:10px">${PH[other()]} remarks:<br>${cur[
+                  "remarks_" + other()
+                ]
+                  .filter((t) => t && t.trim())
+                  .map((t, i) => `${i + 1}. ${esc(t)}`)
+                  .join("<br>")}</div>`
+              : ""
+          }
+        </div>
+
+        <div class="form-section">
+          <h3>7. Appliances &amp; Fixtures <span style="text-transform:none;font-weight:500;color:var(--text-muted)">(if furnished / semi-furnished)</span></h3>
+          ${cur.appliances
+            .map(
+              (a, i) => `<div class="row-card">
+              <div class="row-name">${esc(a.name)}</div>
+              <div class="row-fields">${seg(`appliances.${i}.w_${phase}`, YNS)}${inp(`appliances.${i}.remarks`, { ph: "Remarks" })}</div>
+              ${a["w_" + other()] ? `<div class="other">${PH[other()]} working: <b>${YN[a["w_" + other()]]}</b></div>` : ""}
+            </div>`,
+            )
+            .join("")}
+        </div>
+
+        <div class="form-section">
+          <h3>8. Documents Collected From Tenant (Move-In)</h3>
+          ${cur.documents
+            .map(
+              (d, i) => `<div class="row-card">
+              <div class="row-name">${i + 1}. ${esc(d.name)}</div>
+              ${seg(`documents.${i}.status`, [
+                ["Y", "Received"],
+                ["NA", "N/A"],
+              ])}
+            </div>`,
+            )
+            .join("")}
+        </div>`;
       }
 
-      window.pickBuilding = function () {
-        fillUnits();
+      function areaHtml(a, i) {
+        const o = other();
+        const oc = a[o + "_cond"],
+          orem = a[o + "_rem"];
+        return `<div class="row-card">
+          <div class="row-name"><input value="${esc(a.name)}" data-p="areas.${i}.name" oninput="setP(this)" />
+            <button type="button" class="btn btn-outline btn-sm" onclick="delArea(${i})">Remove</button></div>
+          ${seg(`areas.${i}.${phase}_cond`, CONDS)}
+          <input class="form-control" style="margin-top:8px" data-p="areas.${i}.${phase}_rem" value="${esc(a[phase + "_rem"])}" placeholder="${PH[phase]} remarks (e.g. damage, marks)" oninput="setP(this)" />
+          ${oc || orem ? `<div class="other">${PH[o]}: <b>${oc ? COND[oc] : "-"}</b>${orem ? " — " + esc(orem) : ""}</div>` : ""}
+          <div class="photos">
+            ${(a.photos || []).map((p, pi) => `<div class="photo"><img src="${esc(p.url || p.data)}" alt="" /><i>${p.phase === "out" ? "OUT" : "IN"}</i>${p.phase === phase ? `<button type="button" onclick="removePhoto(${i},${pi})">×</button>` : ""}</div>`).join("")}
+            <label class="add-photo"><span style="font-size:1.4rem">📷</span>Add photos<input type="file" accept="image/*" multiple hidden onchange="addPhotos(${i}, this)" /></label>
+          </div>
+        </div>`;
+      }
+
+      // ── Form actions ──────────────────────────────────────────────
+      window.pickBuilding = (id) => {
+        cur.building_id = id;
         cur.unit_id = "";
-        baseline = null;
-        renderRooms();
+        render();
       };
-      window.pickUnit = async function () {
-        const u = units.find((x) => x.id === $("f-u").value);
-        if (u) {
-          if (!$("f-tname").value) $("f-tname").value = u.tenant_name || "";
-          if (!$("f-temail").value) $("f-temail").value = u.tenant_email || "";
-        }
-        await findBaseline();
-        renderRooms();
+      window.pickUnit = (id) => {
+        cur.unit_id = id;
       };
-      window.setType = async function (t) {
-        cur.type = t;
-        $("t-in").classList.toggle("on", t === "move_in");
-        $("t-out").classList.toggle("on", t === "move_out");
-        await findBaseline();
-        renderRooms();
+      window.addOccupant = () => {
+        cur.occupants.push({ name: "", relationship: "", id_no: "" });
+        render();
       };
-
-      // For a move-out, find the unit's latest move-in report to compare against
-      async function findBaseline() {
-        baseline = null;
-        const note = $("baseline-note");
-        note.style.display = "none";
-        const uid = $("f-u").value;
-        if (cur.type !== "move_out" || !uid) return;
-        const { data } = await supabase
-          .from("inspections")
-          .select("*")
-          .eq("unit_id", uid)
-          .eq("type", "move_in")
-          .order("inspection_date", { ascending: false })
-          .limit(1);
-        baseline = data && data[0] ? data[0] : null;
-        note.style.display = "";
-        note.textContent = baseline
-          ? `Comparing with the move-in report dated ${formatDate(baseline.inspection_date)}. Items that got worse are marked in red.`
-          : "No move-in report found for this unit, so there is nothing to compare with.";
-      }
-
-      // ── Rooms ─────────────────────────────────────────────────────
-      const mkRoom = (type, name) => ({
-        id: crypto.randomUUID(),
-        name: name || ROOM_TYPES[type].label,
-        type,
-        items: ROOM_TYPES[type].items.map((n) => ({
-          name: n,
-          cond: "Good",
-          note: "",
-        })),
-        photos: [],
-        note: "",
-      });
-
-      window.buildRooms = async function () {
+      window.addRemark = () => {
+        cur["remarks_" + phase].push("");
+        render();
+      };
+      window.delRemark = (i) => {
+        const l = cur["remarks_" + phase];
+        l.splice(i, 1);
+        if (!l.length) l.push("");
+        render();
+      };
+      window.addArea = () => {
+        cur.areas.push(emptyArea("New area"));
+        render();
+      };
+      window.delArea = async (i) => {
+        if (!(await showConfirm("Remove this area (and its photos)?"))) return;
+        cur.areas.splice(i, 1);
+        render();
+      };
+      window.rebuildAreas = async () => {
+        const bed = Math.max(0, parseInt($("b-bed").value) || 0),
+          bath = Math.max(0, parseInt($("b-bath").value) || 0);
         if (
-          cur.rooms.length &&
           !(await showConfirm(
-            "This replaces the current rooms and anything you entered in them. Continue?",
+            "This replaces the area list, including anything entered under Section 6. Continue?",
           ))
         )
           return;
-        const bed = Math.max(0, parseInt($("b-bed").value) || 0);
-        const bath = Math.max(0, parseInt($("b-bath").value) || 0);
-        const r = [mkRoom("entrance"), mkRoom("living"), mkRoom("kitchen")];
-        if (bed === 0) r.push(mkRoom("bedroom", "Studio Room"));
-        for (let i = 1; i <= bed; i++)
-          r.push(
-            mkRoom("bedroom", i === 1 ? "Master Bedroom" : "Bedroom " + i),
-          );
-        for (let i = 1; i <= bath; i++)
-          r.push(mkRoom("bathroom", bath > 1 ? "Bathroom " + i : "Bathroom"));
-        if ($("b-balc").checked) r.push(mkRoom("balcony"));
-        if ($("b-maid").checked) r.push(mkRoom("maid"));
-        if ($("b-laundry").checked) r.push(mkRoom("laundry"));
-        cur.rooms = r;
-        renderRooms();
-      };
-      window.addRoom = function () {
-        cur.rooms.push(mkRoom($("add-room-type").value));
-        renderRooms();
-      };
-      window.removeRoom = async function (ri) {
-        if (!(await showConfirm("Remove this room?"))) return;
-        cur.rooms.splice(ri, 1);
-        renderRooms();
-      };
-
-      const baseItem = (room, item) => {
-        if (!baseline) return null;
-        const br = (baseline.rooms || []).find((r) => r.name === room.name);
-        return br ? (br.items || []).find((i) => i.name === item.name) : null;
-      };
-
-      function renderRooms() {
-        if (!cur) return;
-        $("rooms").innerHTML = cur.rooms
-          .map(
-            (r, ri) => `
-          <div class="room">
-            <div class="room-head">
-              <input value="${esc(r.name)}" onchange="cur_room(${ri}).name=this.value" />
-              <button type="button" class="btn btn-outline btn-sm" onclick="removeRoom(${ri})">Remove</button>
-            </div>
-            <div class="room-body">
-              ${r.items
-                .map((it, ii) => {
-                  const b = baseItem(r, it);
-                  const worse = b && rank(it.cond) > rank(b.cond);
-                  return `<div class="item">
-                  <div class="item-row">
-                    <div class="item-name">${esc(it.name)}</div>
-                    <div class="cond">${CONDITIONS.map((c) => `<button type="button" class="${it.cond === c ? "on-" + c : ""}" onclick="setCond(${ri},${ii},'${c}')">${c}</button>`).join("")}</div>
-                  </div>
-                  ${b ? `<div class="was ${worse ? "worse" : ""}">Move-in: ${esc(b.cond)}${b.note ? " — " + esc(b.note) : ""}${worse ? "  ⚠ worse now" : ""}</div>` : ""}
-                  ${it.cond !== "Good" ? `<input class="form-control item-note" placeholder="Describe the damage / issue..." value="${esc(it.note)}" onchange="cur_item(${ri},${ii}).note=this.value" />` : ""}
-                </div>`;
-                })
-                .join("")}
-              <textarea class="form-control" rows="2" style="margin-top:12px" placeholder="Notes for this room (optional)" onchange="cur_room(${ri}).note=this.value">${esc(r.note)}</textarea>
-              <div class="photos">
-                ${(r.photos || []).map((p, pi) => `<div class="photo"><img src="${esc(p.url || p.data)}" alt="" />${locked ? "" : `<button type="button" onclick="removePhoto(${ri},${pi})">×</button>`}</div>`).join("")}
-                ${locked ? "" : `<label class="add-photo"><span style="font-size:1.4rem">📷</span>Add photos<input type="file" accept="image/*" multiple hidden onchange="addPhotos(${ri}, this)" /></label>`}
-              </div>
-            </div>
-          </div>`,
-          )
-          .join("");
-      }
-      window.cur_room = (ri) => cur.rooms[ri];
-      window.cur_item = (ri, ii) => cur.rooms[ri].items[ii];
-      window.setCond = function (ri, ii, c) {
-        cur.rooms[ri].items[ii].cond = c;
-        if (c === "Good") cur.rooms[ri].items[ii].note = "";
-        renderRooms();
+        cur.areas = defaultAreas(bed, bath, true);
+        render();
       };
 
       // ── Photos: shrink on the phone before anything is sent ───────
@@ -1025,233 +862,190 @@
         }
         return out;
       }
-      window.addPhotos = async function (ri, input) {
+      window.addPhotos = async function (i, input) {
         const files = [...input.files];
         input.value = "";
         for (const f of files) {
           try {
-            cur.rooms[ri].photos.push({ data: await compress(f) });
+            cur.areas[i].photos.push({ data: await compress(f), phase });
           } catch (e) {
             showToast("Could not read one of the photos.", "error");
           }
         }
-        renderRooms();
+        render();
       };
-      window.removePhoto = function (ri, pi) {
-        cur.rooms[ri].photos.splice(pi, 1);
-        renderRooms();
+      window.removePhoto = (i, pi) => {
+        cur.areas[i].photos.splice(pi, 1);
+        render();
       };
-
-      // ── Signature pad ─────────────────────────────────────────────
-      let sigCtx,
-        drawing = false;
-      function initSig() {
-        const c = $("sig-canvas");
-        const r = c.getBoundingClientRect();
-        c.width = Math.round(r.width * 2);
-        c.height = Math.round(r.height * 2);
-        sigCtx = c.getContext("2d");
-        sigCtx.scale(2, 2);
-        sigCtx.lineWidth = 2.2;
-        sigCtx.lineCap = "round";
-        sigCtx.strokeStyle = "#111";
-        sigCtx.clearRect(0, 0, c.width, c.height);
-        if (cur.tenant_signature) {
-          const img = new Image();
-          img.onload = () => sigCtx.drawImage(img, 0, 0, r.width, r.height);
-          img.src = cur.tenant_signature;
-        }
-        if (!c.dataset.bound) {
-          c.dataset.bound = "1";
-          const pos = (e) => {
-            const b = c.getBoundingClientRect();
-            return [e.clientX - b.left, e.clientY - b.top];
-          };
-          c.addEventListener("pointerdown", (e) => {
-            if (locked) return;
-            drawing = true;
-            c.setPointerCapture(e.pointerId);
-            const [x, y] = pos(e);
-            sigCtx.beginPath();
-            sigCtx.moveTo(x, y);
-          });
-          c.addEventListener("pointermove", (e) => {
-            if (!drawing) return;
-            const [x, y] = pos(e);
-            sigCtx.lineTo(x, y);
-            sigCtx.stroke();
-            sigDirty = true;
-          });
-          const end = () => {
-            drawing = false;
-          };
-          c.addEventListener("pointerup", end);
-          c.addEventListener("pointercancel", end);
-        }
-      }
-      window.clearSig = function () {
-        const c = $("sig-canvas");
-        sigCtx.clearRect(0, 0, c.width, c.height);
-        cur.tenant_signature = null;
-        sigDirty = false;
-      };
-      function currentSignature() {
-        if (sigDirty) return $("sig-canvas").toDataURL("image/png");
-        return cur.tenant_signature || null;
-      }
-
-      // ── Read the form into an inspection object ───────────────────
-      function collect() {
-        const sig = currentSignature();
-        return {
-          id: cur.id,
-          building_id: $("f-b").value,
-          unit_id: $("f-u").value,
-          type: cur.type,
-          inspection_date: $("f-date").value,
-          inspector: $("f-inspector").value.trim() || null,
-          tenant_name: $("f-tname").value.trim() || null,
-          tenant_email: $("f-temail").value.trim() || null,
-          electricity_meter: $("f-elec").value.trim() || null,
-          water_meter: $("f-water").value.trim() || null,
-          keys_count: $("f-keys").value.trim() || null,
-          general_notes: $("f-notes").value.trim() || null,
-          rooms: cur.rooms,
-          tenant_signature: sig,
-          signed_at: sig
-            ? cur.signed_at && !sigDirty
-              ? cur.signed_at
-              : new Date().toISOString()
-            : null,
-          status: sig ? "signed" : "draft",
-        };
-      }
 
       // ── Save ──────────────────────────────────────────────────────
-      window.saveInspection = async function () {
-        const row = collect();
-        if (!row.building_id || !row.unit_id || !row.inspection_date) {
-          showToast("Choose a building, unit and date.", "error");
+      const COLS = [
+        "building_id",
+        "unit_id",
+        "location",
+        "landlord_name",
+        "landlord_eid",
+        "landlord_tel",
+        "landlord_email",
+        "tenant_name",
+        "contract_no",
+        "ejari_no",
+        "contract_from",
+        "contract_to",
+        "annual_rent",
+        "security_deposit",
+        "move_in_date",
+        "move_out_date",
+        "tenant_mobile",
+        "tenant_email",
+        "emirates_id",
+        "nationality",
+        "passport_no",
+        "forwarding_address",
+        "inspector",
+        "insp_in_date",
+        "insp_out_date",
+        "occupants",
+        "utilities",
+        "keys",
+        "areas",
+        "remarks_in",
+        "remarks_out",
+        "appliances",
+        "documents",
+      ];
+      const DATES = [
+        "contract_from",
+        "contract_to",
+        "move_in_date",
+        "move_out_date",
+        "insp_in_date",
+        "insp_out_date",
+      ];
+      const NUMS = ["annual_rent", "security_deposit"];
+
+      function payload() {
+        const row = { id: cur.id };
+        COLS.forEach((c) => {
+          row[c] = cur[c];
+        });
+        DATES.forEach((c) => {
+          if (!row[c]) row[c] = null;
+        });
+        NUMS.forEach((c) => {
+          row[c] =
+            row[c] === "" || row[c] == null
+              ? null
+              : parseFloat(String(row[c]).replace(/,/g, "")) || 0;
+        });
+        return row;
+      }
+
+      window.saveForm = async function () {
+        if (!cur.building_id || !cur.unit_id) {
+          showToast("Choose the building and unit first.", "error");
           return;
         }
-        if (!row.rooms.length) {
-          showToast("Build or add at least one room first.", "error");
-          return;
-        }
-        if (
-          row.status === "signed" &&
-          !(await showConfirm(
-            "Saving with a signature locks this report. Continue?",
-          ))
-        )
-          return;
+        const dk = `insp_${phase}_date`;
+        if (!cur[dk]) cur[dk] = today();
         const btn = $("btn-save");
         btn.disabled = true;
         try {
           // 1. Upload new photos to the server
-          let n = 0;
-          const total = row.rooms.reduce(
-            (s, r) => s + r.photos.filter((p) => !p.url).length,
-            0,
+          const pending = cur.areas.flatMap((a) =>
+            a.photos.filter((p) => !p.url),
           );
-          for (const r of row.rooms)
-            for (const p of r.photos) {
-              if (p.url) continue;
-              btn.textContent = `Uploading photo ${++n} of ${total}...`;
-              const res = await fetch("/api/inspection-photo", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ inspectionId: row.id, data: p.data }),
-              });
-              const j = await res.json().catch(() => ({}));
-              if (!res.ok || !j.url)
-                throw new Error(
-                  j.error ||
-                    "Photo upload failed (photos can only be saved on the live server)",
-                );
-              p.url = j.url;
-              delete p.data;
-            }
-          // 2. Save the report
+          let n = 0;
+          for (const p of pending) {
+            btn.textContent = `Uploading photo ${++n} of ${pending.length}...`;
+            const res = await fetch("/api/inspection-photo", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ inspectionId: cur.id, data: p.data }),
+            });
+            const j = await res.json().catch(() => ({}));
+            if (!res.ok || !j.url)
+              throw new Error(
+                j.error ||
+                  "Photo upload failed (photos can only be saved on the live server)",
+              );
+            p.url = j.url;
+            delete p.data;
+          }
+          // 2. Save the form
           btn.textContent = "Saving...";
-          const payload = { ...row, created_by: session.full_name };
-          const q = cur.isNew
-            ? supabase.from("inspections").insert(payload)
-            : supabase.from("inspections").update(payload).eq("id", row.id);
-          const { error } = await q;
+          const row = { ...payload(), updated_at: new Date().toISOString() };
+          let error;
+          if (cur.isNew)
+            ({ error } = await supabase
+              .from("inspection_forms")
+              .insert({ ...row, created_by: session.full_name }));
+          else
+            ({ error } = await supabase
+              .from("inspection_forms")
+              .update(row)
+              .eq("id", cur.id));
           if (error) throw new Error(error.message);
-          showToast("Inspection saved.");
+          showToast(PH[phase] + " inspection saved.");
           backToList();
         } catch (err) {
           console.error(err);
           showToast(err.message, "error");
-          renderRooms();
+          render();
         }
         btn.disabled = false;
         btn.textContent = "Save";
       };
 
-      window.deleteInspection = async function (id) {
+      window.deleteForm = async function (id) {
         if (
-          !(await showConfirm("Delete this inspection? This cannot be undone."))
+          !(await showConfirm(
+            "Delete this inspection form? This cannot be undone.",
+          ))
         )
           return;
-        await supabase.from("inspections").delete().eq("id", id);
+        await supabase.from("inspection_forms").delete().eq("id", id);
         showToast("Deleted.");
         loadList();
       };
 
       // ── PDF + email ───────────────────────────────────────────────
-      async function pdfData(insp) {
-        let base = null;
-        if (insp.type === "move_out") {
-          const { data } = await supabase
-            .from("inspections")
-            .select("*")
-            .eq("unit_id", insp.unit_id)
-            .eq("type", "move_in")
-            .order("inspection_date", { ascending: false })
-            .limit(1);
-          base = data && data[0] ? data[0] : null;
-        }
-        const ctx = {
-          buildingName: bName(insp.building_id),
-          unitNumber: uNo(insp.unit_id),
-          baseline: base,
-        };
-        return { doc: await buildInspectionPdf(insp, ctx), ctx };
-      }
-      async function doPdf(insp) {
+      const ctxFor = (f) => ({
+        buildingName: bName(f.building_id),
+        unitNumber: uNo(f.unit_id),
+      });
+      async function doPdf(f) {
         showToast("Building PDF...");
         try {
-          const { doc, ctx } = await pdfData(insp);
-          doc.save(inspectionFilename(insp, ctx));
+          const doc = await buildInspectionPdf(f, ctxFor(f));
+          doc.save(inspectionFilename(f, ctxFor(f)));
         } catch (e) {
           console.error(e);
           showToast("Could not build the PDF: " + e.message, "error");
         }
       }
-      async function doEmail(insp) {
-        let to =
-          insp.tenant_email || window.prompt("Tenant email address:", "");
+      async function doEmail(f) {
+        let to = f.tenant_email || window.prompt("Tenant email address:", "");
         if (!to) return;
         to = to.trim();
         showToast("Preparing email...");
         try {
-          const { doc, ctx } = await pdfData(insp);
+          const ctx = ctxFor(f);
+          const doc = await buildInspectionPdf(f, ctx);
           const b64 = doc.output("datauristring").split(",")[1];
           const res = await fetch("/api/send-inspection", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
               to,
-              tenantName: insp.tenant_name,
+              tenantName: f.tenant_name,
               buildingName: ctx.buildingName,
               unitNumber: ctx.unitNumber,
-              type: insp.type,
-              date: insp.inspection_date,
+              type: f.insp_out_date ? "move_out" : "move_in",
+              date: f.insp_out_date || f.insp_in_date,
               pdfBase64: b64,
-              filename: inspectionFilename(insp, ctx),
+              filename: inspectionFilename(f, ctx),
             }),
           });
           const j = await res.json().catch(() => ({}));
@@ -1259,28 +1053,29 @@
             throw new Error(
               j.error || "Email failed (emails only work on the live server)",
             );
+          const stamp = new Date().toISOString();
           await supabase
-            .from("inspections")
-            .update({ emailed_at: new Date().toISOString(), tenant_email: to })
-            .eq("id", insp.id);
-          insp.emailed_at = new Date().toISOString();
-          showToast("Report emailed to " + to);
+            .from("inspection_forms")
+            .update({ emailed_at: stamp })
+            .eq("id", f.id);
+          f.emailed_at = stamp;
+          showToast("Form emailed to " + to);
         } catch (e) {
           console.error(e);
           showToast(e.message, "error");
         }
       }
-      window.pdfFor = (id) => doPdf(inspections.find((x) => x.id === id));
-      window.emailFor = (id) => doEmail(inspections.find((x) => x.id === id));
-      // From inside the form: use what is on screen (photos not yet saved are included)
-      window.downloadPdf = () =>
-        doPdf({ ...collect(), emailed_at: cur.emailed_at });
-      window.emailCurrent = async () => {
-        if (cur.isNew || !inspections.find((x) => x.id === cur.id)) {
-          showToast("Save the inspection first, then email it.", "error");
+      window.pdfFor = (id) => doPdf(forms.find((x) => x.id === id));
+      window.emailFor = (id) => doEmail(forms.find((x) => x.id === id));
+      // From inside the form: uses what is on screen, including unsaved photos
+      window.downloadPdf = () => doPdf(cur);
+      window.emailCurrent = () => {
+        const saved = forms.find((x) => x.id === cur.id);
+        if (cur.isNew || !saved) {
+          showToast("Save the form first, then email it.", "error");
           return;
         }
-        doEmail(inspections.find((x) => x.id === cur.id));
+        doEmail(saved);
       };
 
       init();
