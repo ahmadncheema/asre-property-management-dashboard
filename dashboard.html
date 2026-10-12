@@ -603,7 +603,52 @@
           gap: 4px;
         }
       }
+      .mr-btn-row {
+        display: flex;
+        justify-content: flex-end;
+        margin-bottom: 16px;
+      }
+      .mr-building-list {
+        max-height: 240px;
+        overflow-y: auto;
+        border: 1px solid var(--border);
+        border-radius: var(--radius-sm);
+        padding: 6px;
+      }
+      .mr-building-item {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 10px;
+        border-radius: 6px;
+        cursor: pointer;
+        font-size: 0.9rem;
+      }
+      .mr-building-item:hover {
+        background: rgba(42, 85, 144, 0.15);
+      }
+      .mr-building-item input {
+        width: 18px;
+        height: 18px;
+        flex-shrink: 0;
+      }
+      .mr-row {
+        display: flex;
+        gap: 10px;
+      }
+      .mr-row .form-control {
+        flex: 1;
+      }
+      @media (max-width: 600px) {
+        .mr-btn-row .btn {
+          width: 100%;
+        }
+        .mr-row {
+          flex-direction: column;
+        }
+      }
     </style>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   </head>
   <body>
     <nav id="main-nav"></nav>
@@ -617,6 +662,12 @@
             <span id="greeting-name"></span> 👋
           </h1>
           <p id="greeting-date" style="display: none"></p>
+        </div>
+
+        <div class="mr-btn-row">
+          <button class="btn btn-green" onclick="openMonthlyReport()">
+            📊 Monthly Report
+          </button>
         </div>
 
         <!-- Last Updated -->
@@ -1016,10 +1067,54 @@
       </div>
     </div>
 
+    <!-- Monthly Report Modal -->
+    <div class="modal-overlay" id="modal-report" style="display: none">
+      <div class="modal" style="max-width: 480px">
+        <div class="modal-header">
+          <div class="modal-title">Monthly Report</div>
+          <button class="modal-close" onclick="closeMonthlyReport()">×</button>
+        </div>
+        <div class="modal-body">
+          <div class="form-group">
+            <label class="form-label">Month</label>
+            <div class="mr-row">
+              <select id="mr-month" class="form-control"></select>
+              <select id="mr-year" class="form-control"></select>
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Buildings</label>
+            <label class="mr-building-item" style="font-weight: 600">
+              <input
+                type="checkbox"
+                id="mr-all"
+                onchange="toggleAllReportBuildings(this.checked)"
+              />
+              All buildings
+            </label>
+            <div class="mr-building-list" id="mr-buildings">Loading...</div>
+          </div>
+          <p style="font-size: 0.78rem; color: var(--text-muted)">
+            Pick one building for a single report, or several for one PDF with a
+            summary page followed by a section per building.
+          </p>
+        </div>
+        <div class="modal-footer">
+          <button class="btn btn-outline" onclick="closeMonthlyReport()">
+            Cancel
+          </button>
+          <button class="btn btn-green" id="mr-go" onclick="runMonthlyReport()">
+            Generate PDF
+          </button>
+        </div>
+      </div>
+    </div>
+
     <script type="module">
       import { requireAuth } from "./js/auth.js";
       import { renderNav, showToast, daysUntil } from "./js/shared.js";
       import { supabase } from "./js/supabase.js";
+      import { generateMonthlyReport } from "./js/monthly-report.js";
 
       // ── Auth ────────────────────────────────────────────────────────
       const session = requireAuth();
@@ -1046,6 +1141,95 @@
       loadWidgets();
       loadDashboard();
       setInterval(loadDashboard, 5 * 60 * 1000);
+
+      // ── Monthly Report ────────────────────────────────────────────────
+      window.openMonthlyReport = async function () {
+        const now = new Date();
+        // Default to last month (the one that just finished)
+        let m = now.getMonth(); // 0-based = previous month in 1-based
+        let y = now.getFullYear();
+        if (m === 0) {
+          m = 12;
+          y -= 1;
+        }
+        const names = [
+          "January",
+          "February",
+          "March",
+          "April",
+          "May",
+          "June",
+          "July",
+          "August",
+          "September",
+          "October",
+          "November",
+          "December",
+        ];
+        document.getElementById("mr-month").innerHTML = names
+          .map(
+            (n, i) =>
+              `<option value="${i + 1}" ${i + 1 === m ? "selected" : ""}>${n}</option>`,
+          )
+          .join("");
+        const years = [];
+        for (let k = now.getFullYear(); k >= now.getFullYear() - 3; k--)
+          years.push(k);
+        document.getElementById("mr-year").innerHTML = years
+          .map(
+            (k) =>
+              `<option value="${k}" ${k === y ? "selected" : ""}>${k}</option>`,
+          )
+          .join("");
+        document.getElementById("mr-all").checked = false;
+        document.getElementById("modal-report").style.display = "flex";
+
+        const box = document.getElementById("mr-buildings");
+        const { data } = await supabase
+          .from("buildings")
+          .select("id, name")
+          .order("name");
+        box.innerHTML = (data || []).length
+          ? data
+              .map(
+                (b) =>
+                  `<label class="mr-building-item"><input type="checkbox" class="mr-b" value="${b.id}" /> ${b.name}</label>`,
+              )
+              .join("")
+          : "No buildings found.";
+      };
+      window.closeMonthlyReport = function () {
+        document.getElementById("modal-report").style.display = "none";
+      };
+      window.toggleAllReportBuildings = function (on) {
+        document.querySelectorAll(".mr-b").forEach((c) => (c.checked = on));
+      };
+      window.runMonthlyReport = async function () {
+        const ids = [...document.querySelectorAll(".mr-b:checked")].map(
+          (c) => c.value,
+        );
+        if (!ids.length) {
+          showToast("Select at least one building.", "error");
+          return;
+        }
+        const btn = document.getElementById("mr-go");
+        btn.disabled = true;
+        btn.textContent = "Generating...";
+        try {
+          await generateMonthlyReport({
+            buildingIds: ids,
+            year: parseInt(document.getElementById("mr-year").value),
+            month: parseInt(document.getElementById("mr-month").value),
+          });
+          showToast("Report downloaded.");
+          closeMonthlyReport();
+        } catch (err) {
+          console.error(err);
+          showToast("Could not create report: " + err.message, "error");
+        }
+        btn.disabled = false;
+        btn.textContent = "Generate PDF";
+      };
 
       // ── Dashboard Stats ───────────────────────────────────────────────
       async function loadDashboard() {
