@@ -153,6 +153,40 @@
         border-color: var(--blue);
         color: var(--white);
       }
+      .contract-row {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 10px;
+        padding: 10px 12px;
+        border: 1px solid var(--border);
+        border-radius: var(--radius-sm);
+        margin-bottom: 8px;
+        flex-wrap: wrap;
+      }
+      .contract-row .nm {
+        font-size: 0.88rem;
+        font-weight: 600;
+        word-break: break-all;
+      }
+      .contract-row .mt {
+        font-size: 0.74rem;
+        color: var(--text-muted);
+      }
+      .contract-row .ac {
+        display: flex;
+        gap: 6px;
+      }
+      @media (max-width: 600px) {
+        .contract-row .ac {
+          width: 100%;
+        }
+        .contract-row .ac .btn,
+        .contract-row .ac a {
+          flex: 1;
+          text-align: center;
+        }
+      }
     </style>
   </head>
   <body>
@@ -579,6 +613,54 @@
       </div>
     </div>
 
+    <!-- Contract Modal -->
+    <div class="modal-overlay" id="modal-contract" style="display: none">
+      <div class="modal" style="max-width: 540px">
+        <div class="modal-header">
+          <div class="modal-title" id="contract-title">Contract</div>
+          <button class="modal-close" onclick="closeModal('modal-contract')">
+            ×
+          </button>
+        </div>
+        <div class="modal-body">
+          <p
+            style="
+              font-size: 0.8rem;
+              color: var(--text-muted);
+              margin: 0 0 14px;
+            "
+          >
+            Upload the signed Ejari contract as a PDF (English / Arabic copy).
+            It is stored exactly as uploaded. You can keep more than one file,
+            such as renewals.
+          </p>
+          <label
+            class="btn btn-green"
+            id="contract-upload-btn"
+            style="cursor: pointer; display: inline-block; margin-bottom: 16px"
+          >
+            ⬆ Upload PDF
+            <input
+              type="file"
+              id="contract-file"
+              accept="application/pdf,.pdf"
+              hidden
+              onchange="uploadContract(this)"
+            />
+          </label>
+          <div id="contract-list"></div>
+        </div>
+        <div class="modal-footer">
+          <button
+            class="btn btn-outline"
+            onclick="closeModal('modal-contract')"
+          >
+            Close
+          </button>
+        </div>
+      </div>
+    </div>
+
     <script type="module">
       import { requireAuth } from "./js/auth.js";
       import {
@@ -862,6 +944,7 @@
             </span>
           </div>
           <div class="unit-actions">
+            <button class="btn btn-outline btn-sm" onclick="openContracts('${u.id}', '${u.unit_number}')">📄 Contract</button>
             <button class="btn btn-outline btn-sm" onclick="openEditUnit('${u.id}')">✏️ Edit</button>
             <button class="btn btn-danger btn-sm" onclick="deleteUnit('${u.id}', '${u.unit_number}')">🗑️</button>
           </div>
@@ -1277,6 +1360,134 @@
           "Properties",
         );
         loadBuildingDetail();
+      };
+
+      // ── Contracts (Ejari PDFs, stored on the server) ─────────────────
+      let contractUnit = null;
+      const sizeText = (b) =>
+        b > 1048576
+          ? (b / 1048576).toFixed(1) + " MB"
+          : Math.max(1, Math.round(b / 1024)) + " KB";
+      const safeText = (s) =>
+        String(s).replace(
+          /[&<>"']/g,
+          (c) =>
+            ({
+              "&": "&amp;",
+              "<": "&lt;",
+              ">": "&gt;",
+              '"': "&quot;",
+              "'": "&#39;",
+            })[c],
+        );
+
+      window.openContracts = function (unitId, unitNumber) {
+        contractUnit = unitId;
+        document.getElementById("contract-title").textContent =
+          "Contract — Unit " + unitNumber;
+        document.getElementById("contract-list").innerHTML =
+          '<p style="color:var(--text-muted);font-size:0.85rem">Loading...</p>';
+        openModal("modal-contract");
+        loadContracts();
+      };
+
+      async function loadContracts() {
+        const box = document.getElementById("contract-list");
+        try {
+          const res = await fetch(
+            "/api/contracts/" + encodeURIComponent(contractUnit),
+          );
+          if (!res.ok) throw new Error();
+          const { files } = await res.json();
+          if (!files.length) {
+            box.innerHTML =
+              '<p style="color:var(--text-muted);font-size:0.85rem">No contract uploaded yet.</p>';
+            return;
+          }
+          box.innerHTML = files
+            .map(
+              (f) => `
+            <div class="contract-row">
+              <div style="flex:1;min-width:160px">
+                <div class="nm">📄 ${safeText(f.name)}</div>
+                <div class="mt">${formatDate(f.uploadedAt)} · ${sizeText(f.size)}</div>
+              </div>
+              <div class="ac">
+                <a class="btn btn-outline btn-sm" href="${f.url}" target="_blank" rel="noopener">View</a>
+                <a class="btn btn-outline btn-sm" href="${f.url}?dl=1">⬇ Download</a>
+                <button class="btn btn-danger btn-sm" onclick="deleteContract('${safeText(f.filename)}')">🗑️</button>
+              </div>
+            </div>`,
+            )
+            .join("");
+        } catch (e) {
+          box.innerHTML =
+            '<p style="color:var(--danger);font-size:0.85rem">Could not load contracts. Contracts are only available on the live server.</p>';
+        }
+      }
+
+      window.uploadContract = async function (input) {
+        const file = input.files[0];
+        input.value = "";
+        if (!file) return;
+        if (!/\.pdf$/i.test(file.name) && file.type !== "application/pdf") {
+          showToast("Please choose a PDF file.", "error");
+          return;
+        }
+        if (file.size > 10 * 1024 * 1024) {
+          showToast("That PDF is larger than 10 MB.", "error");
+          return;
+        }
+        const btn = document.getElementById("contract-upload-btn");
+        btn.style.opacity = "0.6";
+        btn.style.pointerEvents = "none";
+        try {
+          const data = await new Promise((resolve, reject) => {
+            const r = new FileReader();
+            r.onload = () => resolve(r.result);
+            r.onerror = reject;
+            r.readAsDataURL(file);
+          });
+          const res = await fetch("/api/contract-upload", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              unitId: contractUnit,
+              filename: file.name,
+              data,
+            }),
+          });
+          const j = await res.json().catch(() => ({}));
+          if (!res.ok) throw new Error(j.error || "Upload failed");
+          showToast("Contract uploaded.");
+          logActivity("Uploaded contract: " + file.name, "properties");
+          loadContracts();
+        } catch (e) {
+          showToast(e.message || "Upload failed", "error");
+        }
+        btn.style.opacity = "";
+        btn.style.pointerEvents = "";
+      };
+
+      window.deleteContract = async function (filename) {
+        if (
+          !(await showConfirm(
+            "Delete this contract file? This cannot be undone.",
+          ))
+        )
+          return;
+        try {
+          const res = await fetch("/api/contract-delete", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ unitId: contractUnit, filename }),
+          });
+          if (!res.ok) throw new Error();
+          showToast("Contract deleted.");
+          loadContracts();
+        } catch (e) {
+          showToast("Could not delete the file.", "error");
+        }
       };
 
       // ── Open Building from detail view ──────────────────────────────
