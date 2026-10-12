@@ -362,7 +362,10 @@
           supabase.from("units").select("building_id, tenant_name, rent"),
           supabase.from("cheques").select("*"),
           supabase.from("deposit_register").select("amount, status"),
-          supabase.from("invoices").select("total, vat_amount, created_at"),
+          supabase
+            .from("invoices")
+            .select("total, vat_amount, created_at")
+            .neq("type", "maintenance"), // quotations are not invoices
           supabase
             .from("bounce_checks")
             .select("*, units(unit_number), buildings(name)")

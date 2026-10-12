@@ -549,6 +549,16 @@
           </div>
 
           <div class="form-group">
+            <label class="form-label">Tenant WhatsApp Number</label>
+            <input
+              type="tel"
+              id="u-whatsapp"
+              class="form-control"
+              placeholder="e.g. 050 123 4567 or +971 50 123 4567"
+            />
+          </div>
+
+          <div class="form-group">
             <label class="form-label">Remarks</label>
             <textarea
               id="u-remarks"
@@ -1144,6 +1154,8 @@
         document.getElementById("u-parking").value = unit?.parking_number || "";
         document.getElementById("u-tenant").value = unit?.tenant_name || "";
         document.getElementById("u-email").value = unit?.tenant_email || "";
+        document.getElementById("u-whatsapp").value =
+          unit?.tenant_whatsapp || "";
         document.getElementById("u-remarks").value = unit?.remarks || "";
 
         // Extra parking
@@ -1203,6 +1215,8 @@
           extra_parking: extraParking,
           tenant_name: document.getElementById("u-tenant").value.trim() || null,
           tenant_email: document.getElementById("u-email").value.trim() || null,
+          tenant_whatsapp:
+            document.getElementById("u-whatsapp").value.trim() || null,
           remarks: document.getElementById("u-remarks").value.trim() || null,
         };
 

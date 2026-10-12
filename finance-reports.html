@@ -346,6 +346,7 @@
           supabase
             .from("invoices")
             .select("total, vat_amount, amount")
+            .neq("type", "maintenance") // quotations are not invoices
             .gte("created_at", firstDay)
             .lte("created_at", lastDay + "T23:59:59"),
           supabase
@@ -426,6 +427,7 @@
         const { data: invoices } = await supabase
           .from("invoices")
           .select("amount, vat_amount, total, type")
+          .neq("type", "maintenance") // quotations are not invoices
           .gte("created_at", firstDay)
           .lte("created_at", lastDay + "T23:59:59");
 
@@ -792,6 +794,7 @@
             supabase
               .from("invoices")
               .select("*")
+              .neq("type", "maintenance") // quotations are not invoices
               .gte("created_at", firstDay)
               .lte("created_at", lastDay + "T23:59:59"),
             supabase

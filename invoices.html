@@ -297,7 +297,8 @@
           <div>
             <div class="page-title">Invoice <span>Generator</span></div>
             <div class="page-subtitle">
-              Generate VAT-compliant PDF invoices for all fee types
+              Generate VAT-compliant PDF invoices and quotations for all fee
+              types
             </div>
           </div>
           <div style="display: flex; gap: 10px">
@@ -312,7 +313,7 @@
 
         <!-- Invoice Type Selector -->
         <div class="invoice-section">
-          <div class="invoice-section-title">Select Invoice Type</div>
+          <div class="invoice-section-title">Select Document Type</div>
           <div class="invoice-types" id="invoice-types"></div>
         </div>
 
@@ -413,7 +414,7 @@
 
               <!-- Invoice Date -->
               <div class="form-group">
-                <label class="form-label">Invoice Date</label>
+                <label class="form-label" for="i-date">Invoice Date</label>
                 <input type="date" id="i-date" class="form-control" />
               </div>
 
@@ -496,6 +497,7 @@
                 <option value="renewal">Renewal Fee</option>
                 <option value="ejari">Ejari Fee</option>
                 <option value="maintenance">Maintenance Quotation</option>
+                <option value="maintenanceinvoice">Maintenance Invoice</option>
                 <option value="checkhold">Check Hold Fee</option>
                 <option value="bouncedpenalty">Bounced Check Penalty</option>
                 <option value="checkswap">Check Swap Fee</option>
@@ -624,6 +626,12 @@
           type: "maintenance",
           code: "ASRE-MQ",
           label: "Maintenance Quotation",
+          doc: "quotation",
+        },
+        {
+          type: "maintenanceinvoice",
+          code: "ASRE-MI",
+          label: "Maintenance Invoice",
         },
         { type: "checkhold", code: "ASRE-CH", label: "Check Hold Fee" },
         {
@@ -636,6 +644,15 @@
         { type: "checkreceived", code: "ASRE-CR", label: "Check Received" },
         { type: "acknowledgement", code: "ASRE-AC", label: "Acknowledgement" },
       ];
+
+      // A quotation is not an invoice: different title, wording and no
+      // QuickBooks export.
+      function isQuote(t) {
+        return t?.doc === "quotation";
+      }
+      function docWord(t) {
+        return isQuote(t) ? "Quotation" : "Invoice";
+      }
 
       let selectedType = null;
       let selectedUnit = null;
@@ -710,6 +727,14 @@
 
         // Show builder
         document.getElementById("invoice-builder").style.display = "grid";
+
+        // Wording follows the document type (Invoice / Quotation)
+        const word = docWord(selectedType);
+        document.querySelector(".invoice-number-display .inv-label").textContent =
+          word + " Number";
+        document.querySelector('label[for="i-date"]').textContent =
+          word + " Date";
+        document.querySelector(".totals-title").textContent = word + " Summary";
 
         // Generate invoice number
         await generateInvoiceNumber();
@@ -1040,9 +1065,11 @@
           items: lineItems,
         });
 
-        showToast("Invoice generated and saved!");
+        showToast(docWord(selectedType) + " generated and saved!");
         await logActivity(
-          "Generated invoice " +
+          "Generated " +
+            docWord(selectedType).toLowerCase() +
+            " " +
             invNum +
             " for " +
             (selectedUnit.tenant_name || "Vacant Unit"),
@@ -1102,11 +1129,13 @@
           setColor(BLUE);
           doc.text("Ahmed Al Sheebani Real Estate L.L.C", margin, y);
 
-          // INVOICE title right
+          // Document title right (INVOICE or QUOTATION)
+          const quote = isQuote(data.type);
+          const word = quote ? "Quotation" : "Invoice";
           doc.setFontSize(22);
           doc.setFont("helvetica", "bold");
           setColor(BLUE);
-          doc.text("INVOICE", W - margin, y, { align: "right" });
+          doc.text(word.toUpperCase(), W - margin, y, { align: "right" });
 
           y += 6;
 
@@ -1129,9 +1158,10 @@
           // Invoice details right — align with company info
           let ry = 44;
           const invoiceDetails = [
-            { label: "Invoice #", value: data.invNum },
+            { label: word + " #", value: data.invNum },
             { label: "Date", value: data.invDate },
-            { label: "Due Date", value: "On Receipt" },
+            // A quotation has no due date
+            ...(quote ? [] : [{ label: "Due Date", value: "On Receipt" }]),
             { label: "Type", value: data.type.label },
           ];
 
@@ -1327,7 +1357,7 @@
           doc.setFont("helvetica", "bold");
           doc.setFontSize(10);
           setColor(WHITE);
-          doc.text("TOTAL DUE", totalsX + 1, y + 6);
+          doc.text(quote ? "TOTAL" : "TOTAL DUE", totalsX + 1, y + 6);
           doc.setFontSize(11);
           doc.text(`AED ${data.total.toFixed(2)}`, W - margin - 1, y + 6, {
             align: "right",
@@ -1368,7 +1398,7 @@
           doc.setFontSize(7.5);
           setColor(GREY);
           doc.text(
-            "Computer Generated Invoice - E&OE. For Queries Contact: info@alsheebanirealestate.ae or Call +971 4 294 5001",
+            `Computer Generated ${word} - E&OE. For Queries Contact: info@alsheebanirealestate.ae or Call +971 4 294 5001`,
             W / 2,
             disclaimerY,
             { align: "center" },
@@ -1393,6 +1423,13 @@
       window.exportSingleQB = function () {
         if (!lastInvoiceId && !selectedUnit) {
           showToast("Please generate an invoice first.", "error");
+          return;
+        }
+        if (isQuote(selectedType)) {
+          showToast(
+            "Quotations are not exported to QuickBooks. Create a Maintenance Invoice instead.",
+            "warning",
+          );
           return;
         }
 
@@ -1456,6 +1493,7 @@
         const { data: invoices, error } = await supabase
           .from("invoices")
           .select("*")
+          .neq("type", "maintenance") // quotations are not invoices
           .gte("created_at", from)
           .lte("created_at", to + "T23:59:59")
           .order("created_at");
@@ -1588,6 +1626,11 @@
           '<option value="">Select Unit</option>';
         document.getElementById("i-notes").value = "";
         document.getElementById("invoice-number-display").textContent = "—";
+        document.querySelector(".invoice-number-display .inv-label").textContent =
+          "Invoice Number";
+        document.querySelector('label[for="i-date"]').textContent =
+          "Invoice Date";
+        document.querySelector(".totals-title").textContent = "Invoice Summary";
         renderLineItems();
         updateTotals();
         setTodayDate();

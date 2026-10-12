@@ -1598,7 +1598,8 @@
           .select("building_id, tenant_name, rent");
         const { data: invoices } = await supabase
           .from("invoices")
-          .select("vat_amount, created_at");
+          .select("vat_amount, created_at")
+          .neq("type", "maintenance"); // quotations are not invoices
         const { data: maint } = await supabase
           .from("maintenance_requests")
           .select("cost, status");

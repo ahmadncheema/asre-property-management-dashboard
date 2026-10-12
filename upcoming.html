@@ -328,6 +328,7 @@
         formatDate,
         daysUntil,
         getReminderStage,
+        whatsappLink,
       } from "./js/shared.js";
       import { supabase } from "./js/supabase.js";
 
@@ -562,6 +563,15 @@
             </div>`
               : ""
           }
+          ${
+            u.tenant_whatsapp
+              ? `
+            <div>
+              <div class="upcoming-detail-label">WhatsApp</div>
+              <div class="upcoming-detail-value">${u.tenant_whatsapp}</div>
+            </div>`
+              : ""
+          }
         </div>
 
         ${
@@ -584,12 +594,60 @@
                 ⚠️ No email on file
               </span>`
           }
+          ${
+            u.tenant_whatsapp
+              ? `<button class="btn btn-sm" style="background:#25d366;color:#fff;border:none"
+                onclick="sendWhatsApp('${u.id}')">
+                💬 WhatsApp Reminder
+              </button>`
+              : `<span style="font-size:0.8rem;color:var(--text-muted)">
+                ⚠️ No WhatsApp number
+              </span>`
+          }
           <a href="properties.html" class="btn btn-outline btn-sm">
             ✏️ Update Lease
           </a>
         </div>
       </div>`;
       }
+
+      // ── WhatsApp Reminder ─────────────────────────────────────────────
+      // Opens WhatsApp (Web or Desktop) with the tenant's number and a
+      // ready-made message. Nothing is sent until you press Send there.
+      window.sendWhatsApp = function (unitId) {
+        const u = allUpcoming.find((x) => x.id === unitId);
+        if (!u) return;
+
+        const days = daysUntil(u.end_date);
+        const dayText =
+          days > 0
+            ? `in ${days} day${days !== 1 ? "s" : ""}`
+            : days === 0
+              ? "today"
+              : "recently";
+
+        const message =
+          `Dear ${u.tenant_name},\n\n` +
+          `This is a reminder from Ahmed Al Sheebani Real Estate that your ` +
+          `tenancy contract for Unit ${u.unit_number}` +
+          `${u.buildings?.name ? " at " + u.buildings.name : ""} ` +
+          `expires on ${formatDate(u.end_date)} (${dayText}).\n\n` +
+          `Please let us know if you would like to renew, or if you plan to ` +
+          `vacate, so we can arrange the next steps.\n\n` +
+          `For any queries, call +971 4 294 5001 or email ` +
+          `leasing@alsheebanirealestate.ae.\n\n` +
+          `Thank you,\nAhmed Al Sheebani Real Estate`;
+
+        const link = whatsappLink(u.tenant_whatsapp, message);
+        if (!link) {
+          showToast(
+            "The WhatsApp number looks invalid. Please update it in Properties.",
+            "error",
+          );
+          return;
+        }
+        window.open(link, "_blank", "noopener");
+      };
 
       // ── Send Single Reminder ──────────────────────────────────────────
       window.sendReminder = async function (unitId, tenantName, email, stage) {

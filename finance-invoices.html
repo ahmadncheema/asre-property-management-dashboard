@@ -127,6 +127,7 @@
             <option value="renewal">Renewal Fee</option>
             <option value="ejari">Ejari Fee</option>
             <option value="maintenance">Maintenance Quotation</option>
+            <option value="maintenanceinvoice">Maintenance Invoice</option>
             <option value="checkhold">Check Hold Fee</option>
             <option value="bouncedpenalty">Bounced Check Penalty</option>
             <option value="checkswap">Check Swap Fee</option>
@@ -211,6 +212,7 @@
         renewal: "ASRE-RE",
         ejari: "ASRE-EJ",
         maintenance: "ASRE-MQ",
+        maintenanceinvoice: "ASRE-MI",
         checkhold: "ASRE-CH",
         bouncedpenalty: "ASRE-BP",
         checkswap: "ASRE-CS",
@@ -233,8 +235,10 @@
       }
 
       function updateSummary() {
+        // Quotations are not invoices, so they stay out of the totals
+        const invoicesOnly = allInvoices.filter((i) => i.type !== "maintenance");
         const today = new Date();
-        const thisMonth = allInvoices.filter((i) => {
+        const thisMonth = invoicesOnly.filter((i) => {
           const d = new Date(i.created_at);
           return (
             d.getMonth() === today.getMonth() &&
@@ -242,17 +246,17 @@
           );
         });
 
-        const totalAmt = allInvoices.reduce(
+        const totalAmt = invoicesOnly.reduce(
           (s, i) => s + (parseFloat(i.total) || 0),
           0,
         );
-        const totalVAT = allInvoices.reduce(
+        const totalVAT = invoicesOnly.reduce(
           (s, i) => s + (parseFloat(i.vat_amount) || 0),
           0,
         );
 
         document.getElementById("s-total-invoices").textContent =
-          allInvoices.length;
+          invoicesOnly.length;
         document.getElementById("s-total-amount").textContent =
           "AED " +
           totalAmt.toLocaleString("en-AE", { minimumFractionDigits: 2 });
@@ -360,6 +364,7 @@
         const { data: invoices } = await supabase
           .from("invoices")
           .select("*")
+          .neq("type", "maintenance") // quotations are not invoices
           .gte("created_at", from)
           .lte("created_at", to + "T23:59:59")
           .order("created_at");

@@ -50,6 +50,23 @@ export function getReminderStage(endDate) {
   return null;
 }
 
+// ── WhatsApp link ─────────────────────────────────────────────────
+// Turns a number as typed by staff (050 123 4567, +971 50 123 4567,
+// 00971501234567, 501234567 ...) into a wa.me link with the message
+// pre-filled. Returns null if the number does not look valid.
+export function whatsappLink(rawNumber, message) {
+  if (!rawNumber) return null;
+  let d = String(rawNumber).replace(/\D/g, "");
+  if (d.startsWith("00")) d = d.slice(2); // 00971... -> 971...
+  if (d.startsWith("9710")) d = "971" + d.slice(4); // +971 (0) 50... -> 971 50...
+  if (!d.startsWith("971")) {
+    if (d.startsWith("0")) d = "971" + d.slice(1); // 050... -> 97150...
+    else if (d.length === 9 && d.startsWith("5")) d = "971" + d; // 50... -> 97150...
+  }
+  if (d.length < 10 || d.length > 15) return null;
+  return `https://wa.me/${d}?text=${encodeURIComponent(message || "")}`;
+}
+
 // ── Show toast notification ───────────────────────────────────────
 export function showToast(message, type = "success") {
   const existing = document.getElementById("asre-toast");
@@ -141,7 +158,63 @@ export function renderNav(activePage) {
     { href: "/finance-reports.html", label: "Reports", key: "finance-reports" },
   ];
 
+  // Flat list: used by the mobile menu and by the finance role
   const links = isFinanceRole ? financeLinks : adminLinks;
+
+  // Desktop layout for admins: related pages grouped into dropdowns so the
+  // bar always fits on screen (no sideways scrolling).
+  const byKey = (k) => adminLinks.find((l) => l.key === k);
+  const adminGroups = [
+    byKey("dashboard"),
+    {
+      label: "Properties",
+      children: [
+        byKey("properties"),
+        byKey("vacancy"),
+        byKey("upcoming"),
+        byKey("bounce"),
+      ],
+    },
+    {
+      label: "Operations",
+      children: [
+        byKey("maintenance"),
+        byKey("invoices"),
+        byKey("announcements"),
+        byKey("emails"),
+      ],
+    },
+    byKey("finance"),
+    byKey("admin"),
+  ];
+  const desktopItems = isFinanceRole ? financeLinks : adminGroups;
+
+  const renderDesktopItem = (item) => {
+    if (!item.children) {
+      return `
+        <a href="${item.href}" class="nav-link ${activePage === item.key ? "active" : ""}">
+          ${item.label}
+        </a>`;
+    }
+    const groupActive = item.children.some((c) => c.key === activePage);
+    return `
+        <div class="nav-dropdown">
+          <button type="button" class="nav-link nav-dropdown-btn ${groupActive ? "active" : ""}"
+            onclick="toggleNavDropdown(event)">
+            ${item.label} <span class="nav-caret">▾</span>
+          </button>
+          <div class="nav-dropdown-menu">
+            ${item.children
+              .map(
+                (c) => `
+              <a href="${c.href}" class="nav-dropdown-link ${activePage === c.key ? "active" : ""}">
+                ${c.label}
+              </a>`,
+              )
+              .join("")}
+          </div>
+        </div>`;
+  };
 
   nav.innerHTML = `
     <div class="nav-brand" onclick="window.location.href='${isFinanceRole ? "/finance.html" : "/dashboard.html"}'"
@@ -151,15 +224,7 @@ export function renderNav(activePage) {
       <span class="nav-title">${isFinanceRole ? "Finance" : "Property Management"}</span>
     </div>
     <div class="nav-links" id="nav-links-desktop">
-      ${links
-        .map(
-          (l) => `
-        <a href="${l.href}" class="nav-link ${activePage === l.key ? "active" : ""}">
-          ${l.label}
-        </a>
-      `,
-        )
-        .join("")}
+      ${desktopItems.map(renderDesktopItem).join("")}
     </div>
     <div class="nav-user">
       <span class="nav-username">👤 ${session.full_name}</span>
@@ -200,7 +265,28 @@ export function renderNav(activePage) {
       menu.classList.remove("open");
     }
   });
+
+  // Close any open desktop dropdown on outside click or Escape
+  document.addEventListener("click", closeNavDropdowns);
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape") closeNavDropdowns();
+  });
 }
+
+// ── Desktop dropdowns ─────────────────────────────────────────────
+function closeNavDropdowns() {
+  document
+    .querySelectorAll(".nav-dropdown.open")
+    .forEach((d) => d.classList.remove("open"));
+}
+
+window.toggleNavDropdown = function (e) {
+  e.stopPropagation();
+  const dd = e.currentTarget.parentElement;
+  const wasOpen = dd.classList.contains("open");
+  closeNavDropdowns();
+  if (!wasOpen) dd.classList.add("open");
+};
 
 // ── Toggle Mobile Menu ────────────────────────────────────────────
 window.toggleMobileMenu = function () {
