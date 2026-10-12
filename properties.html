@@ -818,7 +818,16 @@
 
         container.innerHTML = currentFloors
           .map((floor) => {
-            const floorUnits = units.filter((u) => u.floor_id === floor.id);
+            // Natural order (101, 102 ... 110), not "last edited first"
+            const floorUnits = units
+              .filter((u) => u.floor_id === floor.id)
+              .sort((a, b) =>
+                String(a.unit_number).localeCompare(
+                  String(b.unit_number),
+                  undefined,
+                  { numeric: true },
+                ),
+              );
             return `
         <div class="floor-section">
           <div class="floor-header">

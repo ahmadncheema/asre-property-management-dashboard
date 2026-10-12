@@ -298,6 +298,17 @@
           return;
         }
 
+        // Natural order (101, 102 ... 110)
+        units.sort((a, b) =>
+          String(a.unit_number).localeCompare(
+            String(b.unit_number),
+            undefined,
+            {
+              numeric: true,
+            },
+          ),
+        );
+
         // Filter to truly vacant (tenant_name null or empty)
         allVacant = (units || []).filter(
           (u) => !u.tenant_name || u.tenant_name.trim() === "",
