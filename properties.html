@@ -159,6 +159,17 @@
       .hint-s { font-size: 0.75rem; color: var(--text-muted); margin-top: 4px; }
       @media (max-width: 600px) { .landlord-grid { grid-template-columns: 1fr; } }
 
+      .ctabs{display:flex;gap:6px;margin-bottom:14px;border-bottom:1px solid var(--border);padding-bottom:8px;flex-wrap:wrap}
+      .ctab{border:1px solid var(--border);background:transparent;color:inherit;border-radius:8px;padding:7px 12px;font-size:0.82rem;cursor:pointer}
+      .ctab.active{background:var(--primary,#1b2b6e);color:#fff;border-color:transparent}
+      .esign-form label{display:block;font-size:0.75rem;font-weight:600;margin:10px 0 3px;color:var(--text-muted)}
+      .esign-form .form-input{width:100%}
+      .es-grid{display:grid;grid-template-columns:1fr 1fr;gap:0 10px}
+      .es-badge{font-size:0.7rem;padding:2px 8px;border-radius:10px;font-weight:700}
+      .es-pending{background:#fff4d6;color:#8a5a00}.es-signed{background:#dcf5e3;color:#14532d}
+      .es-expired,.es-cancelled{background:#eceef2;color:#555}
+      .es-link{display:flex;gap:6px;margin:8px 0}.es-link input{flex:1;font-size:0.8rem}
+      @media (max-width:600px){.es-grid{grid-template-columns:1fr}}
       .contract-row {
         display: flex;
         align-items: center;
@@ -711,6 +722,38 @@
       </div>
     </div>
 
+    <!-- Building Addendum Modal -->
+    <div class="modal-overlay" id="modal-addendum" style="display: none">
+      <div class="modal" style="max-width: 600px">
+        <div class="modal-header">
+          <div class="modal-title" id="ad-title-head">Contract Addendum</div>
+          <button class="modal-close" onclick="closeModal('modal-addendum')">×</button>
+        </div>
+        <div class="modal-body esign-form">
+          <p style="font-size:0.8rem;color:var(--text-muted);margin:0 0 10px">
+            The extra terms for this building, used when you send a tenant an e-sign link (Unit &gt; Contract &gt; E-sign).
+            Leave empty if this building has no addendum. Write it here <b>or</b> attach a PDF.
+          </p>
+          <div id="ad-status" style="font-size:0.82rem;margin-bottom:8px"></div>
+          <label>Document title</label>
+          <input id="ad-title" class="form-input" value="Contract Addendum" />
+          <label>Option 1: write it here</label>
+          <textarea id="ad-text" class="form-input" rows="10" style="width:100%" placeholder="Write the addendum here.&#10;&#10;Start a heading line with # , for example:  # 1. Payments&#10;Leave a blank line between paragraphs.&#10;Start lines with - for bullet points."></textarea>
+          <div style="margin-top:8px"><button class="btn btn-primary btn-sm" id="ad-save" onclick="saveAddendum()">Save written addendum</button></div>
+          <label style="margin-top:16px">Option 2: attach a PDF</label>
+          <label class="btn btn-green btn-sm" id="ad-upload-btn" style="cursor:pointer;display:inline-block">
+            ⬆ Attach PDF
+            <input type="file" id="ad-file" accept="application/pdf,.pdf" hidden onchange="uploadAddendumPdf(this)" />
+          </label>
+          <span style="font-size:0.75rem;color:var(--text-muted)"> The tenant reads your PDF, then a signature page is added at the end.</span>
+        </div>
+        <div class="modal-footer">
+          <button class="btn btn-danger btn-sm" id="ad-remove" onclick="removeAddendum()" style="margin-right:auto">Remove addendum</button>
+          <button class="btn btn-outline" onclick="closeModal('modal-addendum')">Close</button>
+        </div>
+      </div>
+    </div>
+
     <!-- Contract Modal -->
     <div class="modal-overlay" id="modal-contract" style="display: none">
       <div class="modal" style="max-width: 540px">
@@ -721,32 +764,72 @@
           </button>
         </div>
         <div class="modal-body">
-          <p
-            style="
-              font-size: 0.8rem;
-              color: var(--text-muted);
-              margin: 0 0 14px;
-            "
-          >
-            Upload the signed Ejari contract as a PDF (English / Arabic copy).
-            It is stored exactly as uploaded. You can keep more than one file,
-            such as renewals.
-          </p>
-          <label
-            class="btn btn-green"
-            id="contract-upload-btn"
-            style="cursor: pointer; display: inline-block; margin-bottom: 16px"
-          >
-            ⬆ Upload PDF
-            <input
-              type="file"
-              id="contract-file"
-              accept="application/pdf,.pdf"
-              hidden
-              onchange="uploadContract(this)"
-            />
-          </label>
-          <div id="contract-list"></div>
+          <div class="ctabs">
+            <button class="ctab active" data-tab="contract" onclick="switchCTab('contract')">📄 Contract</button>
+            <button class="ctab" data-tab="docs" onclick="switchCTab('docs')">🪪 Documents</button>
+            <button class="ctab" data-tab="esign" onclick="switchCTab('esign')">✍️ E-sign</button>
+          </div>
+
+          <div id="ctab-contract">
+            <p style="font-size:0.8rem;color:var(--text-muted);margin:0 0 14px">
+              Upload the signed Ejari contract as a PDF (English / Arabic copy).
+              It is stored exactly as uploaded. You can keep more than one file,
+              such as renewals and signed addendums.
+            </p>
+            <label class="btn btn-green" id="contract-upload-btn" style="cursor:pointer;display:inline-block;margin-bottom:16px">
+              ⬆ Upload PDF
+              <input type="file" id="contract-file" accept="application/pdf,.pdf" hidden onchange="uploadContract(this)" />
+            </label>
+            <div id="contract-list"></div>
+          </div>
+
+          <div id="ctab-docs" style="display:none">
+            <p style="font-size:0.8rem;color:var(--text-muted);margin:0 0 12px">
+              Keep the tenant's papers here: Emirates ID, passport, visa, trade licence, Ejari. PDF, JPG or PNG.
+            </p>
+            <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px">
+              <select id="doc-cat" class="form-input" style="flex:1;min-width:150px">
+                <option value="emirates_id">Emirates ID</option>
+                <option value="passport">Passport</option>
+                <option value="visa">Visa</option>
+                <option value="trade_license">Trade licence</option>
+                <option value="ejari">Ejari</option>
+                <option value="other">Other</option>
+              </select>
+              <label class="btn btn-green" id="doc-upload-btn" style="cursor:pointer;margin:0">
+                ⬆ Upload
+                <input type="file" id="doc-file" accept="application/pdf,image/jpeg,image/png,.pdf,.jpg,.jpeg,.png" hidden onchange="uploadDoc(this)" />
+              </label>
+            </div>
+            <div id="doc-list"></div>
+          </div>
+
+          <div id="ctab-esign" style="display:none">
+            <p style="font-size:0.8rem;color:var(--text-muted);margin:0 0 12px">
+              Send the tenant a link to read and sign the addendum on their phone. The signed PDF is saved in the Contract tab.
+            </p>
+            <div id="esign-form" class="esign-form">
+              <label>Addendum</label>
+              <select id="es-template" class="form-input" onchange="esignTemplateChanged()"></select>
+              <label>Property name</label><input id="es-property" class="form-input" />
+              <label>Landlord name</label><input id="es-landlord" class="form-input" />
+              <label>Tenant name</label><input id="es-tenant" class="form-input" />
+              <div class="es-grid">
+                <div><label>Apartment no.</label><input id="es-unit" class="form-input" /></div>
+                <div><label>Apartment details</label><input id="es-details" class="form-input" placeholder="e.g. 1 BHK" /></div>
+                <div><label>Total rent</label><input id="es-rent" class="form-input" /></div>
+                <div><label>Security deposit</label><input id="es-deposit" class="form-input" /></div>
+                <div><label>Contract start</label><input id="es-start" class="form-input" /></div>
+                <div><label>Contract end</label><input id="es-end" class="form-input" /></div>
+              </div>
+              <label>Tenant email (optional)</label><input id="es-email" class="form-input" type="email" />
+              <p style="font-size:0.75rem;color:var(--text-muted);margin:10px 0 0">When signed, leasing@alsheebanirealestate.ae is notified automatically and the tenant gets a copy.</p><input id="es-notify" type="hidden" />
+              <button class="btn btn-primary" id="es-create" style="margin-top:14px;width:100%" onclick="createSignRequest()">Create signing link</button>
+            </div>
+            <div id="esign-result" style="display:none"></div>
+            <h4 style="margin:18px 0 8px;font-size:0.9rem">Requests for this unit</h4>
+            <div id="esign-list"></div>
+          </div>
         </div>
         <div class="modal-footer">
           <button
@@ -767,6 +850,7 @@
         showConfirm,
         formatCurrency,
         formatDate,
+        whatsappLink,
       } from "./js/shared.js";
       import { supabase } from "./js/supabase.js";
       import { logActivity } from "./js/shared.js";
@@ -783,6 +867,8 @@
       let buildings = [];
       let currentBuilding = null;
       let currentFloors = [];
+      let currentUnits = [];
+      let contractUnitNo = "";
       let editingBuildingId = null;
       let editingUnitId = null;
 
@@ -941,6 +1027,7 @@
 
         currentFloors = floorsRes.data || [];
         const units = unitsRes.data || [];
+        currentUnits = units;
         const bounces = bounceRes.data || [];
         const maint = maintRes.data || [];
 
@@ -959,6 +1046,7 @@
         <h2>${b.name}</h2>
         <p>📍 ${b.address}</p>
         <span class="building-card-type ${b.type}" style="margin-top:8px; display:inline-block">${b.type}</span>
+        <div style="margin-top:10px"><button class="btn btn-outline btn-sm" onclick="openAddendum()">📝 Contract Addendum</button></div>
       </div>
       <div class="building-detail-stats">
         <div class="detail-stat">
@@ -1532,6 +1620,9 @@
 
       window.openContracts = function (unitId, unitNumber) {
         contractUnit = unitId;
+        contractUnitNo = unitNumber;
+        switchCTab("contract");
+        document.getElementById("esign-result").style.display = "none";
         document.getElementById("contract-title").textContent =
           "Contract — Unit " + unitNumber;
         document.getElementById("contract-list").innerHTML =
@@ -1641,6 +1732,246 @@
         } catch (e) {
           showToast("Could not delete the file.", "error");
         }
+      };
+
+      // ── Tabs ─────────────────────────────────────────────────────────
+      window.switchCTab = function (tab) {
+        document.querySelectorAll(".ctab").forEach((b) => b.classList.toggle("active", b.dataset.tab === tab));
+        ["contract", "docs", "esign"].forEach((t) => (document.getElementById("ctab-" + t).style.display = t === tab ? "" : "none"));
+        if (tab === "docs") loadDocs();
+        if (tab === "esign") { initEsign(); loadSignRequests(); }
+        if (tab === "contract") loadContracts();
+      };
+
+      const jpost = async (url, body) => {
+        const res = await fetch(url, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) });
+        const j = await res.json().catch(() => ({}));
+        if (!res.ok) throw new Error(j.error || "Something went wrong");
+        return j;
+      };
+      const readDataUrl = (file) => new Promise((resolve, reject) => {
+        const r = new FileReader(); r.onload = () => resolve(r.result); r.onerror = reject; r.readAsDataURL(file);
+      });
+      // Shrink big phone photos so they upload fast
+      async function shrinkImage(file) {
+        if (!/^image\/(jpeg|png)$/.test(file.type) || file.size < 1.5 * 1024 * 1024) return readDataUrl(file);
+        const img = await new Promise((res, rej) => { const i = new Image(); i.onload = () => res(i); i.onerror = rej; i.src = URL.createObjectURL(file); });
+        const k = Math.min(1, 2200 / Math.max(img.width, img.height));
+        const c = document.createElement("canvas"); c.width = img.width * k; c.height = img.height * k;
+        c.getContext("2d").drawImage(img, 0, 0, c.width, c.height);
+        return c.toDataURL("image/jpeg", 0.85);
+      }
+
+      // ── Tenant documents ─────────────────────────────────────────────
+      async function loadDocs() {
+        const box = document.getElementById("doc-list");
+        box.innerHTML = '<p style="color:var(--text-muted);font-size:0.85rem">Loading...</p>';
+        try {
+          const res = await fetch("/api/docs/" + encodeURIComponent(contractUnit) + "?t=" + Date.now(), { cache: "no-store" });
+          if (!res.ok) throw new Error();
+          const { files } = await res.json();
+          if (!files.length) { box.innerHTML = '<p style="color:var(--text-muted);font-size:0.85rem">No documents yet.</p>'; return; }
+          box.innerHTML = files.map((f) => `
+            <div class="contract-row">
+              <div style="flex:1;min-width:160px">
+                <div class="nm">${safeText(f.categoryLabel)}</div>
+                <div class="mt">${safeText(f.name)} · ${formatDate(f.uploadedAt)} · ${sizeText(f.size)}</div>
+              </div>
+              <div class="ac">
+                <a class="btn btn-outline btn-sm" href="${f.url}" target="_blank" rel="noopener">View</a>
+                <a class="btn btn-outline btn-sm" href="${f.url}?dl=1">⬇</a>
+                <button class="btn btn-danger btn-sm" onclick="deleteDoc('${safeText(f.filename)}')">🗑️</button>
+              </div>
+            </div>`).join("");
+        } catch (e) {
+          box.innerHTML = '<p style="color:var(--danger);font-size:0.85rem">Could not load documents. They are only available on the live server.</p>';
+        }
+      }
+      window.uploadDoc = async function (input) {
+        const file = input.files[0]; input.value = "";
+        if (!file) return;
+        if (!/\.(pdf|jpe?g|png)$/i.test(file.name) && !/^(application\/pdf|image\/(jpeg|png))$/.test(file.type)) { showToast("Please choose a PDF, JPG or PNG.", "error"); return; }
+        if (file.size > 12 * 1024 * 1024) { showToast("That file is larger than 12 MB.", "error"); return; }
+        const btn = document.getElementById("doc-upload-btn");
+        btn.style.opacity = "0.6"; btn.style.pointerEvents = "none";
+        try {
+          const data = await shrinkImage(file);
+          await jpost("/api/doc-upload", { unitId: contractUnit, category: document.getElementById("doc-cat").value, filename: file.name, data });
+          showToast("Document uploaded.");
+          logActivity("Uploaded tenant document: " + file.name, "properties");
+          loadDocs();
+        } catch (e) { showToast(e.message || "Upload failed", "error"); }
+        btn.style.opacity = ""; btn.style.pointerEvents = "";
+      };
+      window.deleteDoc = async function (filename) {
+        if (!(await showConfirm("Delete this document? This cannot be undone."))) return;
+        try { await jpost("/api/doc-delete", { unitId: contractUnit, filename }); showToast("Document deleted."); loadDocs(); }
+        catch (e) { showToast("Could not delete the file.", "error"); }
+      };
+
+      // ── Building addendum (written or attached) ──────────────────────
+      let buildingAddendum = null;
+      async function fetchAddendum(bid) {
+        try {
+          const j = await (await fetch("/api/addendum/" + encodeURIComponent(bid) + "?t=" + Date.now(), { cache: "no-store" })).json();
+          return j.addendum || null;
+        } catch (e) { return null; }
+      }
+      async function refreshAddendumModal() {
+        buildingAddendum = await fetchAddendum(currentBuilding.id);
+        const a = buildingAddendum;
+        document.getElementById("ad-title-head").textContent = "Contract Addendum — " + currentBuilding.name;
+        document.getElementById("ad-status").innerHTML = !a
+          ? "<b>No addendum yet.</b> Tenants of this building have nothing extra to sign."
+          : a.mode === "pdf"
+            ? "✅ <b>Attached PDF in use:</b> " + safeText(a.filename)
+            : "✅ <b>Written addendum in use.</b>";
+        document.getElementById("ad-title").value = (a && a.title) || "Contract Addendum";
+        document.getElementById("ad-text").value = a && a.mode === "text" ? a.text : "";
+        document.getElementById("ad-remove").style.display = a ? "" : "none";
+      }
+      window.openAddendum = async function () {
+        openModal("modal-addendum");
+        await refreshAddendumModal();
+      };
+      window.saveAddendum = async function () {
+        try {
+          await jpost("/api/addendum-save", { buildingId: currentBuilding.id, title: document.getElementById("ad-title").value, text: document.getElementById("ad-text").value });
+          showToast("Addendum saved.");
+          logActivity("Saved contract addendum for " + currentBuilding.name, "properties");
+          refreshAddendumModal();
+        } catch (e) { showToast(e.message, "error"); }
+      };
+      window.uploadAddendumPdf = async function (input) {
+        const file = input.files[0]; input.value = "";
+        if (!file) return;
+        if (!/\.pdf$/i.test(file.name)) { showToast("Please choose a PDF file.", "error"); return; }
+        if (file.size > 12 * 1024 * 1024) { showToast("That PDF is larger than 12 MB.", "error"); return; }
+        try {
+          await jpost("/api/addendum-pdf-upload", { buildingId: currentBuilding.id, title: document.getElementById("ad-title").value, filename: file.name, data: await readDataUrl(file) });
+          showToast("PDF attached.");
+          logActivity("Attached addendum PDF for " + currentBuilding.name, "properties");
+          refreshAddendumModal();
+        } catch (e) { showToast(e.message, "error"); }
+      };
+      window.removeAddendum = async function () {
+        if (!(await showConfirm("Remove this building's addendum? Requests already sent are not affected."))) return;
+        try { await jpost("/api/addendum-delete", { buildingId: currentBuilding.id }); showToast("Addendum removed."); refreshAddendumModal(); }
+        catch (e) { showToast(e.message, "error"); }
+      };
+
+      // ── E-sign ───────────────────────────────────────────────────────
+      let signTemplates = [];
+      async function initEsign() {
+        document.getElementById("esign-result").style.display = "none";
+        document.getElementById("esign-form").style.display = "";
+        try {
+          if (!signTemplates.length) signTemplates = (await (await fetch("/api/sign-templates")).json()).templates || [];
+        } catch (e) {}
+        const sel = document.getElementById("es-template");
+        const bAd = currentBuilding ? await fetchAddendum(currentBuilding.id) : null;
+        const opts = (bAd ? [{ id: "building", label: "This building's addendum: " + bAd.title, defaults: {} }] : []).concat(signTemplates);
+        window._esOpts = opts;
+        sel.innerHTML = opts.map((t) => `<option value="${safeText(t.id)}">${safeText(t.label)}</option>`).join("") || '<option value="">(no addendum for this building yet - add one on the building page)</option>';
+        const u = currentUnits.find((x) => String(x.id) === String(contractUnit)) || {};
+        const b = currentBuilding || {};
+        const set = (id, v) => (document.getElementById(id).value = v == null ? "" : v);
+        set("es-landlord", b.landlord_name || b.owner_name || "");
+        set("es-tenant", u.tenant_name);
+        set("es-unit", u.unit_number || contractUnitNo);
+        set("es-details", u.unit_type || u.size || "");
+        set("es-rent", u.rent ? "AED " + Number(u.rent).toLocaleString("en-US") : "");
+        set("es-deposit", u.deposit ? "AED " + Number(u.deposit).toLocaleString("en-US") : "");
+        const d = (v) => (v ? new Date(v).toLocaleDateString("en-GB", { day: "2-digit", month: "short", year: "numeric" }) : "");
+        set("es-start", d(u.start_date));
+        set("es-end", d(u.end_date));
+        set("es-email", u.tenant_email);
+        set("es-notify", "");
+        esignTemplateChanged(true);
+        window._esUnit = u;
+      }
+      window.esignTemplateChanged = function (keepLandlord) {
+        const t = (window._esOpts || []).find((x) => x.id === document.getElementById("es-template").value);
+        if (!t) return;
+        document.getElementById("es-property").value = (t.defaults && t.defaults.propertyName) || (currentBuilding && currentBuilding.name) || "";
+        if (t.id === "building") document.getElementById("es-landlord").value = (currentBuilding && (currentBuilding.landlord_name || currentBuilding.owner_name)) || "";
+        if (!document.getElementById("es-landlord").value && t.defaults) document.getElementById("es-landlord").value = t.defaults.landlordName || "";
+      };
+      window.createSignRequest = async function () {
+        const v = (id) => document.getElementById(id).value.trim();
+        const btn = document.getElementById("es-create");
+        btn.disabled = true;
+        try {
+          const j = await jpost("/api/sign-create", {
+            unitId: contractUnit, buildingId: currentBuilding && currentBuilding.id,
+            templateId: v("es-template"), tenantEmail: v("es-email"), notifyEmail: v("es-notify"), createdBy: session.username,
+            fields: { propertyName: v("es-property"), landlordName: v("es-landlord"), tenantName: v("es-tenant"), apartmentNo: v("es-unit"),
+              apartmentDetails: v("es-details"), totalRent: v("es-rent"), securityDeposit: v("es-deposit"), contractStart: v("es-start"), contractEnd: v("es-end") },
+          });
+          logActivity("Created e-sign request for unit " + v("es-unit"), "properties");
+          showSignLink(j.token, v("es-tenant"), v("es-email"));
+          loadSignRequests();
+        } catch (e) { showToast(e.message, "error"); }
+        btn.disabled = false;
+      };
+      function showSignLink(token, tenant, email) {
+        const link = location.origin + "/sign.html?t=" + token;
+        const u = window._esUnit || {};
+        const wa = whatsappLink(u.tenant_whatsapp, `Hello ${tenant}, please read and sign your Contract Addendum using this link (valid 14 days): ${link}`);
+        document.getElementById("esign-form").style.display = "none";
+        const box = document.getElementById("esign-result");
+        box.style.display = "";
+        box.innerHTML = `
+          <div style="background:rgba(34,197,94,.14);border:1px solid rgba(34,197,94,.4);border-radius:10px;padding:14px">
+            <b>✅ Signing link ready</b> — valid for 14 days.
+            <div class="es-link"><input class="form-input" id="es-link-input" readonly value="${safeText(link)}" /><button class="btn btn-outline btn-sm" onclick="copySignLink()">Copy</button></div>
+            <div style="display:flex;gap:6px;flex-wrap:wrap">
+              ${wa ? `<a class="btn btn-green btn-sm" href="${wa}" target="_blank" rel="noopener">WhatsApp</a>` : ""}
+              <button class="btn btn-outline btn-sm" onclick="emailSignLink('${token}','${safeText(email)}')">✉ Email link</button>
+              <button class="btn btn-outline btn-sm" onclick="initEsign()">New request</button>
+            </div>
+          </div>`;
+      }
+      window.initEsign = initEsign;
+      window.copySignLink = function () {
+        const el = document.getElementById("es-link-input"); el.select();
+        (navigator.clipboard ? navigator.clipboard.writeText(el.value) : Promise.reject()).catch(() => document.execCommand("copy"));
+        showToast("Link copied.");
+      };
+      window.emailSignLink = async function (token, email) {
+        const to = prompt("Send the link to which email address?", email || "");
+        if (!to) return;
+        try { await jpost("/api/sign-send-email", { token, to: to.trim(), origin: location.origin }); showToast("Email sent."); }
+        catch (e) { showToast(e.message, "error"); }
+      };
+      async function loadSignRequests() {
+        const box = document.getElementById("esign-list");
+        box.innerHTML = '<p style="color:var(--text-muted);font-size:0.85rem">Loading...</p>';
+        try {
+          const res = await fetch("/api/sign-requests/" + encodeURIComponent(contractUnit) + "?t=" + Date.now(), { cache: "no-store" });
+          if (!res.ok) throw new Error();
+          const { requests } = await res.json();
+          if (!requests.length) { box.innerHTML = '<p style="color:var(--text-muted);font-size:0.85rem">Nothing sent yet.</p>'; return; }
+          box.innerHTML = requests.map((r) => `
+            <div class="contract-row">
+              <div style="flex:1;min-width:160px">
+                <div class="nm" style="word-break:normal">${safeText(r.tenantName)} <span class="es-badge es-${r.status}">${r.status === "pending" ? "Waiting" : r.status[0].toUpperCase() + r.status.slice(1)}</span></div>
+                <div class="mt">${safeText(r.label)} · ${r.status === "signed" ? "Signed " + formatDate(r.signedAt) : "Sent " + formatDate(r.createdAt)}</div>
+              </div>
+              <div class="ac">
+                ${r.status === "signed" && r.file ? `<a class="btn btn-outline btn-sm" href="${r.file}" target="_blank" rel="noopener">View PDF</a>` : ""}
+                ${r.status === "pending" ? `<button class="btn btn-outline btn-sm" onclick="showSignLinkAgain('${r.token}','${safeText(r.tenantName)}','${safeText(r.tenantEmail || "")}')">Link</button><button class="btn btn-danger btn-sm" onclick="cancelSign('${r.token}')">Cancel</button>` : ""}
+              </div>
+            </div>`).join("");
+        } catch (e) {
+          box.innerHTML = '<p style="color:var(--danger);font-size:0.85rem">E-sign is only available on the live server.</p>';
+        }
+      }
+      window.showSignLinkAgain = function (t, n, e) { window._esUnit = currentUnits.find((x) => String(x.id) === String(contractUnit)) || {}; showSignLink(t, n, e); };
+      window.cancelSign = async function (token) {
+        if (!(await showConfirm("Cancel this signing request? The link will stop working."))) return;
+        try { await jpost("/api/sign-cancel", { token }); showToast("Request cancelled."); loadSignRequests(); }
+        catch (e) { showToast(e.message, "error"); }
       };
 
       // ── Open Building from detail view ──────────────────────────────

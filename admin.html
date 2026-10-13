@@ -249,6 +249,23 @@
             </div>
           </div>
 
+          <!-- Backup & Restore -->
+          <div class="admin-card" style="grid-column: 1 / -1">
+            <div class="admin-card-title">🛟 Backup &amp; Restore</div>
+            <div class="admin-card-desc">
+              A backup saves the whole database and every uploaded file (contracts,
+              documents, photos) on the server. One is made automatically every
+              week. Enter your admin password to manage backups.
+              <br /><small style="color: var(--text-muted)">Restoring puts back records that were deleted or changed, and keeps anything added since. A safety backup is made first. Backup files include user passwords, so keep downloads private.</small>
+            </div>
+            <div style="display:flex;gap:8px;flex-wrap:wrap;margin:10px 0">
+              <input type="password" id="bk-pass" class="form-input" placeholder="Your admin password" autocomplete="current-password" style="flex:1;min-width:180px" />
+              <button class="btn btn-outline btn-sm" onclick="bkLoad()">Show backups</button>
+              <button class="btn btn-green btn-sm" id="bk-create" onclick="bkCreate()">➕ Back up now</button>
+            </div>
+            <div id="bk-list"></div>
+          </div>
+
           <!-- Import -->
           <div class="admin-card">
             <div class="admin-card-title">📤 Import Database</div>
@@ -613,6 +630,7 @@
         showToast,
         showConfirm,
         formatDate,
+        logActivity,
       } from "./js/shared.js";
       import { supabase } from "./js/supabase.js";
 
@@ -870,6 +888,66 @@
       };
 
       // ── Export Database ──────────────────────────────────────────────
+      // ── Backup & Restore ─────────────────────────────────────────────
+      const bkBody = (extra) => JSON.stringify(Object.assign({ username: session.username, password: document.getElementById("bk-pass").value }, extra || {}));
+      const bkPost = async (path, extra) => {
+        if (!document.getElementById("bk-pass").value) throw new Error("Enter your admin password first.");
+        const res = await fetch("/api/backup/" + path, { method: "POST", headers: { "Content-Type": "application/json" }, body: bkBody(extra) });
+        if (!res.ok) { const j = await res.json().catch(() => ({})); throw new Error(j.error || "Request failed (" + res.status + ")"); }
+        return res;
+      };
+      const bkSize = (b) => (b > 1048576 ? (b / 1048576).toFixed(1) + " MB" : Math.max(1, Math.round(b / 1024)) + " KB");
+      const bkKind = { manual: "Manual", auto: "Weekly (auto)", safety: "Safety (before a restore)" };
+      window.bkLoad = async function () {
+        const box = document.getElementById("bk-list");
+        try {
+          const j = await (await bkPost("list")).json();
+          if (!j.database) showToast("Database access is not set up for backups on this server.", "error");
+          if (!j.backups.length) { box.innerHTML = '<p style="font-size:0.85rem;color:var(--text-muted)">No backups yet.</p>'; return; }
+          box.innerHTML = j.backups.map((b) => `
+            <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;padding:8px 0;border-top:1px solid var(--border)">
+              <div style="flex:1;min-width:180px"><b style="font-size:0.85rem">${bkKind[b.kind] || b.kind}</b>
+                <div style="font-size:0.75rem;color:var(--text-muted)">${new Date(b.createdAt).toLocaleString("en-GB")} · ${bkSize(b.size)}</div></div>
+              <button class="btn btn-outline btn-sm" onclick="bkDownload('${b.name}')">⬇ Download</button>
+              <button class="btn btn-outline btn-sm" onclick="bkRestore('${b.name}')">♻ Restore</button>
+              <button class="btn btn-danger btn-sm" onclick="bkDelete('${b.name}')">🗑️</button>
+            </div>`).join("");
+        } catch (e) { box.innerHTML = ""; showToast(e.message, "error"); }
+      };
+      window.bkCreate = async function () {
+        const btn = document.getElementById("bk-create");
+        btn.disabled = true; btn.textContent = "Backing up…";
+        try {
+          const j = await (await bkPost("create")).json();
+          showToast("Backup done (" + j.backup.rows + " records).");
+          logActivity("Created a backup", "admin");
+          bkLoad();
+        } catch (e) { showToast(e.message, "error"); }
+        btn.disabled = false; btn.textContent = "➕ Back up now";
+      };
+      window.bkDownload = async function (name) {
+        try {
+          const blob = await (await bkPost("download", { name })).blob();
+          const a = document.createElement("a");
+          a.href = URL.createObjectURL(blob); a.download = name; document.body.appendChild(a); a.click(); a.remove();
+        } catch (e) { showToast(e.message, "error"); }
+      };
+      window.bkDelete = async function (name) {
+        if (!(await showConfirm("Delete this backup file?"))) return;
+        try { await bkPost("delete", { name }); bkLoad(); } catch (e) { showToast(e.message, "error"); }
+      };
+      window.bkRestore = async function (name) {
+        if (!(await showConfirm("Restore from this backup? Deleted or changed records will come back as they were. Records added since stay. A safety backup is made first."))) return;
+        const includeFiles = await showConfirm("Also put back the uploaded files (contracts, documents, photos) from this backup?");
+        try {
+          const j = await (await bkPost("restore", { name, includeFiles })).json();
+          const bad = j.tables.filter((t) => t.error);
+          showToast(bad.length ? "Restored with problems in: " + bad.map((t) => t.table).join(", ") : "Restore complete. Reload the pages to see it.", bad.length ? "error" : undefined);
+          logActivity("Restored backup " + name, "admin");
+          bkLoad();
+        } catch (e) { showToast(e.message, "error"); }
+      };
+
       window.exportDatabase = async function () {
         showToast("Preparing export...");
 

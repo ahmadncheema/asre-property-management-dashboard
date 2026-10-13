@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>Sign Contract Addendum</title>
+<style>
+  *{box-sizing:border-box}
+  body{margin:0;font-family:-apple-system,Segoe UI,Roboto,Arial,sans-serif;background:#eef0f5;color:#1e1e28;line-height:1.5}
+  .wrap{max-width:760px;margin:0 auto;padding:16px}
+  header{background:#1b2b6e;color:#fff;padding:14px 16px;text-align:center}
+  header b{display:block;font-size:13px;letter-spacing:.08em}
+  header span{font-size:12px;opacity:.8}
+  .card{background:#fff;border-radius:12px;padding:18px;margin-bottom:14px;box-shadow:0 1px 4px rgba(0,0,0,.08)}
+  h1{font-size:19px;margin:0 0 6px;color:#1b2b6e}
+  h2{font-size:15px;color:#1b2b6e;margin:18px 0 6px}
+  .info{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:12px 0}
+  .info div{background:#f3f4f8;border-radius:8px;padding:8px 10px;font-size:13px}
+  .info small{display:block;color:#6e737d;font-size:11px;text-transform:uppercase}
+  .info .full{grid-column:1/-1}
+  .doc{max-height:60vh;overflow:auto;border:1px solid #d9dce5;border-radius:8px;padding:12px;font-size:13px;background:#fafbfc}
+  .doc p{margin:4px 0 8px}
+  .cl{display:flex;gap:8px}.cl>b{min-width:34px;color:#1b2b6e}
+  .cl>div{flex:1}
+  .doc ul{margin:2px 0 8px;padding-left:20px}
+  .li{display:flex;gap:6px;margin:2px 0}.li>b{min-width:24px}
+  table{border-collapse:collapse;width:100%;margin:6px 0}
+  td,th{border:1px solid #d9dce5;padding:4px 8px;font-size:12px;text-align:left}
+  th{background:#1b2b6e;color:#fff}
+  label{display:block;font-size:13px;font-weight:600;margin:12px 0 4px}
+  input[type=text]{width:100%;padding:11px;border:1px solid #c5c9d6;border-radius:8px;font-size:16px}
+  canvas{width:100%;height:170px;border:2px dashed #9aa3c4;border-radius:10px;background:#fff;touch-action:none;display:block}
+  .row{display:flex;gap:8px;align-items:center;justify-content:space-between;margin-top:6px}
+  button{font-size:16px;border:0;border-radius:10px;padding:13px 18px;cursor:pointer}
+  .btn{background:#1b2b6e;color:#fff;width:100%;font-weight:700;margin-top:14px}
+  .btn:disabled{opacity:.5}
+  .link{background:none;color:#1b2b6e;padding:4px 0;font-size:14px;text-decoration:underline}
+  .chk{display:flex;gap:10px;align-items:flex-start;font-weight:400;margin-top:14px}
+  .chk input{width:22px;height:22px;margin-top:2px;flex:none}
+  .msg{padding:14px;border-radius:10px;font-size:15px}
+  .err{background:#fde8e8;color:#9b1c1c}.ok{background:#e3f6e8;color:#14532d}
+  .hide{display:none}
+</style>
+</head>
+<body>
+<header><b>AHMED AL SHEEBANI REAL ESTATE</b><span>Contract Addendum · Electronic Signature</span></header>
+<div class="wrap" id="app"><div class="card">Loading…</div></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf-lib/1.17.1/pdf-lib.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+<script type="module">
+import { buildAddendumPdf, pdfToDataUrl, dubaiTime, mergeWithSource } from "./js/addendum-pdf.js";
+
+const token = new URLSearchParams(location.search).get("t") || "";
+const app = document.getElementById("app");
+const esc = (s) => String(s == null ? "" : s).replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+const say = (cls, html) => (app.innerHTML = `<div class="card"><div class="msg ${cls}">${html}</div></div>`);
+
+async function api(path, opt) {
+  const r = await fetch(`/api/sign/${encodeURIComponent(token)}${path}`, { cache: "no-store", ...opt });
+  let j = {}; try { j = await r.json(); } catch {}
+  if (!r.ok) throw new Error(j.error || "Something went wrong. Please try again.");
+  return j;
+}
+
+function blocksHtml(blocks) {
+  return blocks.map((b) => {
+    if (b.t === "h") return `<h2>${esc(b.x)}</h2>`;
+    if (b.t === "p") return `<p>${esc(b.x)}</p>`;
+    if (b.t === "list") return b.items.map((i) => `<div class="li"><b>${esc(i.l)}</b><span>${esc(i.x)}</span></div>`).join("");
+    if (b.t === "bullets") return `<ul>${b.items.map((i) => `<li>${esc(i)}</li>`).join("")}</ul>`;
+    if (b.t === "table") return `<table><tr>${b.head.map((h) => `<th>${esc(h)}</th>`).join("")}</tr>${b.rows.map((r) => `<tr>${r.map((c) => `<td>${esc(c)}</td>`).join("")}</tr>`).join("")}</table>`;
+    return "";
+  }).join("");
+}
+
+let data, srcCache;
+async function srcBytes() {
+  if (!srcCache) {
+    const r = await fetch(`/api/sign/${encodeURIComponent(token)}/document`, { cache: "no-store" });
+    if (!r.ok) throw new Error("Could not load the document. Please reload.");
+    srcCache = await r.arrayBuffer();
+  }
+  return srcCache.slice(0);
+}
+async function showSource() {
+  const box = document.getElementById("pdfpages");
+  try {
+    window.pdfjsLib.GlobalWorkerOptions.workerSrc = "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";
+    const pdf = await window.pdfjsLib.getDocument({ data: await srcBytes() }).promise;
+    box.innerHTML = "";
+    for (let i = 1; i <= pdf.numPages; i++) {
+      const page = await pdf.getPage(i);
+      const base = page.getViewport({ scale: 1 });
+      const sc = Math.min(2, (box.clientWidth || 340) / base.width * (window.devicePixelRatio || 1));
+      const vp = page.getViewport({ scale: sc });
+      const c = document.createElement("canvas");
+      c.width = vp.width; c.height = vp.height; c.style.cssText = "width:100%;height:auto;border:1px solid #d9dce5;margin-bottom:8px;touch-action:auto";
+      box.appendChild(c);
+      await page.render({ canvasContext: c.getContext("2d"), viewport: vp }).promise;
+    }
+  } catch (e) { box.innerHTML = '<a href="/api/sign/' + encodeURIComponent(token) + '/document" target="_blank">Open the document</a>'; }
+}
+(async () => {
+  if (!token) return say("err", "This link is not valid.");
+  try { data = await api(""); } catch (e) { return say("err", esc(e.message)); }
+  if (data.status === "signed") return say("ok", `✅ This addendum has already been signed${data.signedAt ? " on " + esc(dubaiTime(data.signedAt)) : ""}. Thank you.`);
+  if (data.status === "expired") return say("err", "This signing link has expired. Please contact Ahmed Al Sheebani Real Estate for a new one.");
+  if (data.status === "cancelled") return say("err", "This signing request was cancelled. Please contact Ahmed Al Sheebani Real Estate.");
+  if (data.status !== "pending") return say("err", "This link is not available.");
+  render();
+})();
+
+function render() {
+  const { template: t, fields: f } = data;
+  app.innerHTML = `
+  <div class="card">
+    <h1>${esc(t.title)}</h1>
+    <div>Please read the document below, then sign at the bottom.</div>
+    <div class="info">
+      <div class="full"><small>Property</small>${esc(f.propertyName)}</div>
+      <div><small>Landlord</small>${esc(f.landlordName)}</div>
+      <div><small>Tenant</small>${esc(f.tenantName)}</div>
+      <div><small>Apartment</small>${esc(f.apartmentNo)}</div>
+      <div><small>Details</small>${esc(f.apartmentDetails || "-")}</div>
+      <div><small>Total rent</small>${esc(f.totalRent || "-")}</div>
+      <div><small>Security deposit</small>${esc(f.securityDeposit || "-")}</div>
+      <div><small>Contract start</small>${esc(f.contractStart || "-")}</div>
+      <div><small>Contract end</small>${esc(f.contractEnd || "-")}</div>
+    </div>
+    <div class="doc" id="docbox">
+      ${t.mode === "pdf" ? '<div id="pdfpages">Loading document…</div>' : ""}
+      ${t.intro ? `<p>${esc(t.intro)}</p>` : ""}${t.interpretation ? `<p>${esc(t.interpretation)}</p>` : ""}
+      ${blocksHtml(t.mode === "pdf" ? [] : t.body || [])}
+      ${(t.sections || []).map((s) => `<h2>${esc(s.no)}. ${esc(s.title)}</h2>${s.clauses.map((c) => `<div class="cl"><b>${esc(c.no)}</b><div>${blocksHtml(c.blocks)}</div></div>`).join("")}`).join("")}
+    </div>
+  </div>
+  <div class="card">
+    <h2 style="margin-top:0">Sign here</h2>
+    <label for="nm">Your full name</label>
+    <input type="text" id="nm" autocomplete="name" value="${esc(f.tenantName)}">
+    <label>Your signature (draw with your finger or mouse)</label>
+    <canvas id="pad"></canvas>
+    <div class="row"><button class="link" id="clr" type="button">Clear</button><span id="hint" style="font-size:12px;color:#6e737d">Signature is required</span></div>
+    <label class="chk"><input type="checkbox" id="ag"><span>I have read and agree to this Contract Addendum, and I understand it forms part of my Tenancy Contract.</span></label>
+    <button class="btn" id="go" disabled>Sign and submit</button>
+    <div id="err" class="msg err hide" style="margin-top:12px"></div>
+  </div>`;
+
+  if (t.mode === "pdf") showSource();
+  const cv = document.getElementById("pad"), go = document.getElementById("go");
+  const fit = () => {
+    const r = cv.getBoundingClientRect(), d = window.devicePixelRatio || 1;
+    cv.width = r.width * d; cv.height = r.height * d;
+    const c = cv.getContext("2d"); c.scale(d, d); c.lineWidth = 2.4; c.lineCap = c.lineJoin = "round"; c.strokeStyle = "#0b1a4a";
+  };
+  fit();
+  const ctx = cv.getContext("2d");
+  let drawing = false, inked = false, last = null;
+  const pt = (e) => { const r = cv.getBoundingClientRect(); return { x: e.clientX - r.left, y: e.clientY - r.top }; };
+  cv.addEventListener("pointerdown", (e) => { drawing = true; last = pt(e); cv.setPointerCapture(e.pointerId); ctx.beginPath(); ctx.arc(last.x, last.y, 1.1, 0, 7); ctx.fill(); inked = true; check(); });
+  cv.addEventListener("pointermove", (e) => { if (!drawing) return; const p = pt(e); ctx.beginPath(); ctx.moveTo(last.x, last.y); ctx.lineTo(p.x, p.y); ctx.stroke(); last = p; });
+  const up = () => (drawing = false);
+  cv.addEventListener("pointerup", up); cv.addEventListener("pointercancel", up);
+  document.getElementById("clr").onclick = () => { ctx.clearRect(0, 0, cv.width, cv.height); inked = false; check(); };
+  const check = () => {
+    go.disabled = !(inked && document.getElementById("ag").checked && document.getElementById("nm").value.trim().length >= 2);
+    document.getElementById("hint").textContent = inked ? "" : "Signature is required";
+  };
+  ["ag", "nm"].forEach((id) => document.getElementById(id).addEventListener("input", check));
+
+  go.onclick = async () => {
+    const errBox = document.getElementById("err"); errBox.classList.add("hide");
+    go.disabled = true; go.textContent = "Signing…";
+    try {
+      const name = document.getElementById("nm").value.trim();
+      const stamp = await api("/stamp");
+      const doc = await buildAddendumPdf({ template: data.template, fields: data.fields, contentHash: data.contentHash, stamp, signerName: name, signaturePng: cv.toDataURL("image/png") });
+      const pdf = data.template.mode === "pdf" ? await mergeWithSource(doc, await srcBytes()) : await pdfToDataUrl(doc);
+      const res = await api("/submit", { method: "POST", headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ signerName: name, signature: cv.toDataURL("image/png"), pdf, ref: stamp.ref, agreed: true }) });
+      say("ok", `✅ <b>Thank you, ${esc(name)}.</b><br>Your addendum was signed on ${esc(dubaiTime(res.signedAt))}.<br>Reference: <b>${esc(res.ref)}</b>${res.emailed ? "<br>A copy has been emailed to you." : ""}`);
+    } catch (e) {
+      errBox.textContent = e.message; errBox.classList.remove("hide");
+      go.textContent = "Sign and submit"; check();
+    }
+  };
+}
+</script>
+</body>
+</html>

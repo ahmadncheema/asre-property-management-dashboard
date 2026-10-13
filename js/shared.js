@@ -144,7 +144,10 @@ export function renderNav(activePage) {
     { href: "/finance.html", label: "Finance", key: "finance" },
     { href: "/ceo.html", label: "CEO Panel", key: "ceo" },
     { href: "/admin.html", label: "Admin", key: "admin" },
-  ].filter((l) => isAdminRole || l.key !== "admin");
+  ].filter(
+    (l) =>
+      (isAdminRole || l.key !== "admin") && (role === "ceo" || l.key !== "ceo"),
+  );
 
   // Landlord links
   const landlordLinks = [
@@ -236,6 +239,98 @@ export function renderNav(activePage) {
           </div>
         </div>`;
   };
+
+  // View-only accounts (CEO, Landlord): hide every button that adds,
+  // changes, deletes or sends something. Done with CSS so it also covers
+  // buttons that pages draw later.
+  if (viewOnly) {
+    document.body.classList.add("view-only");
+    if (!document.getElementById("view-only-css")) {
+      const actions = [
+        "addArea",
+        "addLineItem",
+        "addOccupant",
+        "addRemark",
+        "delArea",
+        "delRemark",
+        "deleteBounce",
+        "deleteBuilding",
+        "deleteCheque",
+        "deleteContract",
+        "deleteDoc",
+        "openAddendum",
+        "uploadDoc",
+        "createSignRequest",
+        "cancelSign",
+        "emailSignLink",
+        "deleteDeposit",
+        "deleteExpense",
+        "deleteFloor",
+        "deleteForm",
+        "deleteInvoice",
+        "deleteNotice",
+        "deletePayment",
+        "deleteRequest",
+        "deleteUnit",
+        "emailCurrent",
+        "emailFor",
+        "generateInvoice",
+        "markCompleted",
+        "markOpen",
+        "newForm",
+        "openAddBounce",
+        "openAddCheque",
+        "openAddDeposit",
+        "openAddExpense",
+        "openAddFloor",
+        "openAddMaintenance",
+        "openAddNotice",
+        "openAddPayment",
+        "openAddUnit",
+        "openAddUnitForFloor",
+        "openCreateBuilding",
+        "openEditBounce",
+        "openEditBuilding",
+        "openEditCheque",
+        "openEditDeposit",
+        "openEditMaintenance",
+        "openEditUnit",
+        "openRatesModal",
+        "promptAddEmail",
+        "rebuildAreas",
+        "removeLineItem",
+        "removePhoto",
+        "resetInvoiceForm",
+        "saveBounce",
+        "saveBuilding",
+        "saveCheque",
+        "saveDeposit",
+        "saveExpense",
+        "saveFloor",
+        "saveForm",
+        "saveMaintenance",
+        "saveNotice",
+        "savePayment",
+        "saveRates",
+        "saveUnit",
+        "sendAllReminders",
+        "sendAnnouncement",
+        "sendBuildingReminders",
+        "sendReminder",
+        "sendWhatsApp",
+        "toggleStatus",
+        "updateBuilding",
+        "updateStatus",
+      ];
+      const css =
+        actions.map((n) => `body.view-only [onclick*="${n}("]`).join(",") +
+        ",body.view-only #contract-upload-btn,body.view-only #doc-upload-btn,body.view-only .add-photo,body.view-only [onchange^=\"updateLineItem\"]{display:none !important}";
+      const st = document.createElement("style");
+      st.id = "view-only-css";
+      st.textContent = css;
+      document.head.appendChild(st);
+    }
+  }
 
   nav.innerHTML = `
     <div class="nav-brand" onclick="window.location.href='${ROLE_HOME[role]}'"

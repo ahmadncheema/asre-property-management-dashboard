@@ -56,6 +56,8 @@ export function canAccess(role, path) {
   if (role === "admin") return true;
   if (role === "finance") return /^finance(-[a-z]+)?\.html$/.test(file);
   if (role === "landlord") return file === "landlord.html";
+  // The CEO Panel is for the CEO (an admin may open it by its address)
+  if (file === "ceo.html") return role === "ceo";
   // team and ceo
   return file !== "admin.html" && file !== "landlord.html";
 }
