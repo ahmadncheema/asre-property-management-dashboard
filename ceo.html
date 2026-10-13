@@ -1,0 +1,118 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link
+      rel="icon"
+      href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📈</text></svg>"
+    />
+    <title>ASRE — CEO Panel</title>
+    <link rel="stylesheet" href="css/main.css" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <style>
+      .ceo-actions { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 20px; }
+      .act-row { display: flex; gap: 10px; padding: 8px 0; border-bottom: 1px solid var(--border); font-size: 0.88rem; }
+      .act-row .t { color: var(--text-muted); white-space: nowrap; min-width: 110px; }
+      @media (max-width: 600px) {
+        .ceo-actions .btn { width: 100%; }
+        .act-row { flex-direction: column; gap: 2px; }
+      }
+    </style>
+  </head>
+  <body>
+    <nav id="main-nav"></nav>
+    <div class="page-wrapper">
+      <div class="container">
+        <div class="page-header">
+          <div>
+            <div class="page-title">CEO <span>Panel</span></div>
+            <div class="page-subtitle" id="ceo-sub">
+              Whole portfolio at a glance
+            </div>
+          </div>
+        </div>
+
+        <div class="ceo-actions">
+          <button class="btn btn-green" onclick="openReportPicker()">
+            📊 Monthly Report
+          </button>
+          <a class="btn btn-outline" href="/dashboard.html">Open Dashboard</a>
+          <a class="btn btn-outline" href="/finance.html">Open Finance</a>
+        </div>
+
+        <div id="ceo-body">
+          <div class="loading-state"><div class="spinner"></div></div>
+        </div>
+
+        <div class="pf-card" id="ceo-activity-card" style="display: none">
+          <h3>Recent activity</h3>
+          <div id="ceo-activity"></div>
+        </div>
+      </div>
+    </div>
+
+    <script type="module">
+      import { requireAuth, roleOf, isViewOnly } from "./js/auth.js";
+      import { renderNav, formatDate } from "./js/shared.js";
+      import { supabase } from "./js/supabase.js";
+      import {
+        loadPortfolio,
+        analysePortfolio,
+        renderPortfolio,
+      } from "./js/portfolio.js";
+      import { openReport } from "./js/report-ui.js";
+
+      const session = requireAuth();
+      if (!session) throw new Error("Not authenticated");
+      renderNav("ceo");
+
+      if (isViewOnly(session)) {
+        document.getElementById("ceo-sub").textContent =
+          "Whole portfolio at a glance · view only";
+      }
+
+      let buildings = [];
+      const esc = (s) =>
+        String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
+
+      async function load() {
+        const body = document.getElementById("ceo-body");
+        try {
+          const { data, error } = await supabase
+            .from("buildings")
+            .select("id, name")
+            .order("name");
+          if (error) throw error;
+          buildings = data || [];
+          const d = await loadPortfolio(buildings);
+          renderPortfolio(body, d, analysePortfolio(d));
+        } catch (e) {
+          console.error(e);
+          body.innerHTML =
+            '<div class="pf-card" style="color:var(--danger)">Could not load the overview. Please refresh.</div>';
+        }
+        loadActivity();
+      }
+
+      async function loadActivity() {
+        const { data } = await supabase
+          .from("activity_log")
+          .select("user_name, action, module, created_at")
+          .order("created_at", { ascending: false })
+          .limit(12);
+        if (!data || !data.length) return;
+        document.getElementById("ceo-activity-card").style.display = "block";
+        document.getElementById("ceo-activity").innerHTML = data
+          .map(
+            (r) =>
+              `<div class="act-row"><span class="t">${formatDate(r.created_at)}</span><span><b style="color:var(--white)">${esc(r.user_name)}</b> — ${esc(r.action)}</span></div>`,
+          )
+          .join("");
+      }
+
+      window.openReportPicker = () => openReport(buildings);
+      load();
+    </script>
+  </body>
+</html>

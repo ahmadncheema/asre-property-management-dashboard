@@ -507,10 +507,8 @@
       // ── Load + list ───────────────────────────────────────────────
       async function init() {
         const [b, u] = await Promise.all([
-          supabase.from("buildings").select("id, name").order("name"),
-          supabase
-            .from("units")
-            .select("id, building_id, unit_number, tenant_name"),
+          supabase.from("buildings").select("*").order("name"),
+          supabase.from("units").select("*"),
         ]);
         buildings = b.data || [];
         units = u.data || [];
@@ -795,13 +793,38 @@
       }
 
       // ── Form actions ──────────────────────────────────────────────
+      // Fill a field from saved data. Brand-new forms are always filled;
+      // forms already saved only get their empty fields filled.
+      const fillF = (k, v) => {
+        if (v === undefined || v === null || v === "") return;
+        if (cur.isNew || !cur[k]) cur[k] = String(v);
+      };
       window.pickBuilding = (id) => {
         cur.building_id = id;
         cur.unit_id = "";
+        const b = buildings.find((x) => x.id === id);
+        if (b) {
+          fillF("location", b.location_area || b.address);
+          fillF("landlord_name", b.landlord_name || b.owner_name);
+          fillF("landlord_eid", b.landlord_eid);
+          fillF("landlord_tel", b.landlord_phone);
+          fillF("landlord_email", b.landlord_email);
+        }
         render();
       };
       window.pickUnit = (id) => {
         cur.unit_id = id;
+        const u = units.find((x) => x.id === id);
+        if (u) {
+          fillF("tenant_name", u.tenant_name);
+          fillF("tenant_mobile", u.tenant_whatsapp);
+          fillF("tenant_email", u.tenant_email);
+          fillF("annual_rent", u.rent);
+          fillF("security_deposit", u.deposit);
+          fillF("contract_from", u.start_date);
+          fillF("contract_to", u.end_date);
+        }
+        render();
       };
       window.addOccupant = () => {
         cur.occupants.push({ name: "", relationship: "", id_no: "" });

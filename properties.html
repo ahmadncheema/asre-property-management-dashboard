@@ -153,6 +153,12 @@
         border-color: var(--blue);
         color: var(--white);
       }
+      .landlord-box { margin: 4px 0 8px; border: 1px solid var(--border); border-radius: 10px; padding: 10px 12px; background: var(--bg, #fafafa); }
+      .landlord-box summary { cursor: pointer; font-weight: 600; font-size: 0.9rem; }
+      .landlord-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0 12px; margin-top: 10px; }
+      .hint-s { font-size: 0.75rem; color: var(--text-muted); margin-top: 4px; }
+      @media (max-width: 600px) { .landlord-grid { grid-template-columns: 1fr; } }
+
       .contract-row {
         display: flex;
         align-items: center;
@@ -283,6 +289,52 @@
               <option value="villa">Villa</option>
             </select>
           </div>
+          <details class="landlord-box">
+            <summary>Landlord details (saved only, used on forms)</summary>
+            <div class="landlord-grid">
+          <div class="form-group">
+            <label class="form-label">Owner name</label>
+            <input type="text" id="cb-owner" class="form-control" placeholder="" />
+          </div>
+          <div class="form-group">
+            <label class="form-label">Landlord name</label>
+            <input type="text" id="cb-landlord" class="form-control" placeholder="" />
+          </div>
+          <div class="form-group">
+            <label class="form-label">Landlord Emirates ID</label>
+            <input type="text" id="cb-lleid" class="form-control" placeholder="" />
+          </div>
+          <div class="form-group">
+            <label class="form-label">Landlord email</label>
+            <input type="text" id="cb-lemail" class="form-control" placeholder="" />
+          </div>
+          <div class="form-group">
+            <label class="form-label">Landlord phone</label>
+            <input type="text" id="cb-lphone" class="form-control" placeholder="" />
+          </div>
+          <div class="form-group">
+            <label class="form-label">Landlord WhatsApp</label>
+            <input type="text" id="cb-lwa" class="form-control" placeholder="" />
+          </div>
+          <div class="form-group">
+            <label class="form-label">Plot no.</label>
+            <input type="text" id="cb-plot" class="form-control" placeholder="" />
+          </div>
+          <div class="form-group">
+            <label class="form-label">DEWA premises no.</label>
+            <input type="text" id="cb-dewa" class="form-control" placeholder="" />
+          </div>
+          <div class="form-group">
+            <label class="form-label">Location / Community</label>
+            <input type="text" id="cb-area" class="form-control" placeholder="e.g. Dubai Silicon Oasis" />
+          </div>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Landlord login (can view this building)</label>
+              <select id="cb-luser" class="form-control"><option value="">— none —</option></select>
+              <div class="hint-s">Create the landlord under Admin Panel &gt; Users with type Landlord, then pick them here.</div>
+            </div>
+          </details>
         </div>
         <div class="modal-footer">
           <button
@@ -326,6 +378,52 @@
               <option value="villa">Villa</option>
             </select>
           </div>
+          <details class="landlord-box">
+            <summary>Landlord details (saved only, used on forms)</summary>
+            <div class="landlord-grid">
+          <div class="form-group">
+            <label class="form-label">Owner name</label>
+            <input type="text" id="eb-owner" class="form-control" placeholder="" />
+          </div>
+          <div class="form-group">
+            <label class="form-label">Landlord name</label>
+            <input type="text" id="eb-landlord" class="form-control" placeholder="" />
+          </div>
+          <div class="form-group">
+            <label class="form-label">Landlord Emirates ID</label>
+            <input type="text" id="eb-lleid" class="form-control" placeholder="" />
+          </div>
+          <div class="form-group">
+            <label class="form-label">Landlord email</label>
+            <input type="text" id="eb-lemail" class="form-control" placeholder="" />
+          </div>
+          <div class="form-group">
+            <label class="form-label">Landlord phone</label>
+            <input type="text" id="eb-lphone" class="form-control" placeholder="" />
+          </div>
+          <div class="form-group">
+            <label class="form-label">Landlord WhatsApp</label>
+            <input type="text" id="eb-lwa" class="form-control" placeholder="" />
+          </div>
+          <div class="form-group">
+            <label class="form-label">Plot no.</label>
+            <input type="text" id="eb-plot" class="form-control" placeholder="" />
+          </div>
+          <div class="form-group">
+            <label class="form-label">DEWA premises no.</label>
+            <input type="text" id="eb-dewa" class="form-control" placeholder="" />
+          </div>
+          <div class="form-group">
+            <label class="form-label">Location / Community</label>
+            <input type="text" id="eb-area" class="form-control" placeholder="e.g. Dubai Silicon Oasis" />
+          </div>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Landlord login (can view this building)</label>
+              <select id="eb-luser" class="form-control"><option value="">— none —</option></select>
+              <div class="hint-s">Create the landlord under Admin Panel &gt; Users with type Landlord, then pick them here.</div>
+            </div>
+          </details>
         </div>
         <div class="modal-footer">
           <button
@@ -1043,11 +1141,60 @@
         loadBuildings();
       };
 
+      // ── Landlord details (saved on the building, not shown on cards) ──
+      let landlordUsers = [];
+      async function loadLandlordUsers() {
+        const { data } = await supabase
+          .from("users")
+          .select("username, full_name, role")
+          .eq("role", "landlord");
+        landlordUsers = data || [];
+      }
+      function fillLandlordUsers(pre, current) {
+        const el = document.getElementById(pre + "-luser");
+        el.innerHTML =
+          '<option value="">— none —</option>' +
+          landlordUsers
+            .map(
+              (u) =>
+                `<option value="${u.username}" ${u.username === current ? "selected" : ""}>${u.full_name || u.username} (${u.username})</option>`,
+            )
+            .join("");
+      }
+      const LL_MAP = {
+        owner: "owner_name",
+        landlord: "landlord_name",
+        lleid: "landlord_eid",
+        lemail: "landlord_email",
+        lphone: "landlord_phone",
+        lwa: "landlord_whatsapp",
+        plot: "plot_no",
+        dewa: "dewa_premises_no",
+        area: "location_area",
+        luser: "landlord_username",
+      };
+      function readLandlord(pre) {
+        const o = {};
+        for (const [k, col] of Object.entries(LL_MAP)) {
+          o[col] = document.getElementById(pre + "-" + k).value.trim() || null;
+        }
+        return o;
+      }
+      function writeLandlord(pre, b) {
+        for (const [k, col] of Object.entries(LL_MAP)) {
+          if (k === "luser") continue;
+          document.getElementById(pre + "-" + k).value = b[col] || "";
+        }
+        fillLandlordUsers(pre, b.landlord_username || "");
+      }
+
       // ── Create Building ──────────────────────────────────────────────
       window.openCreateBuilding = function () {
         document.getElementById("cb-name").value = "";
         document.getElementById("cb-address").value = "";
         document.getElementById("cb-type").value = "apartment";
+        writeLandlord("cb", {});
+        loadLandlordUsers().then(() => fillLandlordUsers("cb", ""));
         openModal("modal-create-building");
       };
 
@@ -1063,7 +1210,7 @@
 
         const { error } = await supabase
           .from("buildings")
-          .insert({ name, address, type });
+          .insert({ name, address, type, ...readLandlord("cb") });
         if (error) {
           showToast("Error creating building.", "error");
           return;
@@ -1083,6 +1230,8 @@
         document.getElementById("eb-name").value = b.name;
         document.getElementById("eb-address").value = b.address;
         document.getElementById("eb-type").value = b.type;
+        writeLandlord("eb", b);
+        loadLandlordUsers().then(() => fillLandlordUsers("eb", b.landlord_username || ""));
         openModal("modal-edit-building");
       };
 
@@ -1098,7 +1247,7 @@
 
         const { error } = await supabase
           .from("buildings")
-          .update({ name, address, type })
+          .update({ name, address, type, ...readLandlord("eb") })
           .eq("id", editingBuildingId);
 
         if (error) {

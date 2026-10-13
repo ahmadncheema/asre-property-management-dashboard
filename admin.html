@@ -490,9 +490,13 @@
           <div class="form-group" id="u-role-group">
             <label class="form-label">Role *</label>
             <select id="u-role" class="form-control">
-              <option value="admin">Admin</option>
-              <option value="finance">Finance</option>
+              <option value="admin">Admin — everything, including this panel</option>
+              <option value="team">Team — everything except the Admin Panel</option>
+              <option value="finance">Finance — finance pages only</option>
+              <option value="ceo">CEO — view only, plus CEO Panel</option>
+              <option value="landlord">Landlord — own buildings only</option>
             </select>
+            <div id="u-role-note" style="font-size:0.75rem;color:var(--text-muted);margin-top:4px"></div>
           </div>
         </div>
         <div class="modal-footer">
@@ -603,7 +607,7 @@
     </div>
 
     <script type="module">
-      import { requireAuth } from "./js/auth.js";
+      import { requireAuth, roleOf, ROLE_LABELS } from "./js/auth.js";
       import {
         renderNav,
         showToast,
@@ -614,8 +618,8 @@
 
       const session = requireAuth();
       if (!session) throw new Error("Not authenticated");
-      if (session.role === "finance") {
-        window.location.href = "/finance.html";
+      if (roleOf(session) !== "admin") {
+        window.location.href = "/index.html";
         throw new Error("Access denied");
       }
       renderNav("admin");
@@ -677,8 +681,8 @@
                 </td>
                 <td style="color:var(--text-muted)">@${u.username}</td>
                 <td>
-                  <span class="badge ${u.role === "admin" ? "badge-blue" : "badge-green"}">
-                    ${u.role || "admin"}
+                  <span class="badge ${{ admin: "badge-blue", team: "badge-green", finance: "badge-green", ceo: "badge-orange", landlord: "badge-grey" }[u.role || "admin"] || "badge-green"}">
+                    ${ROLE_LABELS[u.role || "admin"] || u.role}
                   </span>
                 </td>
                 <td>${formatDate(u.created_at)}</td>
@@ -724,7 +728,9 @@
         document.getElementById("u-username").disabled = false;
         document.getElementById("u-confirm-group").style.display = "block";
         document.getElementById("u-role-group").style.display = "block";
-        document.getElementById("u-role").value = "admin";
+        document.getElementById("u-role").value = "team";
+        document.getElementById("u-role").disabled = false;
+        document.getElementById("u-role-note").textContent = "";
         openModal("modal-create-user");
       };
 
@@ -739,7 +745,14 @@
         document.getElementById("u-password").value = "";
         document.getElementById("u-username").disabled = false;
         document.getElementById("u-confirm-group").style.display = "none";
-        document.getElementById("u-role-group").style.display = "none";
+        document.getElementById("u-role-group").style.display = "block";
+        document.getElementById("u-role").value = user.role || "admin";
+        // Nobody can change their own type (so the last admin can't be lost)
+        const mine = user.username === session.username || user.username === "admin";
+        document.getElementById("u-role").disabled = mine;
+        document.getElementById("u-role-note").textContent = mine
+          ? "You can't change your own user type."
+          : "The change applies the next time this person logs in.";
         openModal("modal-create-user");
       };
 
@@ -772,6 +785,8 @@
 
         if (editingUserId) {
           const payload = { full_name: fullName, username };
+          const roleSel = document.getElementById("u-role");
+          if (!roleSel.disabled) payload.role = roleSel.value;
           ({ error } = await supabase
             .from("users")
             .update(payload)

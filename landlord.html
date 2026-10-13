@@ -1,0 +1,91 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link
+      rel="icon"
+      href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🏢</text></svg>"
+    />
+    <title>ASRE — Landlord Portal</title>
+    <link rel="stylesheet" href="css/main.css" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <style>
+      .ll-actions { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 20px; }
+      @media (max-width: 600px) { .ll-actions .btn { width: 100%; } }
+    </style>
+  </head>
+  <body>
+    <nav id="main-nav"></nav>
+    <div class="page-wrapper">
+      <div class="container">
+        <div class="page-header">
+          <div>
+            <div class="page-title">My <span>Buildings</span></div>
+            <div class="page-subtitle" id="ll-sub">Loading...</div>
+          </div>
+        </div>
+
+        <div class="ll-actions">
+          <button class="btn btn-green" onclick="openReportPicker()">
+            📊 Monthly Report
+          </button>
+        </div>
+
+        <div id="ll-body">
+          <div class="loading-state"><div class="spinner"></div></div>
+        </div>
+      </div>
+    </div>
+
+    <script type="module">
+      import { requireAuth, roleOf } from "./js/auth.js";
+      import { renderNav } from "./js/shared.js";
+      import { supabase } from "./js/supabase.js";
+      import {
+        loadPortfolio,
+        analysePortfolio,
+        renderPortfolio,
+      } from "./js/portfolio.js";
+      import { openReport } from "./js/report-ui.js";
+
+      const session = requireAuth();
+      if (!session) throw new Error("Not authenticated");
+      renderNav("landlord");
+
+      const isLandlord = roleOf(session) === "landlord";
+      let buildings = [];
+
+      async function load() {
+        const body = document.getElementById("ll-body");
+        try {
+          // A landlord sees only the buildings assigned to their login.
+          // (An admin opening this page sees every building, as a preview.)
+          let q = supabase.from("buildings").select("id, name").order("name");
+          if (isLandlord) q = q.eq("landlord_username", session.username);
+          const { data, error } = await q;
+          if (error) throw error;
+          buildings = data || [];
+
+          document.getElementById("ll-sub").textContent = isLandlord
+            ? `Welcome, ${session.full_name} · view only`
+            : "Preview: showing all buildings (landlords see only their own)";
+
+          const d = await loadPortfolio(buildings);
+          renderPortfolio(body, d, analysePortfolio(d), {
+            unitDetail: true,
+            emptyText:
+              "No buildings are linked to your login yet. Please contact the office.",
+          });
+        } catch (e) {
+          console.error(e);
+          body.innerHTML =
+            '<div class="pf-card" style="color:var(--danger)">Could not load your buildings. Please refresh.</div>';
+        }
+      }
+
+      window.openReportPicker = () => openReport(buildings);
+      load();
+    </script>
+  </body>
+</html>

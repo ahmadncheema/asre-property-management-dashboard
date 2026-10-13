@@ -4,7 +4,7 @@
 // ================================================================
 
 import { supabase } from "./supabase.js";
-import { getSession, logout } from "./auth.js";
+import { getSession, logout, roleOf, isViewOnly, ROLE_HOME } from "./auth.js";
 
 // ── Format currency ───────────────────────────────────────────────
 export function formatCurrency(amount) {
@@ -119,8 +119,11 @@ export function renderNav(activePage) {
   const nav = document.getElementById("main-nav");
   if (!nav || !session) return;
 
-  const isAdminRole = session.role === "admin";
-  const isFinanceRole = session.role === "finance";
+  const role = roleOf(session);
+  const isAdminRole = role === "admin";
+  const isFinanceRole = role === "finance";
+  const isLandlordRole = role === "landlord";
+  const viewOnly = isViewOnly(session);
 
   // Admin links
   const adminLinks = [
@@ -139,7 +142,13 @@ export function renderNav(activePage) {
     },
     { href: "/emails.html", label: "Emails", key: "emails" },
     { href: "/finance.html", label: "Finance", key: "finance" },
+    { href: "/ceo.html", label: "CEO Panel", key: "ceo" },
     { href: "/admin.html", label: "Admin", key: "admin" },
+  ].filter((l) => isAdminRole || l.key !== "admin");
+
+  // Landlord links
+  const landlordLinks = [
+    { href: "/landlord.html", label: "My Buildings", key: "landlord" },
   ];
 
   // Finance links
@@ -161,7 +170,11 @@ export function renderNav(activePage) {
   ];
 
   // Flat list: used by the mobile menu and by the finance role
-  const links = isFinanceRole ? financeLinks : adminLinks;
+  const links = isFinanceRole
+    ? financeLinks
+    : isLandlordRole
+      ? landlordLinks
+      : adminLinks;
 
   // Desktop layout for admins: related pages grouped into dropdowns so the
   // bar always fits on screen (no sideways scrolling).
@@ -188,9 +201,14 @@ export function renderNav(activePage) {
       ],
     },
     byKey("finance"),
+    byKey("ceo"),
     byKey("admin"),
-  ];
-  const desktopItems = isFinanceRole ? financeLinks : adminGroups;
+  ].filter(Boolean);
+  const desktopItems = isFinanceRole
+    ? financeLinks
+    : isLandlordRole
+      ? landlordLinks
+      : adminGroups;
 
   const renderDesktopItem = (item) => {
     if (!item.children) {
@@ -220,17 +238,17 @@ export function renderNav(activePage) {
   };
 
   nav.innerHTML = `
-    <div class="nav-brand" onclick="window.location.href='${isFinanceRole ? "/finance.html" : "/dashboard.html"}'"
+    <div class="nav-brand" onclick="window.location.href='${ROLE_HOME[role]}'"
       style="cursor:pointer">
       <img src="assets/logo/logo-small.png" alt="ASRE"
         style="height:36px; width:auto; object-fit:contain;" />
-      <span class="nav-title">${isFinanceRole ? "Finance" : "Property Management"}</span>
+      <span class="nav-title">${isFinanceRole ? "Finance" : isLandlordRole ? "Landlord Portal" : "Property Management"}</span>
     </div>
     <div class="nav-links" id="nav-links-desktop">
       ${desktopItems.map(renderDesktopItem).join("")}
     </div>
     <div class="nav-user">
-      <span class="nav-username">👤 ${session.full_name}</span>
+      <span class="nav-username">👤 ${session.full_name}${viewOnly ? ' <span class="badge badge-orange" style="margin-left:6px">View only</span>' : ""}</span>
       <button class="nav-logout" onclick="handleLogout()">Logout</button>
       <button class="nav-hamburger" id="nav-hamburger" onclick="toggleMobileMenu()">
         ☰

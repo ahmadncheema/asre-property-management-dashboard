@@ -75,12 +75,11 @@
     </div>
 
     <script type="module">
-      import { login } from "./js/auth.js";
-      import { getSession } from "./js/auth.js";
+      import { login, getSession, roleOf, ROLE_HOME } from "./js/auth.js";
 
-      // If already logged in, go straight to dashboard
+      // If already logged in, go straight to their home page
       if (getSession()) {
-        window.location.href = "/dashboard.html";
+        window.location.href = ROLE_HOME[roleOf(getSession())];
       }
 
       const loginBtn = document.getElementById("login-btn");
@@ -115,11 +114,7 @@
         const result = await login(username, password);
 
         if (result.success) {
-          if (result.user.role === "finance") {
-            window.location.href = "/finance.html";
-          } else {
-            window.location.href = "/dashboard.html";
-          }
+          window.location.href = ROLE_HOME[roleOf(result.user)];
         } else {
           showError(result.message);
           loginBtn.disabled = false;
