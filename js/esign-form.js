@@ -69,12 +69,13 @@ export async function mountEsignForm(box, { building, unit, session, onCreated }
       ${building.landlord_username ? "" : '<div style="font-size:0.78rem;color:var(--warning);margin-bottom:8px">⚠ This building has no landlord login assigned (building page > Landlord details). The landlord will not be able to sign until one is set.</div>'}
       <label>What does the tenant sign?</label>
       <select class="form-input" data-f="template">${opts.map((t) => `<option value="${esc(t.id)}">${esc(t.label)}</option>`).join("")}</select>
-      <label>Tenancy contract to include (your uploaded PDF, shown first)</label>
+      <label>Tenancy contract to include (shown first)</label>
       <select class="form-input" data-f="contract">
+        <option value="__ejari__" selected>Standard Ejari tenancy contract (blank form, filled in automatically)</option>
         <option value="">No contract, addendum only</option>
-        ${contracts.map((f, i) => `<option value="${esc(f.filename)}" ${i === 0 ? "selected" : ""}>${esc(f.name)} (${day(f.uploadedAt)})</option>`).join("")}
+        ${contracts.map((f) => `<option value="${esc(f.filename)}" >${esc(f.name)} (${day(f.uploadedAt)})</option>`).join("")}
       </select>
-      ${contracts.length ? "" : '<div style="font-size:0.75rem;color:var(--warning)">No contract uploaded for this unit yet. Upload it in the Contract tab to include it.</div>'}
+      
       <div data-f="formbox" style="margin-top:10px">
         <label style="display:flex;gap:8px;align-items:center;font-size:0.8rem;color:inherit;margin:0">
           <input type="checkbox" data-f="stamp" checked style="width:auto" />
@@ -179,7 +180,7 @@ export async function mountEsignForm(box, { building, unit, session, onCreated }
       const fetchBuf = async (u) => (await fetch(u + "?t=" + Date.now())).arrayBuffer();
       const dataUrl = await assemble({
         template: pv.template, fields: pv.fields, contentHash: pv.contentHash,
-        contractBuf: p.contractFile ? await fetchBuf("/api/contract/" + encodeURIComponent(unit.id) + "/" + encodeURIComponent(p.contractFile)) : null,
+        contractBuf: p.contractFile === "__ejari__" ? await fetchBuf("/templates/ejari-blank.pdf") : p.contractFile ? await fetchBuf("/api/contract/" + encodeURIComponent(unit.id) + "/" + encodeURIComponent(p.contractFile)) : null,
         srcBuf: pv.hasSource ? await fetchBuf("/api/addendum-file/" + encodeURIComponent(building.id)) : null,
         stampContractPage: pv.stampContractPage, form: pv.form, usage: pv.usage,
         tenant: null, landlord: null, preview: true,
