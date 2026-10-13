@@ -316,6 +316,7 @@ export async function stampContract(buf, { tenant, landlord, preview, form, usag
       } else if (preview) {
         page.drawRectangle({ x: b.x, y: H - b.top - b.h, width: b.w, height: b.h, borderColor: rgb(0.85, 0.2, 0.2), borderWidth: 0.8, borderDashArray: [3, 2] });
         page.drawText(role === "tenant" ? "Tenant signs here" : "Landlord signs here", { x: b.x + 3, y: H - b.top - 8, size: 6.5, font, color: rgb(0.85, 0.2, 0.2) });
+        page.drawText("dd/mm/yyyy (added on signing)", { x: b.dx, y: H - spot.dateTop, size: 7, font, color: rgb(0.85, 0.2, 0.2) });
       }
     }
   }
