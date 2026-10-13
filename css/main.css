@@ -1442,3 +1442,14 @@ button.nav-dropdown-btn.active {
     display: none;
   }
 }
+
+/* ── E-sign form and request list (Contracts page + unit Contract window) ── */
+.esign-form label{display:block;font-size:0.75rem;font-weight:600;margin:10px 0 3px;color:var(--text-muted)}
+.esign-form .form-input{width:100%}
+.es-grid{display:grid;grid-template-columns:1fr 1fr;gap:0 10px}
+.es-badge{font-size:0.7rem;padding:2px 8px;border-radius:10px;font-weight:700;white-space:nowrap}
+.es-pending{background:#fff4d6;color:#8a5a00}.es-signed{background:#dcf5e3;color:#14532d}
+.es-tenant_signed{background:#dbe9ff;color:#1b3a7a}
+.es-expired,.es-cancelled{background:#eceef2;color:#555}
+.es-link{display:flex;gap:6px;margin:8px 0}.es-link input{flex:1;font-size:0.8rem}
+@media (max-width:600px){.es-grid{grid-template-columns:1fr}}

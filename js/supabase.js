@@ -74,7 +74,7 @@ if (viewOnly()) {
   const realFetch = window.fetch.bind(window);
   window.fetch = (url, opts) => {
     const method = ((opts && opts.method) || "GET").toUpperCase();
-    if (method !== "GET" && String(url).startsWith("/api/")) {
+    if (method !== "GET" && String(url).startsWith("/api/") && !String(url).startsWith("/api/landlord-sign/")) {
       viewOnlyNotice();
       return Promise.resolve(
         new Response(JSON.stringify({ error: "View-only account" }), {

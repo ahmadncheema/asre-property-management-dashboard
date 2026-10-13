@@ -1,0 +1,167 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>✍️</text></svg>" />
+    <title>ASRE — Contracts</title>
+    <link rel="stylesheet" href="css/main.css" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf-lib/1.17.1/pdf-lib.min.js"></script>
+    <style>
+      .panel{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);padding:18px;margin-bottom:18px}
+      .stat-row{display:flex;gap:12px;flex-wrap:wrap;margin-bottom:18px}
+      .stat{flex:1;min-width:90px;background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);padding:12px 14px;text-align:center;cursor:pointer}
+      .stat b{display:block;font-size:1.5rem;color:var(--white)}
+      .stat span{font-size:0.75rem;color:var(--text-muted)}
+      .stat.on{border-color:var(--green,#3ead82)}
+      .req{display:flex;gap:10px;align-items:center;justify-content:space-between;flex-wrap:wrap;padding:12px 0;border-top:1px solid var(--border)}
+      .req .t{font-weight:700;color:var(--white)}
+      .req .m{font-size:0.78rem;color:var(--text-muted);margin-top:2px}
+      .req .a{display:flex;gap:6px;flex-wrap:wrap}
+      .pick{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:6px}
+      @media (max-width:600px){.pick{grid-template-columns:1fr}}
+    </style>
+  </head>
+  <body>
+    <nav id="main-nav"></nav>
+    <div class="page-wrapper">
+      <div class="container">
+        <div class="page-header">
+          <div>
+            <div class="page-title">Contracts <span>&amp; E-sign</span></div>
+            <div class="page-subtitle">Send a tenant their contract and addendum to sign on their phone, and track who has signed</div>
+          </div>
+          <button class="btn btn-green" onclick="openNewRequest()">+ New signing request</button>
+        </div>
+
+        <div class="panel" id="new-panel" style="display:none">
+          <b>New signing request</b>
+          <div class="pick">
+            <div><label style="font-size:0.75rem;font-weight:600;color:var(--text-muted)">Building</label>
+              <select id="np-building" class="form-input" style="width:100%"></select></div>
+            <div><label style="font-size:0.75rem;font-weight:600;color:var(--text-muted)">Unit (with a tenant)</label>
+              <select id="np-unit" class="form-input" style="width:100%"></select></div>
+          </div>
+          <div id="np-form"></div>
+        </div>
+
+        <div class="stat-row" id="stats"></div>
+
+        <div class="panel">
+          <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:6px">
+            <input id="q" class="form-input" placeholder="Search tenant, building or unit…" style="flex:2;min-width:200px" />
+          </div>
+          <div id="list"><p style="color:var(--text-muted)">Loading…</p></div>
+        </div>
+      </div>
+    </div>
+
+    <script type="module">
+      import { requireAuth } from "./js/auth.js";
+      import { renderNav, showToast, showConfirm, formatDate, logActivity } from "./js/shared.js";
+      import { supabase } from "./js/supabase.js";
+      import { mountEsignForm, renderLinkPanel } from "./js/esign-form.js";
+
+      const session = requireAuth();
+      if (!session) throw new Error("Not authenticated");
+      renderNav("contracts");
+
+      const esc = (s) => String(s == null ? "" : s).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
+      let buildings = [], units = [], requests = [], filter = "all";
+
+      async function load() {
+        const [b, u] = await Promise.all([
+          supabase.from("buildings").select("*").order("name"),
+          supabase.from("units").select("*"),
+        ]);
+        buildings = b.data || []; units = u.data || [];
+        const sel = document.getElementById("np-building");
+        sel.innerHTML = buildings.map((x) => `<option value="${esc(x.id)}">${esc(x.name)}</option>`).join("");
+        fillUnits();
+        await loadRequests();
+      }
+
+      function fillUnits() {
+        const bid = document.getElementById("np-building").value;
+        const list = units.filter((u) => u.building_id === bid && u.tenant_name && u.tenant_name.trim())
+          .sort((a, b) => String(a.unit_number).localeCompare(String(b.unit_number), undefined, { numeric: true }));
+        document.getElementById("np-unit").innerHTML = list.length
+          ? list.map((u) => `<option value="${esc(u.id)}">Unit ${esc(u.unit_number)} — ${esc(u.tenant_name)}</option>`).join("")
+          : '<option value="">No occupied units</option>';
+        mountForm();
+      }
+
+      function mountForm() {
+        const box = document.getElementById("np-form");
+        const b = buildings.find((x) => x.id === document.getElementById("np-building").value);
+        const u = units.find((x) => x.id === document.getElementById("np-unit").value);
+        if (!b || !u) { box.innerHTML = ""; return; }
+        mountEsignForm(box, {
+          building: b, unit: u, session,
+          onCreated: () => { logActivity("Created e-sign request for unit " + u.unit_number + ", " + b.name, "contracts"); loadRequests(); },
+        });
+      }
+      document.getElementById("np-building").onchange = fillUnits;
+      document.getElementById("np-unit").onchange = mountForm;
+      window.openNewRequest = () => {
+        const p = document.getElementById("new-panel");
+        p.style.display = p.style.display === "none" ? "" : "none";
+      };
+
+      async function loadRequests() {
+        try {
+          const res = await fetch("/api/sign-requests?t=" + Date.now(), { cache: "no-store" });
+          if (!res.ok) throw new Error();
+          requests = (await res.json()).requests;
+        } catch (e) {
+          document.getElementById("list").innerHTML = '<p style="color:var(--danger)">E-sign is only available on the live server.</p>';
+          return;
+        }
+        render();
+      }
+
+      const LABEL = { pending: "Waiting for tenant", tenant_signed: "Waiting for landlord", signed: "Signed", expired: "Expired", cancelled: "Cancelled" };
+      function render() {
+        const count = (s) => requests.filter((r) => r.status === s).length;
+        document.getElementById("stats").innerHTML = [["all", "All", requests.length], ["pending", "Waiting for tenant", count("pending")], ["tenant_signed", "Waiting for landlord", count("tenant_signed")], ["signed", "Signed", count("signed")], ["expired", "Expired", count("expired")]]
+          .map(([k, l, n]) => `<div class="stat ${filter === k ? "on" : ""}" onclick="setFilter('${k}')"><b>${n}</b><span>${l}</span></div>`).join("");
+        const term = document.getElementById("q").value.toLowerCase().trim();
+        const rows = requests.filter((r) => (filter === "all" || r.status === filter) &&
+          (!term || [r.tenantName, r.propertyName, r.apartmentNo].join(" ").toLowerCase().includes(term)));
+        document.getElementById("list").innerHTML = rows.length ? rows.map((r) => `
+          <div class="req">
+            <div style="flex:1;min-width:200px">
+              <div class="t">${esc(r.tenantName)} <span class="es-badge es-${r.status}">${LABEL[r.status] || r.status}</span></div>
+              <div class="m">${esc(r.propertyName)} · Unit ${esc(r.apartmentNo)} · ${esc(r.label)}</div>
+              <div class="m">${r.status === "signed" ? "Fully signed " + formatDate(r.signedAt) : r.status === "tenant_signed" ? "Tenant signed " + formatDate(r.tenantSignedAt) + " · waiting for the landlord to sign in the portal" : "Sent " + formatDate(r.createdAt) + (r.status === "pending" ? " · expires " + formatDate(r.expiresAt) : "")}</div>
+            </div>
+            <div class="a">
+              ${r.status === "signed" && r.file ? `<a class="btn btn-outline btn-sm" href="${r.file}" target="_blank" rel="noopener">View PDF</a><a class="btn btn-outline btn-sm" href="${r.file}?dl=1">⬇</a>` : ""}
+              ${r.status === "tenant_signed" ? `${r.interim ? `<a class="btn btn-outline btn-sm" href="${r.interim}" target="_blank" rel="noopener">View (tenant signed)</a>` : ""}<button class="btn btn-danger btn-sm" onclick="cancelSignRequest('${r.token}')">Cancel</button>` : ""}
+              ${r.status === "pending" ? `<button class="btn btn-outline btn-sm" onclick="showLink('${r.token}')">Link</button><button class="btn btn-danger btn-sm" onclick="cancelSignRequest('${r.token}')">Cancel</button>` : ""}
+            </div>
+            <div id="lk-${r.token}" style="flex-basis:100%"></div>
+          </div>`).join("") : '<p style="color:var(--text-muted);padding:10px 0">Nothing here yet.</p>';
+      }
+      window.setFilter = (k) => { filter = k; render(); };
+      document.getElementById("q").oninput = render;
+
+      window.showLink = (token) => {
+        const r = requests.find((x) => x.token === token);
+        const u = units.find((x) => String(x.id) === String(r.unitId)) || {};
+        renderLinkPanel(document.getElementById("lk-" + token), { token, tenant: r.tenantName, email: r.tenantEmail, whatsapp: u.tenant_whatsapp, onNew: () => (document.getElementById("lk-" + token).innerHTML = "") });
+      };
+      window.cancelSignRequest = async (token) => {
+        if (!(await showConfirm("Cancel this signing request? The link will stop working."))) return;
+        try {
+          const res = await fetch("/api/sign-cancel", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ token }) });
+          if (!res.ok) throw new Error((await res.json()).error);
+          showToast("Request cancelled."); loadRequests();
+        } catch (e) { showToast(e.message || "Could not cancel", "error"); }
+      };
+
+      load();
+    </script>
+  </body>
+</html>

@@ -300,6 +300,14 @@
               <option value="villa">Villa</option>
             </select>
           </div>
+          <div class="form-group">
+            <label class="form-label">Property Usage (ticked on the Ejari contract)</label>
+            <select id="cb-usage" class="form-control">
+              <option value="residential">Residential</option>
+              <option value="commercial">Commercial</option>
+              <option value="industrial">Industrial</option>
+            </select>
+          </div>
           <details class="landlord-box">
             <summary>Landlord details (saved only, used on forms)</summary>
             <div class="landlord-grid">
@@ -387,6 +395,14 @@
             <select id="eb-type" class="form-control">
               <option value="apartment">Apartment</option>
               <option value="villa">Villa</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Property Usage (ticked on the Ejari contract)</label>
+            <select id="eb-usage" class="form-control">
+              <option value="residential">Residential</option>
+              <option value="commercial">Commercial</option>
+              <option value="industrial">Industrial</option>
             </select>
           </div>
           <details class="landlord-box">
@@ -808,25 +824,7 @@
             <p style="font-size:0.8rem;color:var(--text-muted);margin:0 0 12px">
               Send the tenant a link to read and sign the addendum on their phone. The signed PDF is saved in the Contract tab.
             </p>
-            <div id="esign-form" class="esign-form">
-              <label>Addendum</label>
-              <select id="es-template" class="form-input" onchange="esignTemplateChanged()"></select>
-              <label>Property name</label><input id="es-property" class="form-input" />
-              <label>Landlord name</label><input id="es-landlord" class="form-input" />
-              <label>Tenant name</label><input id="es-tenant" class="form-input" />
-              <div class="es-grid">
-                <div><label>Apartment no.</label><input id="es-unit" class="form-input" /></div>
-                <div><label>Apartment details</label><input id="es-details" class="form-input" placeholder="e.g. 1 BHK" /></div>
-                <div><label>Total rent</label><input id="es-rent" class="form-input" /></div>
-                <div><label>Security deposit</label><input id="es-deposit" class="form-input" /></div>
-                <div><label>Contract start</label><input id="es-start" class="form-input" /></div>
-                <div><label>Contract end</label><input id="es-end" class="form-input" /></div>
-              </div>
-              <label>Tenant email (optional)</label><input id="es-email" class="form-input" type="email" />
-              <p style="font-size:0.75rem;color:var(--text-muted);margin:10px 0 0">When signed, leasing@alsheebanirealestate.ae is notified automatically and the tenant gets a copy.</p><input id="es-notify" type="hidden" />
-              <button class="btn btn-primary" id="es-create" style="margin-top:14px;width:100%" onclick="createSignRequest()">Create signing link</button>
-            </div>
-            <div id="esign-result" style="display:none"></div>
+            <div id="esign-mount"></div>
             <h4 style="margin:18px 0 8px;font-size:0.9rem">Requests for this unit</h4>
             <div id="esign-list"></div>
           </div>
@@ -842,6 +840,8 @@
       </div>
     </div>
 
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf-lib/1.17.1/pdf-lib.min.js"></script>
     <script type="module">
       import { requireAuth } from "./js/auth.js";
       import {
@@ -850,8 +850,8 @@
         showConfirm,
         formatCurrency,
         formatDate,
-        whatsappLink,
       } from "./js/shared.js";
+      import { mountEsignForm, renderLinkPanel } from "./js/esign-form.js";
       import { supabase } from "./js/supabase.js";
       import { logActivity } from "./js/shared.js";
 
@@ -1260,6 +1260,7 @@
         dewa: "dewa_premises_no",
         area: "location_area",
         luser: "landlord_username",
+        usage: "property_usage",
       };
       function readLandlord(pre) {
         const o = {};
@@ -1271,7 +1272,7 @@
       function writeLandlord(pre, b) {
         for (const [k, col] of Object.entries(LL_MAP)) {
           if (k === "luser") continue;
-          document.getElementById(pre + "-" + k).value = b[col] || "";
+          document.getElementById(pre + "-" + k).value = b[col] || (k === "usage" ? "residential" : "");
         }
         fillLandlordUsers(pre, b.landlord_username || "");
       }
@@ -1622,7 +1623,6 @@
         contractUnit = unitId;
         contractUnitNo = unitNumber;
         switchCTab("contract");
-        document.getElementById("esign-result").style.display = "none";
         document.getElementById("contract-title").textContent =
           "Contract — Unit " + unitNumber;
         document.getElementById("contract-list").innerHTML =
@@ -1861,89 +1861,16 @@
       };
 
       // ── E-sign ───────────────────────────────────────────────────────
-      let signTemplates = [];
-      async function initEsign() {
-        document.getElementById("esign-result").style.display = "none";
-        document.getElementById("esign-form").style.display = "";
-        try {
-          if (!signTemplates.length) signTemplates = (await (await fetch("/api/sign-templates")).json()).templates || [];
-        } catch (e) {}
-        const sel = document.getElementById("es-template");
-        const bAd = currentBuilding ? await fetchAddendum(currentBuilding.id) : null;
-        const opts = (bAd ? [{ id: "building", label: "This building's addendum: " + bAd.title, defaults: {} }] : []).concat(signTemplates);
-        window._esOpts = opts;
-        sel.innerHTML = opts.map((t) => `<option value="${safeText(t.id)}">${safeText(t.label)}</option>`).join("") || '<option value="">(no addendum for this building yet - add one on the building page)</option>';
-        const u = currentUnits.find((x) => String(x.id) === String(contractUnit)) || {};
-        const b = currentBuilding || {};
-        const set = (id, v) => (document.getElementById(id).value = v == null ? "" : v);
-        set("es-landlord", b.landlord_name || b.owner_name || "");
-        set("es-tenant", u.tenant_name);
-        set("es-unit", u.unit_number || contractUnitNo);
-        set("es-details", u.unit_type || u.size || "");
-        set("es-rent", u.rent ? "AED " + Number(u.rent).toLocaleString("en-US") : "");
-        set("es-deposit", u.deposit ? "AED " + Number(u.deposit).toLocaleString("en-US") : "");
-        const d = (v) => (v ? new Date(v).toLocaleDateString("en-GB", { day: "2-digit", month: "short", year: "numeric" }) : "");
-        set("es-start", d(u.start_date));
-        set("es-end", d(u.end_date));
-        set("es-email", u.tenant_email);
-        set("es-notify", "");
-        esignTemplateChanged(true);
-        window._esUnit = u;
-      }
-      window.esignTemplateChanged = function (keepLandlord) {
-        const t = (window._esOpts || []).find((x) => x.id === document.getElementById("es-template").value);
-        if (!t) return;
-        document.getElementById("es-property").value = (t.defaults && t.defaults.propertyName) || (currentBuilding && currentBuilding.name) || "";
-        if (t.id === "building") document.getElementById("es-landlord").value = (currentBuilding && (currentBuilding.landlord_name || currentBuilding.owner_name)) || "";
-        if (!document.getElementById("es-landlord").value && t.defaults) document.getElementById("es-landlord").value = t.defaults.landlordName || "";
-      };
-      window.createSignRequest = async function () {
-        const v = (id) => document.getElementById(id).value.trim();
-        const btn = document.getElementById("es-create");
-        btn.disabled = true;
-        try {
-          const j = await jpost("/api/sign-create", {
-            unitId: contractUnit, buildingId: currentBuilding && currentBuilding.id,
-            templateId: v("es-template"), tenantEmail: v("es-email"), notifyEmail: v("es-notify"), createdBy: session.username,
-            fields: { propertyName: v("es-property"), landlordName: v("es-landlord"), tenantName: v("es-tenant"), apartmentNo: v("es-unit"),
-              apartmentDetails: v("es-details"), totalRent: v("es-rent"), securityDeposit: v("es-deposit"), contractStart: v("es-start"), contractEnd: v("es-end") },
-          });
-          logActivity("Created e-sign request for unit " + v("es-unit"), "properties");
-          showSignLink(j.token, v("es-tenant"), v("es-email"));
-          loadSignRequests();
-        } catch (e) { showToast(e.message, "error"); }
-        btn.disabled = false;
-      };
-      function showSignLink(token, tenant, email) {
-        const link = location.origin + "/sign.html?t=" + token;
-        const u = window._esUnit || {};
-        const wa = whatsappLink(u.tenant_whatsapp, `Hello ${tenant}, please read and sign your Contract Addendum using this link (valid 14 days): ${link}`);
-        document.getElementById("esign-form").style.display = "none";
-        const box = document.getElementById("esign-result");
-        box.style.display = "";
-        box.innerHTML = `
-          <div style="background:rgba(34,197,94,.14);border:1px solid rgba(34,197,94,.4);border-radius:10px;padding:14px">
-            <b>✅ Signing link ready</b> — valid for 14 days.
-            <div class="es-link"><input class="form-input" id="es-link-input" readonly value="${safeText(link)}" /><button class="btn btn-outline btn-sm" onclick="copySignLink()">Copy</button></div>
-            <div style="display:flex;gap:6px;flex-wrap:wrap">
-              ${wa ? `<a class="btn btn-green btn-sm" href="${wa}" target="_blank" rel="noopener">WhatsApp</a>` : ""}
-              <button class="btn btn-outline btn-sm" onclick="emailSignLink('${token}','${safeText(email)}')">✉ Email link</button>
-              <button class="btn btn-outline btn-sm" onclick="initEsign()">New request</button>
-            </div>
-          </div>`;
+      function initEsign() {
+        const u = currentUnits.find((x) => String(x.id) === String(contractUnit));
+        if (!u || !currentBuilding) { document.getElementById("esign-mount").innerHTML = '<p style="color:var(--text-muted)">Open this from a building.</p>'; return; }
+        mountEsignForm(document.getElementById("esign-mount"), {
+          building: currentBuilding, unit: u, session,
+          onCreated: (j) => { logActivity("Created e-sign request for unit " + u.unit_number, "properties"); loadSignRequests(); },
+        });
       }
       window.initEsign = initEsign;
-      window.copySignLink = function () {
-        const el = document.getElementById("es-link-input"); el.select();
-        (navigator.clipboard ? navigator.clipboard.writeText(el.value) : Promise.reject()).catch(() => document.execCommand("copy"));
-        showToast("Link copied.");
-      };
-      window.emailSignLink = async function (token, email) {
-        const to = prompt("Send the link to which email address?", email || "");
-        if (!to) return;
-        try { await jpost("/api/sign-send-email", { token, to: to.trim(), origin: location.origin }); showToast("Email sent."); }
-        catch (e) { showToast(e.message, "error"); }
-      };
+
       async function loadSignRequests() {
         const box = document.getElementById("esign-list");
         box.innerHTML = '<p style="color:var(--text-muted);font-size:0.85rem">Loading...</p>';
@@ -1955,11 +1882,12 @@
           box.innerHTML = requests.map((r) => `
             <div class="contract-row">
               <div style="flex:1;min-width:160px">
-                <div class="nm" style="word-break:normal">${safeText(r.tenantName)} <span class="es-badge es-${r.status}">${r.status === "pending" ? "Waiting" : r.status[0].toUpperCase() + r.status.slice(1)}</span></div>
-                <div class="mt">${safeText(r.label)} · ${r.status === "signed" ? "Signed " + formatDate(r.signedAt) : "Sent " + formatDate(r.createdAt)}</div>
+                <div class="nm" style="word-break:normal">${safeText(r.tenantName)} <span class="es-badge es-${r.status}">${({ pending: "Waiting for tenant", tenant_signed: "Waiting for landlord", signed: "Signed", expired: "Expired", cancelled: "Cancelled" })[r.status] || r.status}</span></div>
+                <div class="mt">${safeText(r.label)} · ${r.status === "signed" ? "Fully signed " + formatDate(r.signedAt) : r.status === "tenant_signed" ? "Tenant signed " + formatDate(r.tenantSignedAt) : "Sent " + formatDate(r.createdAt)}</div>
               </div>
               <div class="ac">
                 ${r.status === "signed" && r.file ? `<a class="btn btn-outline btn-sm" href="${r.file}" target="_blank" rel="noopener">View PDF</a>` : ""}
+                ${r.status === "tenant_signed" && r.interim ? `<a class="btn btn-outline btn-sm" href="${r.interim}" target="_blank" rel="noopener">View (tenant signed)</a><button class="btn btn-danger btn-sm" onclick="cancelSign('${r.token}')">Cancel</button>` : ""}
                 ${r.status === "pending" ? `<button class="btn btn-outline btn-sm" onclick="showSignLinkAgain('${r.token}','${safeText(r.tenantName)}','${safeText(r.tenantEmail || "")}')">Link</button><button class="btn btn-danger btn-sm" onclick="cancelSign('${r.token}')">Cancel</button>` : ""}
               </div>
             </div>`).join("");
@@ -1967,7 +1895,11 @@
           box.innerHTML = '<p style="color:var(--danger);font-size:0.85rem">E-sign is only available on the live server.</p>';
         }
       }
-      window.showSignLinkAgain = function (t, n, e) { window._esUnit = currentUnits.find((x) => String(x.id) === String(contractUnit)) || {}; showSignLink(t, n, e); };
+      window.showSignLinkAgain = function (t, n, e) {
+        const u = currentUnits.find((x) => String(x.id) === String(contractUnit)) || {};
+        const box = document.getElementById("esign-mount");
+        renderLinkPanel(box, { token: t, tenant: n, email: e, whatsapp: u.tenant_whatsapp, onNew: initEsign });
+      };
       window.cancelSign = async function (token) {
         if (!(await showConfirm("Cancel this signing request? The link will stop working."))) return;
         try { await jpost("/api/sign-cancel", { token }); showToast("Request cancelled."); loadSignRequests(); }

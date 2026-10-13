@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="robots" content="noindex">
-<title>Sign Contract Addendum</title>
+<title>Review and Sign</title>
 <style>
   *{box-sizing:border-box}
   body{margin:0;font-family:-apple-system,Segoe UI,Roboto,Arial,sans-serif;background:#eef0f5;color:#1e1e28;line-height:1.5}
@@ -19,7 +19,7 @@
   .info div{background:#f3f4f8;border-radius:8px;padding:8px 10px;font-size:13px}
   .info small{display:block;color:#6e737d;font-size:11px;text-transform:uppercase}
   .info .full{grid-column:1/-1}
-  .doc{max-height:60vh;overflow:auto;border:1px solid #d9dce5;border-radius:8px;padding:12px;font-size:13px;background:#fafbfc}
+  .doc{max-height:65vh;overflow:auto;border:1px solid #d9dce5;border-radius:8px;padding:12px;font-size:13px;background:#fafbfc}
   .doc p{margin:4px 0 8px}
   .cl{display:flex;gap:8px}.cl>b{min-width:34px;color:#1b2b6e}
   .cl>div{flex:1}
@@ -44,14 +44,14 @@
 </style>
 </head>
 <body>
-<header><b>AHMED AL SHEEBANI REAL ESTATE</b><span>Contract Addendum · Electronic Signature</span></header>
+<header><b>AHMED AL SHEEBANI REAL ESTATE</b><span>Electronic Signature</span></header>
 <div class="wrap" id="app"><div class="card">Loading…</div></div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf-lib/1.17.1/pdf-lib.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 <script type="module">
-import { buildAddendumPdf, pdfToDataUrl, dubaiTime, mergeWithSource } from "./js/addendum-pdf.js";
+import { assemble, stampContract, dubaiTime } from "./js/addendum-pdf.js";
 
 const token = new URLSearchParams(location.search).get("t") || "";
 const app = document.getElementById("app");
@@ -76,20 +76,22 @@ function blocksHtml(blocks) {
   }).join("");
 }
 
-let data, srcCache;
-async function srcBytes() {
-  if (!srcCache) {
-    const r = await fetch(`/api/sign/${encodeURIComponent(token)}/document`, { cache: "no-store" });
+let data;
+const cache = {};
+async function bytesOf(which) { // "document" = attached addendum PDF, "contract-document" = tenancy contract
+  if (!cache[which]) {
+    const r = await fetch(`/api/sign/${encodeURIComponent(token)}/${which}`, { cache: "no-store" });
     if (!r.ok) throw new Error("Could not load the document. Please reload.");
-    srcCache = await r.arrayBuffer();
+    cache[which] = await r.arrayBuffer();
   }
-  return srcCache.slice(0);
+  return cache[which].slice(0);
 }
-async function showSource() {
-  const box = document.getElementById("pdfpages");
+async function renderPdf(which, box, transform) {
   try {
     window.pdfjsLib.GlobalWorkerOptions.workerSrc = "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";
-    const pdf = await window.pdfjsLib.getDocument({ data: await srcBytes() }).promise;
+    let bytes = await bytesOf(which);
+    if (transform) bytes = await transform(bytes);
+    const pdf = await window.pdfjsLib.getDocument({ data: bytes }).promise;
     box.innerHTML = "";
     for (let i = 1; i <= pdf.numPages; i++) {
       const page = await pdf.getPage(i);
@@ -101,12 +103,18 @@ async function showSource() {
       box.appendChild(c);
       await page.render({ canvasContext: c.getContext("2d"), viewport: vp }).promise;
     }
-  } catch (e) { box.innerHTML = '<a href="/api/sign/' + encodeURIComponent(token) + '/document" target="_blank">Open the document</a>'; }
+  } catch (e) { box.innerHTML = '<a href="/api/sign/' + encodeURIComponent(token) + "/" + which + '" target="_blank">Open the document</a>'; }
+}
+async function showSources() {
+  if (data.hasContract) await renderPdf("contract-document", document.getElementById("contractpages"),
+    data.stampContractPage ? (b) => stampContract(b, { form: data.form, usage: data.usage, tenant: null, landlord: null }) : null);
+  if (data.template.mode === "pdf") await renderPdf("document", document.getElementById("pdfpages"));
 }
 (async () => {
   if (!token) return say("err", "This link is not valid.");
   try { data = await api(""); } catch (e) { return say("err", esc(e.message)); }
-  if (data.status === "signed") return say("ok", `✅ This addendum has already been signed${data.signedAt ? " on " + esc(dubaiTime(data.signedAt)) : ""}. Thank you.`);
+  if (data.status === "tenant_signed") return say("ok", `✅ You have already signed${data.signedAt ? " on " + esc(dubaiTime(data.signedAt)) : ""}. It is now with the landlord for their signature, and you will receive the fully signed copy by email. Thank you.`);
+  if (data.status === "signed") return say("ok", `✅ This has already been signed by everyone${data.signedAt ? " (" + esc(dubaiTime(data.signedAt)) + ")" : ""}. Thank you.`);
   if (data.status === "expired") return say("err", "This signing link has expired. Please contact Ahmed Al Sheebani Real Estate for a new one.");
   if (data.status === "cancelled") return say("err", "This signing request was cancelled. Please contact Ahmed Al Sheebani Real Estate.");
   if (data.status !== "pending") return say("err", "This link is not available.");
@@ -117,8 +125,8 @@ function render() {
   const { template: t, fields: f } = data;
   app.innerHTML = `
   <div class="card">
-    <h1>${esc(t.title)}</h1>
-    <div>Please read the document below, then sign at the bottom.</div>
+    <h1>${esc(data.hasContract ? "Your tenancy documents" : t.title)}</h1>
+    <div>Please read everything below, then sign at the bottom.</div>
     <div class="info">
       <div class="full"><small>Property</small>${esc(f.propertyName)}</div>
       <div><small>Landlord</small>${esc(f.landlordName)}</div>
@@ -131,6 +139,8 @@ function render() {
       <div><small>Contract end</small>${esc(f.contractEnd || "-")}</div>
     </div>
     <div class="doc" id="docbox">
+      ${data.hasContract ? '<h2 style="margin-top:0">Tenancy Contract</h2><div id="contractpages">Loading contract…</div>' : ""}
+      ${t.mode === "pdf" || t.body?.length || t.sections?.length ? `<h2 ${data.hasContract ? "" : 'style="margin-top:0"'}>${esc(t.title)}</h2>` : ""}
       ${t.mode === "pdf" ? '<div id="pdfpages">Loading document…</div>' : ""}
       ${t.intro ? `<p>${esc(t.intro)}</p>` : ""}${t.interpretation ? `<p>${esc(t.interpretation)}</p>` : ""}
       ${blocksHtml(t.mode === "pdf" ? [] : t.body || [])}
@@ -149,7 +159,7 @@ function render() {
     <div id="err" class="msg err hide" style="margin-top:12px"></div>
   </div>`;
 
-  if (t.mode === "pdf") showSource();
+  showSources();
   const cv = document.getElementById("pad"), go = document.getElementById("go");
   const fit = () => {
     const r = cv.getBoundingClientRect(), d = window.devicePixelRatio || 1;
@@ -177,11 +187,17 @@ function render() {
     try {
       const name = document.getElementById("nm").value.trim();
       const stamp = await api("/stamp");
-      const doc = await buildAddendumPdf({ template: data.template, fields: data.fields, contentHash: data.contentHash, stamp, signerName: name, signaturePng: cv.toDataURL("image/png") });
-      const pdf = data.template.mode === "pdf" ? await mergeWithSource(doc, await srcBytes()) : await pdfToDataUrl(doc);
+      const sigPng = cv.toDataURL("image/png");
+      const pdf = await assemble({
+        template: data.template, fields: data.fields, contentHash: data.contentHash,
+        contractBuf: data.hasContract ? await bytesOf("contract-document") : null,
+        srcBuf: data.template.mode === "pdf" ? await bytesOf("document") : null,
+        stampContractPage: data.stampContractPage, form: data.form, usage: data.usage,
+        tenant: { name, signaturePng: sigPng, stamp }, landlord: null,
+      });
       const res = await api("/submit", { method: "POST", headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ signerName: name, signature: cv.toDataURL("image/png"), pdf, ref: stamp.ref, agreed: true }) });
-      say("ok", `✅ <b>Thank you, ${esc(name)}.</b><br>Your addendum was signed on ${esc(dubaiTime(res.signedAt))}.<br>Reference: <b>${esc(res.ref)}</b>${res.emailed ? "<br>A copy has been emailed to you." : ""}`);
+        body: JSON.stringify({ signerName: name, signature: sigPng, pdf, ref: stamp.ref, agreed: true }) });
+      say("ok", `✅ <b>Thank you, ${esc(name)}.</b><br>You signed on ${esc(dubaiTime(res.signedAt))}.<br>Reference: <b>${esc(res.ref)}</b><br>The landlord will now sign, and you will receive the fully signed copy by email.`);
     } catch (e) {
       errBox.textContent = e.message; errBox.classList.remove("hide");
       go.textContent = "Sign and submit"; check();

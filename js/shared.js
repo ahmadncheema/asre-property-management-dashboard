@@ -134,6 +134,7 @@ export function renderNav(activePage) {
     { href: "/bounce.html", label: "Bounce Check", key: "bounce" },
     { href: "/maintenance.html", label: "Maintenance", key: "maintenance" },
     { href: "/inspection.html", label: "Inspections", key: "inspection" },
+    { href: "/contracts.html", label: "Contracts", key: "contracts" },
     { href: "/invoices.html", label: "Invoices", key: "invoices" },
     {
       href: "/announcements.html",
@@ -198,6 +199,7 @@ export function renderNav(activePage) {
       children: [
         byKey("maintenance"),
         byKey("inspection"),
+        byKey("contracts"),
         byKey("invoices"),
         byKey("announcements"),
         byKey("emails"),
@@ -259,6 +261,8 @@ export function renderNav(activePage) {
         "deleteContract",
         "deleteDoc",
         "openAddendum",
+        "cancelSignRequest",
+        "openNewRequest",
         "uploadDoc",
         "createSignRequest",
         "cancelSign",
