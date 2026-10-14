@@ -260,6 +260,7 @@ export function renderNav(activePage) {
         "deleteCheque",
         "deleteContract",
         "deleteDoc",
+        "deleteMaintImg",
         "openAddendum",
         "cancelSignRequest",
         "openNewRequest",
@@ -328,7 +329,7 @@ export function renderNav(activePage) {
       ];
       const css =
         actions.map((n) => `body.view-only [onclick*="${n}("]`).join(",") +
-        ",body.view-only #contract-upload-btn,body.view-only #doc-upload-btn,body.view-only .add-photo,body.view-only [onchange^=\"updateLineItem\"]{display:none !important}";
+        ",body.view-only #contract-upload-btn,body.view-only #doc-upload-btn,body.view-only .add-photo,body.view-only .maint-add-photo,body.view-only [onchange^=\"updateLineItem\"]{display:none !important}";
       const st = document.createElement("style");
       st.id = "view-only-css";
       st.textContent = css;

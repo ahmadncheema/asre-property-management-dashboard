@@ -397,6 +397,16 @@ button {
   color: var(--green-light);
 }
 
+.building-card-type.shop {
+  background: rgba(224, 160, 60, 0.2);
+  color: #e0a03c;
+}
+
+.building-card-type.office {
+  background: rgba(150, 110, 220, 0.2);
+  color: #b48ae8;
+}
+
 .building-card-stats {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -1453,3 +1463,44 @@ button.nav-dropdown-btn.active {
 .es-expired,.es-cancelled{background:#eceef2;color:#555}
 .es-link{display:flex;gap:6px;margin:8px 0}.es-link input{flex:1;font-size:0.8rem}
 @media (max-width:600px){.es-grid{grid-template-columns:1fr}}
+
+/* ── Inputs used by the e-sign / contracts / backup pages ───────── */
+.form-input {
+  width: 100%;
+  background: var(--bg-input);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  color: var(--text);
+  padding: 10px 14px;
+  font-family: inherit;
+  font-size: 0.9rem;
+  transition: var(--transition);
+  outline: none;
+  box-sizing: border-box;
+}
+.form-input:focus { border-color: var(--blue-light); box-shadow: 0 0 0 3px rgba(42, 85, 144, 0.2); }
+.form-input::placeholder { color: var(--text-muted); }
+select.form-input {
+  cursor: pointer;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath fill='%238896a8' d='M6 8L0 0h12z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 14px center;
+  padding-right: 36px;
+}
+textarea.form-input { resize: vertical; min-height: 80px; }
+
+/* ── Phones: wide tables scroll sideways, taps are easy, no zoom on inputs ── */
+@media (max-width: 768px) {
+  .table-wrapper, .pf-scroll { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+  .table-wrapper td, .pf-scroll td, .pf-scroll th { white-space: nowrap; }
+  .table-wrapper table, .pf-scroll table { min-width: 520px; }
+  input.form-control, select.form-control, textarea.form-control,
+  input.form-input, select.form-input, textarea.form-input { font-size: 16px; }
+  .btn { min-height: 38px; }
+  .modal { max-height: 92vh; overflow-y: auto; }
+}
+@media (max-width: 480px) {
+  .es-grid, .esign-form .es-grid { grid-template-columns: 1fr; }
+  .maint-photo { width: 64px; height: 64px; }
+}

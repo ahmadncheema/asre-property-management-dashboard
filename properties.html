@@ -26,6 +26,8 @@
         display: flex;
         align-items: center;
         justify-content: space-between;
+        flex-wrap: wrap;
+        gap: 8px;
         margin-bottom: 10px;
       }
 
@@ -298,6 +300,8 @@
             <select id="cb-type" class="form-control">
               <option value="apartment">Apartment</option>
               <option value="villa">Villa</option>
+              <option value="shop">Shop</option>
+              <option value="office">Office</option>
             </select>
           </div>
           <div class="form-group">
@@ -395,6 +399,8 @@
             <select id="eb-type" class="form-control">
               <option value="apartment">Apartment</option>
               <option value="villa">Villa</option>
+              <option value="shop">Shop</option>
+              <option value="office">Office</option>
             </select>
           </div>
           <div class="form-group">
@@ -534,6 +540,14 @@
             </div>
           </div>
 
+          <div class="form-group">
+            <label class="form-label">Unit Type</label>
+            <input type="text" id="u-type" class="form-control" list="u-type-list" placeholder="e.g. 1 BHK, 2 BHK, Studio, Shop, Office" />
+            <datalist id="u-type-list">
+              <option value="Studio"></option><option value="1 BHK"></option><option value="2 BHK"></option><option value="3 BHK"></option><option value="4 BHK"></option><option value="5 BHK"></option><option value="Villa"></option><option value="Shop"></option><option value="Office"></option>
+            </datalist>
+            <div class="hint-s">Used for Property Type on the Ejari contract.</div>
+          </div>
           <div class="form-row">
             <div class="form-group">
               <label class="form-label">Size</label>
@@ -1146,6 +1160,15 @@
               : ""
           }
           ${
+            u.unit_type
+              ? `
+            <div class="unit-detail">
+              <div class="unit-detail-label">Type</div>
+              <div class="unit-detail-value">${u.unit_type}</div>
+            </div>`
+              : ""
+          }
+          ${
             u.size
               ? `
             <div class="unit-detail">
@@ -1471,6 +1494,7 @@
 
         // Fill fields
         document.getElementById("u-number").value = unit?.unit_number || "";
+        document.getElementById("u-type").value = unit?.unit_type || "";
         document.getElementById("u-size").value = unit?.size || "";
         document.getElementById("u-view").value = unit?.view || "";
         document.getElementById("u-rent").value = unit?.rent || "";
@@ -1529,6 +1553,7 @@
           building_id: currentBuilding.id,
           floor_id: floorId,
           unit_number: number,
+          unit_type: document.getElementById("u-type").value.trim() || null,
           size: document.getElementById("u-size").value.trim() || null,
           view: document.getElementById("u-view").value.trim() || null,
           rent: parseFloat(document.getElementById("u-rent").value) || 0,

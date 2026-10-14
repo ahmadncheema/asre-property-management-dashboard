@@ -129,7 +129,7 @@ export async function mountEsignForm(box, { building, unit, session, onCreated }
     owner: building.owner_name || building.landlord_name, landlord: building.landlord_name || building.owner_name,
     tenantName: unit.tenant_name, tenantEmail: unit.tenant_email, landlordEmail: building.landlord_email,
     tenantPhone: unit.tenant_whatsapp, landlordPhone: building.landlord_phone,
-    buildingName: building.name, location: building.location_area, propertySize: unit.size, propertyType: "", propertyNo: unit.unit_number,
+    buildingName: building.name, location: building.location_area, propertySize: unit.size, propertyType: unit.unit_type, propertyNo: unit.unit_number,
     premises: building.dewa_premises_no, plot: building.plot_no, periodTo: td, periodFrom: fd,
     annualRent: money(unit.rent), contractValue: money(unit.rent), deposit: money(unit.deposit),
     payMode: checks ? checks + (checks === 1 ? " Cheque" : " Cheques") : "", term1: "",

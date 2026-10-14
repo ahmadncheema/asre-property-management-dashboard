@@ -210,6 +210,14 @@
             </div>
             <div class="summary-item-label">Villas</div>
           </div>
+          <div class="summary-item">
+            <div class="summary-item-num" id="s-shop" style="color: var(--green)">—</div>
+            <div class="summary-item-label">Shops</div>
+          </div>
+          <div class="summary-item">
+            <div class="summary-item-num" id="s-office" style="color: var(--green)">—</div>
+            <div class="summary-item-label">Offices</div>
+          </div>
         </div>
 
         <!-- Filter Bar -->
@@ -328,6 +336,10 @@
           (u) => u.buildings?.type === "villa",
         ).length;
 
+        const shops = allVacant.filter((u) => u.buildings?.type === "shop").length;
+        const offices = allVacant.filter((u) => u.buildings?.type === "office").length;
+        document.getElementById("s-shop").textContent = shops;
+        document.getElementById("s-office").textContent = offices;
         document.getElementById("s-total").textContent = allVacant.length;
         document.getElementById("s-buildings").textContent = buildingsAffected;
         document.getElementById("s-apartment").textContent = apartments;

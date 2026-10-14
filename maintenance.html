@@ -21,6 +21,12 @@
         animation: slideUp 0.3s ease forwards;
       }
 
+      .maint-photos { display:flex; flex-wrap:wrap; gap:8px; align-items:center; margin:0 0 12px; }
+      .maint-photo { position:relative; width:72px; height:72px; border-radius:8px; overflow:hidden; border:1px solid var(--border); cursor:pointer; background:#0003; }
+      .maint-photo img { width:100%; height:100%; object-fit:cover; display:block; }
+      .maint-photo .x { position:absolute; top:2px; right:2px; width:20px; height:20px; border-radius:50%; background:rgba(0,0,0,.65); color:#fff; border:0; font-size:13px; line-height:20px; cursor:pointer; padding:0; }
+      .maint-add-photo { display:inline-flex; align-items:center; gap:6px; padding:8px 12px; border:1px dashed var(--border); border-radius:8px; font-size:0.8rem; cursor:pointer; color:var(--text-muted); background:transparent; }
+      .maint-add-photo:hover { border-color:var(--green); color:var(--green); }
       .maint-card.completed {
         border-left-color: var(--green);
         opacity: 0.72;
@@ -403,6 +409,14 @@
               placeholder="Additional notes..."
             ></textarea>
           </div>
+          <div class="form-group">
+            <label class="form-label">Photos</label>
+            <div class="maint-photos" id="m-photo-preview"></div>
+            <label class="maint-add-photo">📷 Add image
+              <input type="file" id="m-photos" accept="image/*" multiple style="display:none" onchange="stageMaintImages(this)" />
+            </label>
+            <div style="font-size:0.75rem;color:var(--text-muted);margin-top:4px">Up to 12 images. On a phone you can take a photo directly.</div>
+          </div>
         </div>
         <div class="modal-footer">
           <button
@@ -445,6 +459,8 @@
       let allBuildings = [];
       let editingId = null;
       let activeCategory = "";
+      let maintImgs = {};
+      let stagedImgs = [];
 
       // ── Load Data ────────────────────────────────────────────────────
       async function loadMaintenance() {
@@ -465,6 +481,10 @@
 
         allBuildings = buildingsRes.data || [];
         allRecords = recordsRes.data || [];
+        try {
+          const ir = await fetch("/api/maint-imgs-all?t=" + Date.now(), { cache: "no-store" });
+          maintImgs = ir.ok ? (await ir.json()).images || {} : {};
+        } catch (e) { maintImgs = {}; }
 
         // Populate building filter
         const filterSel = document.getElementById("filter-building");
@@ -713,6 +733,8 @@
             : ""
         }
 
+        <div class="maint-photos" id="mp-${r.id}">${photosHtml(r.id)}</div>
+
         <div class="maint-actions">
           ${
             !isCompleted
@@ -736,6 +758,95 @@
         </div>
       </div>`;
       }
+
+      // ── Photos ───────────────────────────────────────────────────────
+      function photosHtml(id) {
+        const imgs = maintImgs[id] || [];
+        return (
+          imgs.map((f) => `
+            <div class="maint-photo" onclick="viewMaintImg('${f.url}')">
+              <img src="${f.url}" alt="Maintenance photo" loading="lazy" />
+              <button class="x" title="Delete" onclick="event.stopPropagation();deleteMaintImg('${id}','${f.filename}')">×</button>
+            </div>`).join("") +
+          `<label class="maint-add-photo">📷 Add image
+            <input type="file" accept="image/*" multiple style="display:none" onchange="addMaintImages('${id}', this)" />
+          </label>`
+        );
+      }
+      function refreshPhotos(id) {
+        const el = document.getElementById("mp-" + id);
+        if (el) el.innerHTML = photosHtml(id);
+      }
+      // shrink big phone photos to a sensible size before uploading
+      function toJpegDataUrl(file) {
+        return new Promise((resolve, reject) => {
+          const fr = new FileReader();
+          fr.onerror = reject;
+          fr.onload = () => {
+            const img = new Image();
+            img.onerror = () => resolve(/^data:image\/(jpeg|png)/.test(fr.result) ? fr.result : reject(new Error("Unsupported image")));
+            img.onload = () => {
+              const k = Math.min(1, 1600 / Math.max(img.width, img.height));
+              const c = document.createElement("canvas");
+              c.width = Math.round(img.width * k);
+              c.height = Math.round(img.height * k);
+              c.getContext("2d").drawImage(img, 0, 0, c.width, c.height);
+              resolve(c.toDataURL("image/jpeg", 0.82));
+            };
+            img.src = fr.result;
+          };
+          fr.readAsDataURL(file);
+        });
+      }
+      async function uploadMaintImage(id, file) {
+        const data = await toJpegDataUrl(file);
+        const res = await fetch("/api/maint-img-upload", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ requestId: id, filename: file.name, data }),
+        });
+        const j = await res.json().catch(() => ({}));
+        if (!res.ok) throw new Error(j.error || "Upload failed");
+        maintImgs[id] = j.files;
+      }
+      window.addMaintImages = async function (id, input) {
+        const files = [...input.files];
+        input.value = "";
+        if (!files.length) return;
+        showToast("Uploading " + files.length + " image" + (files.length > 1 ? "s" : "") + "…");
+        try {
+          for (const f of files) await uploadMaintImage(id, f);
+          refreshPhotos(id);
+          showToast("Image added.");
+        } catch (e) { showToast(e.message, "error"); refreshPhotos(id); }
+      };
+      window.deleteMaintImg = async function (id, filename) {
+        if (!(await showConfirm("Delete this image?"))) return;
+        try {
+          const res = await fetch("/api/maint-img-delete", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ requestId: id, filename }),
+          });
+          const j = await res.json();
+          if (!res.ok) throw new Error(j.error || "Could not delete");
+          maintImgs[id] = j.files;
+          refreshPhotos(id);
+        } catch (e) { showToast(e.message, "error"); }
+      };
+      window.viewMaintImg = (url) => window.open(url, "_blank");
+      // photos chosen inside the Add / Edit window are uploaded when the request is saved
+      function drawStaged() {
+        document.getElementById("m-photo-preview").innerHTML = stagedImgs
+          .map((f, i) => `<div class="maint-photo"><img src="${URL.createObjectURL(f)}" alt="" /><button class="x" onclick="unstageMaintImg(${i})">×</button></div>`)
+          .join("");
+      }
+      window.stageMaintImages = function (input) {
+        stagedImgs = stagedImgs.concat([...input.files]).slice(0, 12);
+        input.value = "";
+        drawStaged();
+      };
+      window.unstageMaintImg = function (i) { stagedImgs.splice(i, 1); drawStaged(); };
 
       // ── Mark Completed ───────────────────────────────────────────────
       window.markCompleted = async function (id) {
@@ -815,6 +926,7 @@
       // ── Open Add Modal ───────────────────────────────────────────────
       window.openAddMaintenance = function () {
         editingId = null;
+        stagedImgs = []; drawStaged();
         document.getElementById("maint-modal-title").textContent =
           "Add Maintenance Request";
         document.getElementById("maint-save-btn").textContent = "Save Request";
@@ -829,6 +941,7 @@
         if (!record) return;
 
         editingId = id;
+        stagedImgs = []; drawStaged();
         document.getElementById("maint-modal-title").textContent =
           "Edit Maintenance Request";
         document.getElementById("maint-save-btn").textContent = "Save Changes";
@@ -950,15 +1063,20 @@
         };
 
         let error;
+        let savedId = editingId;
         if (editingId) {
           ({ error } = await supabase
             .from("maintenance_requests")
             .update(payload)
             .eq("id", editingId));
         } else {
-          ({ error } = await supabase
+          let ins;
+          ({ data: ins, error } = await supabase
             .from("maintenance_requests")
-            .insert(payload));
+            .insert(payload)
+            .select("id")
+            .single());
+          if (ins) savedId = ins.id;
         }
 
         if (error) {
@@ -966,6 +1084,15 @@
           console.error(error);
           return;
         }
+
+        if (savedId && stagedImgs.length) {
+          showToast("Uploading images…");
+          for (const f of stagedImgs) {
+            try { await uploadMaintImage(savedId, f); }
+            catch (e) { showToast("An image could not be uploaded: " + e.message, "error"); }
+          }
+        }
+        stagedImgs = [];
 
         const unitSel = document.getElementById("m-unit");
         const unitText = unitSel.options[unitSel.selectedIndex]?.text || unitId;
