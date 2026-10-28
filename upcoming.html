@@ -249,6 +249,10 @@
             </div>
             <div class="summary-item-label">Within 90 Days</div>
           </div>
+          <div class="summary-item">
+            <div class="summary-item-num" id="s-expired" style="color: var(--danger)">—</div>
+            <div class="summary-item-label">Expired, Not Renewed</div>
+          </div>
         </div>
 
         <!-- Top Actions -->
@@ -300,6 +304,17 @@
           </div>
         </div>
 
+        <!-- Expired contracts -->
+        <div class="log-section" id="expired-section">
+          <div class="section-header">
+            <div class="section-title">Expired Contracts — not renewed</div>
+          </div>
+          <div style="font-size:0.82rem;color:var(--text-muted);margin:-4px 0 12px">
+            Leases that reached their end date and still show the old tenant. Renew them in the building page, or mark the unit vacant.
+          </div>
+          <div id="expired-container"></div>
+        </div>
+
         <!-- Email Log Section -->
         <div class="log-section">
           <div class="section-header">
@@ -343,6 +358,7 @@
       let allUpcoming = [];
       let allBuildings = [];
       let filtered = [];
+      let allExpired = [];
 
       // ── Load Data ────────────────────────────────────────────────────
       async function loadUpcoming() {
@@ -384,6 +400,14 @@
           return days !== null && days >= 0 && days <= 90;
         });
 
+        // Leases already past their end date and not renewed
+        allExpired = (units || []).filter((u) => {
+          if (!u.tenant_name || u.tenant_name.trim() === "") return false;
+          const days = daysUntil(u.end_date);
+          return days !== null && days < 0;
+        });
+        allExpired.sort((a, b) => daysUntil(b.end_date) - daysUntil(a.end_date));
+
         // Sort by days remaining (urgent first)
         allUpcoming.sort(
           (a, b) => daysUntil(a.end_date) - daysUntil(b.end_date),
@@ -412,6 +436,7 @@
         document.getElementById("s-30").textContent = s30;
         document.getElementById("s-60").textContent = s60;
         document.getElementById("s-90").textContent = s90;
+        document.getElementById("s-expired").textContent = allExpired.length;
       }
 
       window.applyFilters = function () {
@@ -446,7 +471,53 @@
         }
 
         renderUpcoming(filtered);
+
+        let exp = allExpired;
+        if (buildingF) exp = exp.filter((u) => u.building_id === buildingF);
+        if (search) exp = exp.filter((u) => u.tenant_name?.toLowerCase().includes(search) || u.unit_number?.toLowerCase().includes(search));
+        renderExpired(exp);
       };
+
+      function renderExpired(units) {
+        const box = document.getElementById("expired-container");
+        if (!units.length) {
+          box.innerHTML = '<div style="color:var(--text-muted);font-size:0.88rem;padding:6px 0">No expired contracts. 🎉</div>';
+          return;
+        }
+        const grouped = {};
+        units.forEach((u) => { (grouped[u.buildings?.name || "Unknown"] ||= []).push(u); });
+        box.innerHTML = Object.entries(grouped).map(([bName, list]) => `
+          <div class="building-section">
+            <div class="building-section-header">
+              <div class="building-section-name">🏢 ${bName}</div>
+              <div class="building-section-count">${list.length} expired</div>
+            </div>
+            ${list.map((u) => {
+              const ago = Math.abs(daysUntil(u.end_date));
+              return `
+              <div class="upcoming-card stage-30d">
+                <div class="upcoming-card-header">
+                  <div class="upcoming-card-left">
+                    <div class="upcoming-unit-num">Unit ${u.unit_number}</div>
+                    <span class="badge badge-grey">Floor: ${u.floors?.name || "—"}</span>
+                    <div class="upcoming-tenant">👤 ${u.tenant_name}</div>
+                  </div>
+                  <span class="days-remaining days-30">Expired ${ago} day${ago !== 1 ? "s" : ""} ago</span>
+                </div>
+                <div class="upcoming-details">
+                  <div><div class="upcoming-detail-label">Expired On</div><div class="upcoming-detail-value">${formatDate(u.end_date)}</div></div>
+                  ${u.size ? `<div><div class="upcoming-detail-label">Size</div><div class="upcoming-detail-value">${u.size}</div></div>` : ""}
+                  ${u.rent ? `<div><div class="upcoming-detail-label">Rent</div><div class="upcoming-detail-value">${formatCurrency(u.rent)}</div></div>` : ""}
+                  ${u.tenant_whatsapp ? `<div><div class="upcoming-detail-label">WhatsApp</div><div class="upcoming-detail-value">${u.tenant_whatsapp}</div></div>` : ""}
+                </div>
+                <div class="upcoming-actions">
+                  ${u.tenant_whatsapp ? `<button class="btn btn-sm" style="background:#25d366;color:#fff;border:none" onclick="sendWhatsApp('${u.id}')">💬 WhatsApp</button>` : ""}
+                  <a href="properties.html" class="btn btn-outline btn-sm">✏️ Update Lease</a>
+                </div>
+              </div>`;
+            }).join("")}
+          </div>`).join("");
+      }
 
       function renderUpcoming(units) {
         const container = document.getElementById("upcoming-container");
@@ -615,7 +686,7 @@
       // Opens WhatsApp (Web or Desktop) with the tenant's number and a
       // ready-made message. Nothing is sent until you press Send there.
       window.sendWhatsApp = function (unitId) {
-        const u = allUpcoming.find((x) => x.id === unitId);
+        const u = allUpcoming.find((x) => x.id === unitId) || allExpired.find((x) => x.id === unitId);
         if (!u) return;
 
         const days = daysUntil(u.end_date);
@@ -628,10 +699,12 @@
 
         const message =
           `Dear ${u.tenant_name},\n\n` +
-          `This is a reminder from Ahmed Al Sheebani Real Estate that your ` +
+          `This is a message from Ahmed Al Sheebani Real Estate. Your ` +
           `tenancy contract for Unit ${u.unit_number}` +
           `${u.buildings?.name ? " at " + u.buildings.name : ""} ` +
-          `expires on ${formatDate(u.end_date)} (${dayText}).\n\n` +
+          (days < 0
+            ? `ended on ${formatDate(u.end_date)} and has not been renewed yet.\n\n`
+            : `expires on ${formatDate(u.end_date)} (${dayText}).\n\n`) +
           `Please let us know if you would like to renew, or if you plan to ` +
           `vacate, so we can arrange the next steps.\n\n` +
           `For any queries, call +971 4 294 5001 or email ` +

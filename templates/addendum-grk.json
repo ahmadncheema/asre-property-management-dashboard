@@ -1,971 +1,974 @@
 {
- "id": "grk",
- "label": "GRK Residency (Dubai Silicon Oasis)",
- "title": "Contract Addendum",
- "version": "1",
- "footer": "Contract Addendum for GRK Residency – Dubai Silicon Oasis",
- "defaults": {
-  "propertyName": "GRK RESIDENCY (DUBAI SILICON OASIS)",
-  "landlordName": "GHULAM RABBANI KHOKAR"
- },
- "intro": "This addendum is an integral part of the Tenancy Contract. The Tenant undertakes to observe, abide and perform all of the Tenant’s obligations set out in this Agreement in accordance with the applicable tenancy laws and regulations of the Emirate of Dubai and the United Arab Emirates.",
- "interpretation": "In the event of any ambiguity, discrepancy, or need for clarification regarding any clause or definition within this agreement, the landlord shall have sole and final authority to interpret and decide. The tenant shall not interpret any part of the agreement based on personal understanding or preference. The landlord’s decision shall be final and binding on all matters.",
- "sections": [
-  {
-   "no": 1,
-   "title": "Core Tenancy Provisions",
-   "clauses": [
-    {
-     "no": "1.1",
-     "blocks": [
-      {
-       "t": "p",
-       "x": "The tenant is responsible for his/her payments and must ensure that their rental cheque(s) are not returned by the bank for any reason whatsoever (including but not limited to - insufficient funds, irregular signature, alterations, overwriting, closed account, incorrect amount with data, etc.). In case a cheque is returned by the bank, the Tenant shall, within two (2) days from the date of the original bounced cheque, make the payment in cash or via wire transfer, including a penalty of AED 1,000 (UAE Dirhams One Thousand only) per cheque, as an administration charge to the Landlord. The Landlord has the right to cancel, or refuse renewal, of this tenancy agreement in case the Tenant refuses, delays, or fails to pay the rent on time."
-      }
-     ]
-    },
-    {
-     "no": "1.2",
-     "blocks": [
-      {
-       "t": "p",
-       "x": "Renewal of the tenancy agreement is at the Landlord’s discretion; the contract duration on renewal is for twelve months only, and extension is not allowed. The dates and number of cheques on renewal will remain the same as per the existing contract."
-      }
-     ]
-    },
-    {
-     "no": "1.3",
-     "blocks": [
-      {
-       "t": "p",
-       "x": "Modification(s) to the apartment is strictly not allowed; the Tenant agrees that he/she is renting the apartment in as-is condition. Adding shelves, applying wallpaper, changing paint colour, nailing, or screwing (on doors, kitchen cabinet, tiles, etc.), glueing carpet to the floor, installing private dish antennae etc., are NOT allowed."
-      }
-     ]
-    },
-    {
-     "no": "1.4",
-     "blocks": [
-      {
-       "t": "p",
-       "x": "Under no circumstances should the Tenant assign, sublet, or share the rented unit. The apartment is rented only to the registered (primary) Tenant and his/her immediate family (i.e., spouse and children). The maximum number of people in an apartment shall be limited to one immediate family only, and the contract is not transferable."
-      }
-     ]
-    },
-    {
-     "no": "1.5",
-     "blocks": [
-      {
-       "t": "p",
-       "x": "The Tenant has paid the Security Deposit amount as specified herein, which shall be held by the Landlord for the entire duration of the tenancy. The release of the Security Deposit, whether in full or in part, shall be at the sole discretion of the Landlord and shall be subject to the condition of the rented premises at the time of vacating. Additionally, any outstanding dues owed by the Tenant to the Landlord or the management shall be deducted from the Security Deposit prior to its release."
-      }
-     ]
-    },
-    {
-     "no": "1.6",
-     "blocks": [
-      {
-       "t": "p",
-       "x": "The Tenant expressly agrees that any amount payable to the Landlord under this Agreement, including but not limited to unpaid rent, penalties, restoration costs, or other charges, may be recovered from the Security Deposit. If the Security Deposit is insufficient to cover such amounts, the Landlord reserves the right to recover the balance through any lawful means, including deduction from future rents or raising separate claims, and the Tenant shall have no objection to such recovery."
-      }
-     ]
-    },
-    {
-     "no": "1.7",
-     "blocks": [
-      {
-       "t": "p",
-       "x": "If legal proceedings are initiated and the court finds the landlord liable, the landlord’s total liability shall be strictly capped at the amount of rent paid by the tenant during the current tenancy period only (from the start of the current tenancy year up to the date the claim is made). Any rent paid prior to this period shall not be considered."
-      }
-     ]
-    }
-   ]
+  "id": "grk",
+  "label": "GRK Residency (Dubai Silicon Oasis)",
+  "buildings": [
+    "grk"
+  ],
+  "title": "Contract Addendum",
+  "version": "1",
+  "footer": "Contract Addendum for GRK Residency – Dubai Silicon Oasis",
+  "defaults": {
+    "propertyName": "GRK RESIDENCY (DUBAI SILICON OASIS)",
+    "landlordName": "GHULAM RABBANI KHOKAR"
   },
-  {
-   "no": 2,
-   "title": "Property Upkeep And Tenant Responsibilities",
-   "clauses": [
+  "intro": "This addendum is an integral part of the Tenancy Contract. The Tenant undertakes to observe, abide and perform all of the Tenant’s obligations set out in this Agreement in accordance with the applicable tenancy laws and regulations of the Emirate of Dubai and the United Arab Emirates.",
+  "interpretation": "In the event of any ambiguity, discrepancy, or need for clarification regarding any clause or definition within this agreement, the landlord shall have sole and final authority to interpret and decide. The tenant shall not interpret any part of the agreement based on personal understanding or preference. The landlord’s decision shall be final and binding on all matters.",
+  "sections": [
     {
-     "no": "2.1",
-     "blocks": [
-      {
-       "t": "p",
-       "x": "The Landlord maintains an on-site maintenance team within the building to address routine maintenance requirements. For urgent or specialised interventions, the Landlord has appointed off-site teams and certified contractors who are dispatched as needed to ensure the proper functioning and safety of critical systems, including but not limited to elevators, fire alarm systems, and firefighting equipment."
-      }
-     ]
-    },
-    {
-     "no": "2.2",
-     "blocks": [
-      {
-       "t": "p",
-       "x": "The Tenant shall permit access to the rented premises by the Landlord’s authorised maintenance personnel and/or appointed specialist contractors for the purpose of carrying out necessary maintenance works, whether routine or urgent. Failure by the Tenant to grant such access, particularly in cases involving urgent maintenance or safety-related interventions, shall constitute a material breach of this Tenancy Agreement. In such an event, the Landlord reserves the right to terminate the tenancy with immediate effect, and the Tenant shall forfeit any remaining rental amount and the Security Deposit, without entitlement to reimbursement."
-      }
-     ]
-    },
-    {
-     "no": "2.3",
-     "blocks": [
-      {
-       "t": "p",
-       "x": "The Tenant shall be responsible for conducting pest control treatments before move-in and during their stay within the rented premises, using a service provider approved by Dubai Municipality (DM) or the Dubai Silicon Oasis Authority (DSOA). The building management reserves the right to issue a formal notice requiring the Tenant to carry out pest control if infestation is observed or suspected. The Tenant must ensure that no pest-related issues originate from their apartment. Failure to comply with such notice shall entitle the Landlord to undertake pest control measures at the Tenant’s expense, without further notice."
-      }
-     ]
-    },
-    {
-     "no": "2.4",
-     "blocks": [
-      {
-       "t": "p",
-       "x": "Changing of locks for the apartment is not allowed, and if any key is lost, the cost of replacement of the entire lock shall be borne by the tenant. If a tenant requests a change of the main door lock for privacy reasons, a fee of AED 250 per lock shall apply."
-      }
-     ]
-    },
-    {
-     "no": "2.5",
-     "blocks": [
-      {
-       "t": "p",
-       "x": "Any individual maintenance work costing AED 1,000 (UAE Dirhams One Thousand only) or less shall be carried out by the Tenant, subject to prior written approval and supervision by the landlord."
-      }
-     ]
-    },
-    {
-     "no": "2.6",
-     "blocks": [
-      {
-       "t": "p",
-       "x": "While all equipment in GRK Residency is of premium quality, isolated incidents of equipment failure may occur, which could take several days to rectify. Such incidents may include, but are not limited to, failure of the AC unit or other major repairs inside the apartment. In these cases, the tenant agrees not to hold the Landlord or their staff liable for any inconvenience or losses, and no compensation will be provided. The landlord will not provide alternative accommodation or bear any costs or expenses arising from such incidents."
-      }
-     ]
-    },
-    {
-     "no": "2.7",
-     "blocks": [
-      {
-       "t": "p",
-       "x": "The repair or replacement of wooden doors, kitchen cabinets, kitchen or washbasin countertops, and bathtubs is not included in the standard maintenance and will be charged separately to the tenant. Replacement of water heaters shall be the responsibility of the tenant, using only Ariston Italy 80L or 100L models, as per existing installations. For clarity, the Landlord shall replace a water heater if such replacement is required within ninety (90) days from the commencement date of the tenancy agreement."
-      }
-     ]
-    },
-    {
-     "no": "2.8",
-     "blocks": [
-      {
-       "t": "p",
-       "x": "The Landlord is not responsible for repainting the apartment. If the tenant wishes to repaint, they must hire a professional agency at their own cost and follow the existing paint codes (Jotun 1442 Fenomastic for walls and white for ceilings). Prior written approval from the landlord is required before any repainting is undertaken."
-      }
-     ]
-    },
-    {
-     "no": "2.9",
-     "blocks": [
-      {
-       "t": "p",
-       "x": "The tenant is responsible for the cost of repairing any property or equipment damaged due to their negligence, including, but not limited to: shattered windows caused by impact, damage to kitchen countertops from heavy items, or leaks that were not promptly reported, resulting in damage to cabinets, doors, ceilings, or other fixtures. Any addition or replacement of any cables from the main telephone room to the apartment for du/Etisalat, the cost will be borne by the tenant."
-      }
-     ]
-    },
-    {
-     "no": "2.10",
-     "blocks": [
-      {
-       "t": "p",
-       "x": "The Tenant acknowledges that the apartment is handed over in a renovated and serviceable condition. Following handover, the Tenant shall be responsible for the proper use and maintenance of all sanitary fixtures, faucets, bidet sprays, hoses, drainage outlets and other water-related fittings. Any leakage, seepage or resulting damage caused by the Tenant’s misuse, negligence, damaged fixtures, improper use, or failure to promptly report and rectify a leakage shall be the Tenant’s responsibility, including all related repair and rectification costs.The Tenant shall immediately arrange the necessary repair or replacement at their own cost and take all reasonable measures to prevent further damage."
-      }
-     ]
-    }
-   ]
-  },
-  {
-   "no": 3,
-   "title": "Compliance And Conduct Regulations",
-   "clauses": [
-    {
-     "no": "3.1",
-     "blocks": [
-      {
-       "t": "p",
-       "x": "The Tenant shall at all times comply with all applicable rules, regulations, circulars, and notices issued from time to time by the Landlord and by any relevant Governmental or Statutory Authority, including but not limited to the Dubai Silicon Oasis Authority (DSOA), Dubai Municipality (DM), Dubai Police, Etisalat, DU, and the Dubai Civil Defense (DCD). Any such rules, regulations, or directives, whether existing at the date of this Agreement or issued thereafter, shall form an integral and enforceable part of this Tenancy Agreement. The Tenant shall be solely and fully responsible for the payment of any fines, penalties, or charges imposed by the Landlord or any Authority as a result of the Tenant’s breach, negligence, or non-compliance with such laws, regulations, or directives. The Landlord shall bear no responsibility for any such fines or consequences arising from the Tenant’s default."
-      }
-     ]
-    },
-    {
-     "no": "3.2",
-     "blocks": [
-      {
-       "t": "p",
-       "x": "The Tenant shall not engage in any activity upon the property that is in violation of any law, ordinance, statute, rule or regulation of Dubai or of the United Arab Emirates."
-      }
-     ]
-    },
-    {
-     "no": "3.3",
-     "blocks": [
-      {
-       "t": "p",
-       "x": "The Tenant shall use the premises only as a place of residence and must not carry out or allow his/her family member or visitor to carry out any noisy, offensive, or hazardous activity or anything which would constitute a nuisance to the Landlord or other tenant(s) of the building or adjoining buildings."
-      }
-     ]
-    },
-    {
-     "no": "3.4",
-     "blocks": [
-      {
-       "t": "p",
-       "x": "The use of electrical cookers and LPG cylinders within the premises is strictly prohibited. The building is equipped with a centralised LPG system managed by Al Fanar National Gas Services Sole Proprietorship LLC (Al Fanar). Tenants are required to coordinate directly with Al Fanar for their gas connection, pay the applicable deposit, and comply with their operational terms, pricing, and safety requirements, as well as those of the Landlord. Pricing and conditions set by Al Fanar are final and non-negotiable. Upon vacating, tenants must settle all dues and complete the deposit refund process directly with Al Fanar."
-      }
-     ]
-    },
-    {
-     "no": "3.5",
-     "blocks": [
-      {
-       "t": "p",
-       "x": "Cigarette smoking is prohibited inside common areas and inside apartments, as per the Dubai Green Building Law; the Tenant must use the designated ‘Smoking Area’ only. Barbequing and the use of shisha (i.e. hookah or hubbly bubbly) is also strictly prohibited and must not be carried out anywhere in the premises."
-      }
-     ]
-    },
-    {
-     "no": "3.6",
-     "blocks": [
-      {
-       "t": "p",
-       "x": "The Tenant must not carry out any activity or bring onto the premises anything which may impose strain on the building’s structure or electro-mechanical systems."
-      }
-     ]
-    },
-    {
-     "no": "3.7",
-     "blocks": [
-      {
-       "t": "p",
-       "x": "The Tenant shall not carry out any activity or store such material that shall increase the building’s rate of insurance or cause it to be cancelled."
-      }
-     ]
-    },
-    {
-     "no": "3.8",
-     "blocks": [
-      {
-       "t": "p",
-       "x": "Any act that affects the appearance and sanitary condition of the building, whether internally or externally, is not allowed by the DSOA. For example, hanging laundry outside on clotheslines, balconies, or other apparatus visible from the street or the ground level is not permitted. Rugs, drapes, towels or other articles shall not be draped or hung on balcony railings or from windows. No pots or other items shall be placed on top of any wall, window, or railing. Tenant is responsible for cleaning the balcony glass rail from the interior and exterior."
-      }
-     ]
-    },
-    {
-     "no": "3.9",
-     "blocks": [
-      {
-       "t": "p",
-       "x": "Balconies and common areas may not be used for storage of any storage units, water bottles, boxes, unused furniture, cabinets, cartons, automobile parts, recyclable materials, storage and/or recycling containers, woodpiles, clotheslines, clothes drying racks, barbecue grills and/or other equipment, bicycles, or any children’s tricycles, wagons, strollers, skateboards, scooters, slides and playhouses."
-      }
-     ]
-    },
-    {
-     "no": "3.10",
-     "blocks": [
-      {
-       "t": "p",
-       "x": "No items in the balcony may extend higher than the balcony railing, including personal items. Plants kept in the balcony must be kept in good condition and be aesthetically agreeable. Any resulting damage to the exterior of the residence caused by the installation of hooks or attachments for hanging decorative items will be the responsibility of the Tenant."
-      }
-     ]
-    },
-    {
-     "no": "3.11",
-     "blocks": [
-      {
-       "t": "p",
-       "x": "Storage of any combustible items, such as charcoal lighter or other flammable items, on terraces and balconies is strictly prohibited."
-      }
-     ]
-    },
-    {
-     "no": "3.12",
-     "blocks": [
-      {
-       "t": "p",
-       "x": "Tenants are strictly prohibited from installing individual satellite dishes or related equipment on the premises, including balconies, rooftops, or external façades. Only the centralised satellite system provided by the Landlord may be used. Tenants may subscribe to licensed entertainment services offered by Etisalat and DU for access to television channels and related content. Any unauthorised installation constitutes a violation of building and municipal regulations and may result in penalties imposed by the relevant authorities. The Tenant shall bear full responsibility for any legal consequences, fines, or costs arising from such violations."
-      }
-     ]
-    },
-    {
-     "no": "3.13",
-     "blocks": [
-      {
-       "t": "p",
-       "x": "The building is equipped and ready for Etisalat services. Should the Tenant opt to subscribe to DU or any other telecommunications provider, any additional cabling, wiring, or replacement of existing infrastructure from the main telephone room to the apartment shall be carried out at the Tenant’s sole expense. The Landlord shall bear no responsibility for any charges levied by Etisalat, DU, or any other telecommunications company. In the event that the Landlord is invoiced for such services or related works on behalf of the Tenant, the Tenant shall be liable to reimburse the full amount without delay."
-      }
-     ]
-    },
-    {
-     "no": "3.14",
-     "blocks": [
-      {
-       "t": "p",
-       "x": "Pets are strictly not allowed in the premises."
-      }
-     ]
-    }
-   ]
-  },
-  {
-   "no": 4,
-   "title": "Building Security And Vehicle Management",
-   "clauses": [
-    {
-     "no": "4.1",
-     "blocks": [
-      {
-       "t": "p",
-       "x": "For the safety and security of all occupants, the Landlord, Property Management, and/or authorized security personnel reserve the right to verify the identity and purpose of any individual entering or present within the premises who appears unfamiliar or whose presence is not pre-registered or expected.All visitors, contractors, delivery agents, or guests may be required to provide identification and register their details at the security desk or through the management system before being granted access. Failure to provide proper identification or to comply with security procedures may result in the visitor(s) being denied entry or asked to leave the premises. The Tenant shall ensure that all their visitors, guests, and representatives adhere to these security measures, and the Landlord or management shall bear no liability for any inconvenience caused by refusal of entry due to non-compliance."
-      }
-     ]
-    },
-    {
-     "no": "4.2",
-     "blocks": [
-      {
-       "t": "p",
-       "x": "The GRK Residency is a private property owned by the Landlord. The tenancy granted under this Agreement provides the Tenant only with a limited right of occupancy for the duration of the lease term and does not confer any ownership or proprietary rights whatsoever over the property or any part thereof. The security staff and building management, acting under the authority of the Landlord, reserve the right to refuse entry to any person(s) and/or vehicle(s) attempting to access the premises, if deemed necessary for safety, security, or operational reasons. The Tenant, together with his/her visitors, guests, employees, and family members, must strictly comply with all building rules, regulations, and instructions issued by the Landlord, management, or security personnel from time to time. Failure to comply with any of these rules or directions shall constitute a material breach of the Tenancy Agreement, entitling the Landlord to terminate the tenancy immediately and take any necessary legal action in accordance with applicable UAE laws."
-      }
-     ]
-    },
-    {
-     "no": "4.3",
-     "blocks": [
-      {
-       "t": "p",
-       "x": "When travelling, the Tenant may permit a relative to stay in the apartment, provided the individual is registered with property management and building security. If the apartment will be unoccupied, the Tenant must leave a spare key with the management (to be securely stored) for emergency access in case of maintenance, fire, or other urgent situations. The Tenant consents to such access, and the management will take reasonable steps to safeguard personal belongings."
-      }
-     ]
-    },
-    {
-     "no": "4.4",
-     "blocks": [
-      {
-       "t": "p",
-       "x": "Each apartment is allocated the number of parking spaces specified in the tenancy agreement or as approved by the Landlord or Building Management. These spaces are linked to the respective apartment and may not be exchanged, transferred, or sub-let without prior written consent from the Landlord or Management. The Landlord and/or Building Management shall bear no responsibility or liability for any loss, damage, theft, fire, or vandalism involving vehicles, bicycles, or personal belongings left inside vehicles parked within the premises, regardless of the cause. The Landlord shall likewise not be liable for any injury, accident, or property damage occurring in or around the parking area. All vehicle owners must ensure that their vehicles are properly registered, maintained in safe operating condition, and covered under a valid comprehensive insurance policy at all times. Vehicles must be parked only within their designated spaces, and any vehicle found obstructing traffic, emergency access routes, or other parking bays may be towed, relocated, or clamped at the vehicle owner’s cost and risk, without any liability on the Landlord or Management."
-      }
-     ]
-    },
-    {
-     "no": "4.5",
-     "blocks": [
-      {
-       "t": "p",
-       "x": "No part of the driveway, landscape, footpaths, or other common areas shall be used for the storage of personal belongings, materials, or any form of obstruction. The parking and open areas are reserved exclusively for vehicles duly authorised by the Landlord or Building Management. Parking or storage of motorbikes, scooters, dune buggies, boats, watercraft, trailers, trucks, recreational vehicles, mobile homes, vans, motor homes, or any detached camper shells is strictly prohibited within the premises unless prior written approval has been granted by the Landlord. The Landlord and/or Building Management reserves the right to remove, tow, or dispose of any unauthorised vehicle, object, or stored item found within the premises without prior notice, and shall not be responsible for any loss or damage arising from such removal or disposal. All costs incurred in the removal, towing, or disposal of unauthorised vehicles or items shall be borne solely by the Tenant. Repeated violations may constitute a material breach of the Tenancy Agreement and may result in termination of the tenancy."
-      }
-     ]
-    },
-    {
-     "no": "4.6",
-     "blocks": [
-      {
-       "t": "p",
-       "x": "Vehicles shall not be parked in designated handicapped parking spaces unless the Tenant/Visitor possesses a valid handicap placard or has received prior written authorisation from the management."
-      }
-     ]
-    },
-    {
-     "no": "4.7",
-     "blocks": [
-      {
-       "t": "p",
-       "x": "The installation or use of electric vehicle (EV) charging stations within the premises is strictly prohibited and will not be tolerated under any circumstances."
-      }
-     ]
-    },
-    {
-     "no": "4.8",
-     "blocks": [
-      {
-       "t": "p",
-       "x": "Mobile refuelling services (e.g., CAFU) are also strictly prohibited from entering the building premises, both for safety reasons and to maintain cleanliness standards. Tenants wishing to have their vehicles cleaned must use the official car cleaning service provider appointed by the Landlord."
-      }
-     ]
-    },
-    {
-     "no": "4.9",
-     "blocks": [
-      {
-       "t": "p",
-       "x": "Access remotes provided at the time of handover of the apartment may only be used by the Tenant and shall be promptly returned once the Tenant vacates the apartment. If the Tenant fails to return the remote(s) or requires a replacement, a fee of AED 250 (UAE Dirhams One Hundred Fifty only) per remote shall apply. Any attempt to access the premises using unauthorised or tampered remote devices is strictly prohibited, and such actions will be reported to the relevant authorities."
-      }
-     ]
-    },
-    {
-     "no": "4.10",
-     "blocks": [
-      {
-       "t": "p",
-       "x": "Visitor parking is provided free of charge and strictly at the discretion of the Building Management and Security Staff. The maximum parking duration permitted is four (4) hours per day. Vehicles exceeding this limit shall be charged AED 100 (UAE Dirhams One Hundred only) per additional hour. Tenant vehicles are strictly prohibited from using the visitors’ parking. Any tenant vehicle found in violation, or repeatedly warned by management, shall be clamped and fined AED 500 (UAE Dirhams Five Hundred only) per day, and the vehicle will be released only after full payment of penalties. The Landlord and Management accept no responsibility for any loss or damage resulting from enforcement actions such as clamping or towing."
-      }
-     ]
-    },
-    {
-     "no": "4.11",
-     "blocks": [
-      {
-       "t": "p",
-       "x": "Any misuse of the Landlord’s property, including unauthorised parking, installation of equipment, or violation of the above vehicle-related policies, shall result in immediate enforcement action by the Landlord. This may include, but is not limited to, towing of the vehicle at the owner’s expense, imposition of penalties, and cancellation of the tenancy agreement without reimbursement of rent or Security Deposit. The Landlord shall not be held liable for any damage caused to vehicles removed due to violations."
-      }
-     ]
-    },
-    {
-     "no": "4.12",
-     "blocks": [
-      {
-       "t": "p",
-       "x": "The Landlord further reserves the right to refuse renewal or to terminate this Tenancy Agreement with immediate effect should the Tenant fail to comply with the aforementioned regulations."
-      }
-     ]
-    },
-    {
-     "no": "4.13",
-     "blocks": [
-      {
-       "t": "p",
-       "x": "Subject to availability and at the sole discretion of the Landlord, the Tenant may request allocation of an additional parking space. If such a space becomes available, the applicable annual fee shall be advised by the Landlord at that time. All existing building rules, regulations, and policies related to parking shall apply to any additional parking space allocated. The Tenant shall be fully responsible for compliance with these rules, and any violation may result in the revocation of parking privileges without refund."
-      }
-     ]
-    },
-    {
-     "no": "4.14",
-     "blocks": [
-      {
-       "t": "p",
-       "x": "The Tenant acknowledges and agrees that any additional parking space provided separately from the apartment lease is subject to availability and approval by the Landlord/Building Management. The rental charges for such additional parking space may be revised, increased, or modified at the sole discretion of the Landlord without requiring a ninety (90) days’ prior notice. The Tenant shall comply with the revised parking charges upon notification from the Landlord/Building Management."
-      }
-     ]
-    }
-   ]
-  },
-  {
-   "no": 5,
-   "title": "Common Facilities And Usage Guidelines",
-   "clauses": [
-    {
-     "no": "5.1",
-     "blocks": [
-      {
-       "t": "p",
-       "x": "Tenants may rent the multipurpose hall on the Roof floor for events, etc. The terms and conditions and rental amount shall be updated from time to time and shall be at the sole discretion of the Landlord."
-      }
-     ]
-    },
-    {
-     "no": "5.2",
-     "blocks": [
-      {
-       "t": "p",
-       "x": "The Tenant must dispose of all household waste using the garbage chute located inside the designated garbage rooms. Separate bins are provided for recyclable waste as well as outdoor bins for general disposal. The Tenant is responsible for arranging and covering the cost of the removal of any large or heavy items."
-      }
-     ]
-    },
-    {
-     "no": "5.3",
-     "blocks": [
-      {
-       "t": "p",
-       "x": "The Tenant, along with their family and visitors, must comply with all management rules regarding the use of the swimming pool and health club facilities (including gym, steam, and sauna). The Landlord shall not be liable under any circumstances for any damage, injury, or death arising from the use of these facilities. It is understood that the rent applies solely to the apartment and does not grant entitlement to any facilities such as the pool, gym, steam room, sauna, or car parking. Therefore, if any facility becomes unavailable for any reason, the Landlord or building management will not be responsible, and no compensation or rent reduction shall be granted. The Landlord reserves the right to modify facility operating hours, restrict access, or discontinue facilities entirely, without prior notice, and such actions shall not be considered a breach of the tenancy agreement nor grounds for rent reduction or early termination."
-      }
-     ]
-    },
-    {
-     "no": "5.4",
-     "blocks": [
-      {
-       "t": "p",
-       "x": "The swimming pool and health club facilities shall be open for use from 10:00 AM to 10:00 PM, or as otherwise determined by the Building Management. The schedule, rules, and conditions of use may be changed from time to time, and all tenants are required to comply with the latest instructions issued by the Management. Use of these facilities outside the permitted hours is strictly prohibited."
-      }
-     ]
-    },
-    {
-     "no": "5.5",
-     "blocks": [
-      {
-       "t": "p",
-       "x": "The Tenant shall ensure that the pool and gym are not used by children under the age of sixteen (16) and that all users follow the posted safety regulations.The Landlord and Management shall bear no responsibility or liability for any injury, accident, or incident arising from misuse, negligence, or violation of these rules."
-      }
-     ]
-    },
-    {
-     "no": "5.6",
-     "blocks": [
-      {
-       "t": "p",
-       "x": "A qualified lifeguard shall be on duty for twelve (12) hours daily during the designated pool operating hours. The instructions and decisions of the lifeguard regarding safety, hygiene, or conduct shall be final and binding on all tenants and visitors. The Tenant, his/her family members, and guests must not use the swimming pool in the absence of a lifeguard and must comply fully with all safety notices and directions displayed at the facility."
-      }
-     ]
-    },
-    {
-     "no": "5.7",
-     "blocks": [
-      {
-       "t": "p",
-       "x": "Use of the swimming pool and health club (gym) shall be strictly at the Tenant’s own risk. The Landlord, Building Management, and their representatives shall under no circumstance be held responsible or liable for any injury, illness, accident, drowning, death, loss, or damage arising from the use or misuse of these facilities, whether supervised or unsupervised. There is no gym trainer, instructor, or attendant assigned to monitor activities within the health club. Each user is solely responsible for ensuring that they are medically fit and capable of safely using the equipment. By using these facilities, the Tenant and all users irrevocably waive any right to claim compensation or hold the Landlord or Management accountable for any incident occurring within the premises."
-      }
-     ]
-    },
-    {
-     "no": "5.8",
-     "blocks": [
-      {
-       "t": "p",
-       "x": "The Landlord and Management reserve the right to suspend, restrict, or close access to the pool or gym at any time for safety, maintenance, or operational reasons, without any compensation or rent adjustment to the Tenant."
-      }
-     ]
-    },
-    {
-     "no": "5.9",
-     "blocks": [
-      {
-       "t": "p",
-       "x": "Tenants are required to comply with all rules, regulations, and usage conditions set by the Landlord concerning the building’s common facilities. The Tenant acknowledges that the payment of rent pertains solely to the leased apartment and does not constitute a right to unrestricted access or guaranteed functionality of any shared amenities. The Landlord reserves the right, at their sole discretion, to restrict or deny access to any common facility - including but not limited to gyms, pools, recreational areas, or other shared spaces - to the Tenant or their guests, particularly in cases of non-compliance or misuse. The Tenant shall not raise claims or objections regarding the availability or condition of such facilities."
-      }
-     ]
-    }
-   ]
-  },
-  {
-   "no": 6,
-   "title": "Liability Disclaimer And Insurance Advisory",
-   "clauses": [
-    {
-     "no": "6.1",
-     "blocks": [
-      {
-       "t": "p",
-       "x": "The act of littering, defacing property with graffiti, or engaging in vandalism within the building premises is strictly prohibited. The Tenant shall be held fully liable for the cost of cleaning, repair, or replacement resulting from any such prohibited activity committed by the Tenant, any occupant of the rented unit, or their visitors. Incidents involving serious vandalism shall be reported to the relevant authorities for appropriate legal action."
-      }
-     ]
-    },
-    {
-     "no": "6.2",
-     "blocks": [
-      {
-       "t": "p",
-       "x": "To ensure compliance with the Landlord's insurance policy and maintain safety standards, activities that may pose a fire hazard are strictly prohibited. This includes the use of open flames such as traditional oil lamps ('diyas') in common areas or inside apartments. As a safer alternative, tenants are encouraged to use battery-operated or electric decorative lamps, which are widely available and designed to replicate the traditional look."
-      }
-     ]
-    },
-    {
-     "no": "6.3",
-     "blocks": [
-      {
-       "t": "p",
-       "x": "The Tenant shall be fully responsible for the actions of any moving company or service provider engaged for relocation purposes. In the event that any damage is caused to the building’s property, common areas, or infrastructure – whether by the moving company’s vehicles, equipment, or personnel – the Tenant shall bear the full cost of reinstatement, repair, or replacement. Such costs may be deducted from the Security Deposit or charged to the Tenant separately. The Landlord shall not be held liable for any damage caused by third-party service providers engaged by the Tenant."
-      }
-     ]
-    },
-    {
-     "no": "6.4",
-     "blocks": [
-      {
-       "t": "p",
-       "x": "All move-in and move-out activities, including the movement of furniture, appliances, and other personal belongings, shall be conducted strictly within the following approved timings: Monday to Thursday and Saturday, from 9:00 AM to 5:00 PM; and Friday, from 9:00 AM to 12:00 PM and from 2:00 PM to 5:00 PM. Move-in and move-out activities are strictly prohibited on Sundays. Prior approval must be obtained directly from Building Management in advance, and Security personnel shall not grant access or permission without Management's prior approval. The Tenant shall ensure that the appointed movers strictly follow the approved date and timings, comply with all instructions issued by Management and Security, maintain the cleanliness of the work area, and take all necessary precautions to prevent damage to the lifts, corridors, walls, doors, building infrastructure, or any other common areas. The Tenant shall remain fully responsible for the conduct of the movers and for the full cost of repairing, reinstating, or replacing any property damaged during the move-in or move-out activity. Such costs may be deducted from the Security Deposit or recovered separately from the Tenant."
-      }
-     ]
-    },
-    {
-     "no": "6.5",
-     "blocks": [
-      {
-       "t": "p",
-       "x": "The Landlord shall not, under any circumstances, be held liable for any loss, damage, injury, or fatality – regardless of cause – suffered by the Tenant, their family members, guests, service providers, or any third party entering the premises at the Tenant’s invitation or association. This includes, but is not limited to, incidents arising from accidents, negligence, equipment failure, natural events, or intentional acts such as self-harm. The Tenant shall bear full responsibility for the conduct and safety of all individuals associated with their occupancy, and the Landlord shall remain fully indemnified against any claims, complaints, or involvement of external authorities in relation to such matters."
-      }
-     ]
-    },
-    {
-     "no": "6.6",
-     "blocks": [
-      {
-       "t": "p",
-       "x": "It is strongly recommended that the Tenant obtain comprehensive household insurance to cover personal belongings and contents within the rented premises. The Landlord shall not be held liable for any loss, damage, or deterioration of the Tenant’s personal property resulting from incidents such as equipment failure (including air conditioning units), water leakage, flooding, electrical faults, or any other unforeseen event occurring within the premises. In the absence of such insurance coverage, the Tenant shall bear full responsibility for any resulting loss or inconvenience. Under no circumstances shall the Tenant hold the Landlord accountable or involve any external authority in relation to such matters. Should the Landlord incur any costs or claims arising from such incidents, the Tenant shall be liable to reimburse the same."
-      }
-     ]
-    },
-    {
-     "no": "6.7",
-     "blocks": [
-      {
-       "t": "p",
-       "x": "Under no circumstances, for whatsoever reason, shall the tenant be entitled to any claim or compensation from the Landlord."
-      }
-     ]
-    }
-   ]
-  },
-  {
-   "no": 7,
-   "title": "Lease Renewal, Vacating, And Restoration Guidelines",
-   "clauses": [
-    {
-     "no": "7.1",
-     "blocks": [
-      {
-       "t": "p",
-       "x": "If the Tenant intends to renew or terminate the Tenancy Agreement, such intention must be communicated in writing or via email from the Tenant’s registered email address. Once a confirmation is submitted, it shall be considered binding."
-      }
-     ]
-    },
-    {
-     "no": "7.2",
-     "blocks": [
-      {
-       "t": "p",
-       "x": "If the Tenant intends to renew the Tenancy Agreement, all rental payments must be made no later than forty-five (45) days prior to the expiration date of the current agreement."
-      }
-     ]
-    },
-    {
-     "no": "7.3",
-     "blocks": [
-      {
-       "t": "p",
-       "x": "This Tenancy Agreement shall automatically renew for successive periods under the same terms and conditions unless:"
-      },
-      {
-       "t": "list",
-       "items": [
+      "no": 1,
+      "title": "Core Tenancy Provisions",
+      "clauses": [
         {
-         "l": "a.",
-         "x": "The Landlord notifies the Tenant in writing at least ninety (90) days prior to the expiration date of any proposed adjustment to the rent, subject to prevailing market conditions and applicable laws or"
+          "no": "1.1",
+          "blocks": [
+            {
+              "t": "p",
+              "x": "The tenant is responsible for his/her payments and must ensure that their rental cheque(s) are not returned by the bank for any reason whatsoever (including but not limited to - insufficient funds, irregular signature, alterations, overwriting, closed account, incorrect amount with data, etc.). In case a cheque is returned by the bank, the Tenant shall, within two (2) days from the date of the original bounced cheque, make the payment in cash or via wire transfer, including a penalty of AED 1,000 (UAE Dirhams One Thousand only) per cheque, as an administration charge to the Landlord. The Landlord has the right to cancel, or refuse renewal, of this tenancy agreement in case the Tenant refuses, delays, or fails to pay the rent on time."
+            }
+          ]
         },
         {
-         "l": "b.",
-         "x": "either party provides written notice of non-renewal at least sixty (60) days prior to the expiration date."
+          "no": "1.2",
+          "blocks": [
+            {
+              "t": "p",
+              "x": "Renewal of the tenancy agreement is at the Landlord’s discretion; the contract duration on renewal is for twelve months only, and extension is not allowed. The dates and number of cheques on renewal will remain the same as per the existing contract."
+            }
+          ]
+        },
+        {
+          "no": "1.3",
+          "blocks": [
+            {
+              "t": "p",
+              "x": "Modification(s) to the apartment is strictly not allowed; the Tenant agrees that he/she is renting the apartment in as-is condition. Adding shelves, applying wallpaper, changing paint colour, nailing, or screwing (on doors, kitchen cabinet, tiles, etc.), glueing carpet to the floor, installing private dish antennae etc., are NOT allowed."
+            }
+          ]
+        },
+        {
+          "no": "1.4",
+          "blocks": [
+            {
+              "t": "p",
+              "x": "Under no circumstances should the Tenant assign, sublet, or share the rented unit. The apartment is rented only to the registered (primary) Tenant and his/her immediate family (i.e., spouse and children). The maximum number of people in an apartment shall be limited to one immediate family only, and the contract is not transferable."
+            }
+          ]
+        },
+        {
+          "no": "1.5",
+          "blocks": [
+            {
+              "t": "p",
+              "x": "The Tenant has paid the Security Deposit amount as specified herein, which shall be held by the Landlord for the entire duration of the tenancy. The release of the Security Deposit, whether in full or in part, shall be at the sole discretion of the Landlord and shall be subject to the condition of the rented premises at the time of vacating. Additionally, any outstanding dues owed by the Tenant to the Landlord or the management shall be deducted from the Security Deposit prior to its release."
+            }
+          ]
+        },
+        {
+          "no": "1.6",
+          "blocks": [
+            {
+              "t": "p",
+              "x": "The Tenant expressly agrees that any amount payable to the Landlord under this Agreement, including but not limited to unpaid rent, penalties, restoration costs, or other charges, may be recovered from the Security Deposit. If the Security Deposit is insufficient to cover such amounts, the Landlord reserves the right to recover the balance through any lawful means, including deduction from future rents or raising separate claims, and the Tenant shall have no objection to such recovery."
+            }
+          ]
+        },
+        {
+          "no": "1.7",
+          "blocks": [
+            {
+              "t": "p",
+              "x": "If legal proceedings are initiated and the court finds the landlord liable, the landlord’s total liability shall be strictly capped at the amount of rent paid by the tenant during the current tenancy period only (from the start of the current tenancy year up to the date the claim is made). Any rent paid prior to this period shall not be considered."
+            }
+          ]
         }
-       ]
-      }
-     ]
+      ]
     },
     {
-     "no": "7.4",
-     "blocks": [
-      {
-       "t": "p",
-       "x": "If the Tenant fails to provide written notice of termination at least sixty (60) days prior to the expiry of the existing Tenancy Agreement, the Tenant shall be liable to pay a penalty equivalent to two (2) months’ rent. This penalty shall be calculated from the date on which the Tenant submits the delayed notice of intent to vacate. The Landlord and/or Managing Agent shall have no obligation to issue reminders regarding renewal, and full responsibility for compliance rests solely with the Tenant."
-      }
-     ]
-    },
-    {
-     "no": "7.5",
-     "blocks": [
-      {
-       "t": "p",
-       "x": "If the Tenant confirms their intention to renew the Tenancy Agreement prior to the stipulated sixty (60) day notice deadline but subsequently withdraws such confirmation on or beyond the expiry of that deadline, the Tenant shall be liable for a penalty equivalent to two (2) months’ rent, as the prior consent to renew is deemed binding. This penalty shall be calculated from the date on which the Tenant communicates their revised decision to vacate. The revised decision to terminate the existing agreement shall be deemed an ‘Early Termination’ (refer to Clause 8.5), as the initial confirmation constituted a renewal of the Tenancy Agreement."
-      }
-     ]
-    },
-    {
-     "no": "7.6",
-     "blocks": [
-      {
-       "t": "p",
-       "x": "Where the Tenant has duly served a sixty (60) day notice to vacate, the Tenancy Agreement shall not be eligible for renewal, notwithstanding any subsequent change in the Tenant’s intention to remain in the Premises. Renewal of the Tenancy Agreement, in such a case, shall be at the sole and absolute discretion of the Landlord and subject to revised terms and conditions as determined by the Landlord. Such revised terms may include, without limitation, an increase in rent, adjustment of the Security Deposit, and imposition of additional charges or penalties as deemed appropriate by the Landlord."
-      }
-     ]
-    },
-    {
-     "no": "7.7",
-     "blocks": [
-      {
-       "t": "p",
-       "x": "At the sole discretion of the Landlord, if a short-term lease extension is approved, the following rent increase structure shall apply:"
-      },
-      {
-       "t": "list",
-       "items": [
+      "no": 2,
+      "title": "Property Upkeep And Tenant Responsibilities",
+      "clauses": [
         {
-         "l": "a.",
-         "x": "Extension ≤ 30 days: 25% increase on annual rent."
+          "no": "2.1",
+          "blocks": [
+            {
+              "t": "p",
+              "x": "The Landlord maintains an on-site maintenance team within the building to address routine maintenance requirements. For urgent or specialised interventions, the Landlord has appointed off-site teams and certified contractors who are dispatched as needed to ensure the proper functioning and safety of critical systems, including but not limited to elevators, fire alarm systems, and firefighting equipment."
+            }
+          ]
         },
         {
-         "l": "b.",
-         "x": "Extension > 30 days and ≤ 90 days: 35% increase on annual rent."
+          "no": "2.2",
+          "blocks": [
+            {
+              "t": "p",
+              "x": "The Tenant shall permit access to the rented premises by the Landlord’s authorised maintenance personnel and/or appointed specialist contractors for the purpose of carrying out necessary maintenance works, whether routine or urgent. Failure by the Tenant to grant such access, particularly in cases involving urgent maintenance or safety-related interventions, shall constitute a material breach of this Tenancy Agreement. In such an event, the Landlord reserves the right to terminate the tenancy with immediate effect, and the Tenant shall forfeit any remaining rental amount and the Security Deposit, without entitlement to reimbursement."
+            }
+          ]
         },
         {
-         "l": "c.",
-         "x": "Extension > 90 days and ≤ 180 days: 45% increase on annual rent."
+          "no": "2.3",
+          "blocks": [
+            {
+              "t": "p",
+              "x": "The Tenant shall be responsible for conducting pest control treatments before move-in and during their stay within the rented premises, using a service provider approved by Dubai Municipality (DM) or the Dubai Silicon Oasis Authority (DSOA). The building management reserves the right to issue a formal notice requiring the Tenant to carry out pest control if infestation is observed or suspected. The Tenant must ensure that no pest-related issues originate from their apartment. Failure to comply with such notice shall entitle the Landlord to undertake pest control measures at the Tenant’s expense, without further notice."
+            }
+          ]
+        },
+        {
+          "no": "2.4",
+          "blocks": [
+            {
+              "t": "p",
+              "x": "Changing of locks for the apartment is not allowed, and if any key is lost, the cost of replacement of the entire lock shall be borne by the tenant. If a tenant requests a change of the main door lock for privacy reasons, a fee of AED 250 per lock shall apply."
+            }
+          ]
+        },
+        {
+          "no": "2.5",
+          "blocks": [
+            {
+              "t": "p",
+              "x": "Any individual maintenance work costing AED 1,000 (UAE Dirhams One Thousand only) or less shall be carried out by the Tenant, subject to prior written approval and supervision by the landlord."
+            }
+          ]
+        },
+        {
+          "no": "2.6",
+          "blocks": [
+            {
+              "t": "p",
+              "x": "While all equipment in GRK Residency is of premium quality, isolated incidents of equipment failure may occur, which could take several days to rectify. Such incidents may include, but are not limited to, failure of the AC unit or other major repairs inside the apartment. In these cases, the tenant agrees not to hold the Landlord or their staff liable for any inconvenience or losses, and no compensation will be provided. The landlord will not provide alternative accommodation or bear any costs or expenses arising from such incidents."
+            }
+          ]
+        },
+        {
+          "no": "2.7",
+          "blocks": [
+            {
+              "t": "p",
+              "x": "The repair or replacement of wooden doors, kitchen cabinets, kitchen or washbasin countertops, and bathtubs is not included in the standard maintenance and will be charged separately to the tenant. Replacement of water heaters shall be the responsibility of the tenant, using only Ariston Italy 80L or 100L models, as per existing installations. For clarity, the Landlord shall replace a water heater if such replacement is required within ninety (90) days from the commencement date of the tenancy agreement."
+            }
+          ]
+        },
+        {
+          "no": "2.8",
+          "blocks": [
+            {
+              "t": "p",
+              "x": "The Landlord is not responsible for repainting the apartment. If the tenant wishes to repaint, they must hire a professional agency at their own cost and follow the existing paint codes (Jotun 1442 Fenomastic for walls and white for ceilings). Prior written approval from the landlord is required before any repainting is undertaken."
+            }
+          ]
+        },
+        {
+          "no": "2.9",
+          "blocks": [
+            {
+              "t": "p",
+              "x": "The tenant is responsible for the cost of repairing any property or equipment damaged due to their negligence, including, but not limited to: shattered windows caused by impact, damage to kitchen countertops from heavy items, or leaks that were not promptly reported, resulting in damage to cabinets, doors, ceilings, or other fixtures. Any addition or replacement of any cables from the main telephone room to the apartment for du/Etisalat, the cost will be borne by the tenant."
+            }
+          ]
+        },
+        {
+          "no": "2.10",
+          "blocks": [
+            {
+              "t": "p",
+              "x": "The Tenant acknowledges that the apartment is handed over in a renovated and serviceable condition. Following handover, the Tenant shall be responsible for the proper use and maintenance of all sanitary fixtures, faucets, bidet sprays, hoses, drainage outlets and other water-related fittings. Any leakage, seepage or resulting damage caused by the Tenant’s misuse, negligence, damaged fixtures, improper use, or failure to promptly report and rectify a leakage shall be the Tenant’s responsibility, including all related repair and rectification costs.The Tenant shall immediately arrange the necessary repair or replacement at their own cost and take all reasonable measures to prevent further damage."
+            }
+          ]
         }
-       ]
-      }
-     ]
+      ]
     },
     {
-     "no": "7.8",
-     "blocks": [
-      {
-       "t": "p",
-       "x": "All renewals or short-term extensions (if approved by the Landlord) are subject to a non-refundable administration fee of AED 1,000 (UAE Dirhams One Thousand only), payable by the Tenant prior to renewal. The Tenancy Agreement shall not be renewed until this payment is received."
-      }
-     ]
-    },
-    {
-     "no": "7.9",
-     "blocks": [
-      {
-       "t": "p",
-       "x": "For clarity, the rent calculation (and penalties) under Section 7 shall be based on the higher of (i) the existing rent or (ii) the latest RERA index rate."
-      }
-     ]
-    },
-    {
-     "no": "7.10",
-     "blocks": [
-      {
-       "t": "p",
-       "x": "Upon expiry or termination of the tenancy, the Tenant shall vacate the Premises no later than the last day of the contract period. Failure to vacate and hand over possession of the Premises by the contract expiry date shall constitute an unauthorised overstay, and the Landlord shall be entitled to charge the Tenant an overstay rent of AED 500 (UAE Dirhams Five Hundred only) per day until the apartment is fully vacated and accepted by the Landlord."
-      }
-     ]
-    },
-    {
-     "no": "7.11",
-     "blocks": [
-      {
-       "t": "p",
-       "x": "Prior to vacating the premises, the Tenant shall restore the apartment to its original condition, as handed over at the commencement of the tenancy. This includes, but is not limited to, full painting, deep cleaning, and repair of any damages. All restoration works must be carried out by the Landlord’s designated Facilities Management (FM) company unless otherwise approved in writing."
-      },
-      {
-       "t": "p",
-       "x": "The apartment must meet the following minimum standards at the time of handover:"
-      },
-      {
-       "t": "list",
-       "items": [
+      "no": 3,
+      "title": "Compliance And Conduct Regulations",
+      "clauses": [
         {
-         "l": "a.",
-         "x": "Tiles: All floor and wall tiles throughout the Premises must be intact, free from cracks or damage, and thoroughly cleaned."
+          "no": "3.1",
+          "blocks": [
+            {
+              "t": "p",
+              "x": "The Tenant shall at all times comply with all applicable rules, regulations, circulars, and notices issued from time to time by the Landlord and by any relevant Governmental or Statutory Authority, including but not limited to the Dubai Silicon Oasis Authority (DSOA), Dubai Municipality (DM), Dubai Police, Etisalat, DU, and the Dubai Civil Defense (DCD). Any such rules, regulations, or directives, whether existing at the date of this Agreement or issued thereafter, shall form an integral and enforceable part of this Tenancy Agreement. The Tenant shall be solely and fully responsible for the payment of any fines, penalties, or charges imposed by the Landlord or any Authority as a result of the Tenant’s breach, negligence, or non-compliance with such laws, regulations, or directives. The Landlord shall bear no responsibility for any such fines or consequences arising from the Tenant’s default."
+            }
+          ]
         },
         {
-         "l": "b.",
-         "x": "Paint and Walls: All walls and ceilings must be freshly painted or spot-cleaned using the original specified colours, and must be free from nails, hooks, stains, or marks. Only use Low-VOC JOTUN 1442 Fenomastic paint for Walls and Jotun White for the ceiling."
+          "no": "3.2",
+          "blocks": [
+            {
+              "t": "p",
+              "x": "The Tenant shall not engage in any activity upon the property that is in violation of any law, ordinance, statute, rule or regulation of Dubai or of the United Arab Emirates."
+            }
+          ]
         },
         {
-         "l": "c.",
-         "x": "Doors and Wardrobes: All doors, door frames, and wardrobes (interior and exterior) must be clean, undamaged, and in proper working condition."
+          "no": "3.3",
+          "blocks": [
+            {
+              "t": "p",
+              "x": "The Tenant shall use the premises only as a place of residence and must not carry out or allow his/her family member or visitor to carry out any noisy, offensive, or hazardous activity or anything which would constitute a nuisance to the Landlord or other tenant(s) of the building or adjoining buildings."
+            }
+          ]
         },
         {
-         "l": "d.",
-         "x": "Sanitaryware and Fittings: All bathroom and kitchen sanitary fittings, accessories, and fixtures must be clean, functional, and of the original Bagnodesign (Sanipex) brand."
+          "no": "3.4",
+          "blocks": [
+            {
+              "t": "p",
+              "x": "The use of electrical cookers and LPG cylinders within the premises is strictly prohibited. The building is equipped with a centralised LPG system managed by Al Fanar National Gas Services Sole Proprietorship LLC (Al Fanar). Tenants are required to coordinate directly with Al Fanar for their gas connection, pay the applicable deposit, and comply with their operational terms, pricing, and safety requirements, as well as those of the Landlord. Pricing and conditions set by Al Fanar are final and non-negotiable. Upon vacating, tenants must settle all dues and complete the deposit refund process directly with Al Fanar."
+            }
+          ]
         },
         {
-         "l": "e.",
-         "x": "Cabinets and Appliances: Kitchen cabinets, shelves, and installed appliances must be clean, free from damage, and properly maintained."
+          "no": "3.5",
+          "blocks": [
+            {
+              "t": "p",
+              "x": "Cigarette smoking is prohibited inside common areas and inside apartments, as per the Dubai Green Building Law; the Tenant must use the designated ‘Smoking Area’ only. Barbequing and the use of shisha (i.e. hookah or hubbly bubbly) is also strictly prohibited and must not be carried out anywhere in the premises."
+            }
+          ]
         },
         {
-         "l": "f.",
-         "x": "Windows and Fly Screens: All accessible windows and fly screens must be clean, intact, and in working condition."
+          "no": "3.6",
+          "blocks": [
+            {
+              "t": "p",
+              "x": "The Tenant must not carry out any activity or bring onto the premises anything which may impose strain on the building’s structure or electro-mechanical systems."
+            }
+          ]
         },
         {
-         "l": "g.",
-         "x": "General Cleanliness: All rooms, living areas, bathrooms, kitchens, and balconies must be deep cleaned and completely cleared of personal belongings, waste, or debris."
+          "no": "3.7",
+          "blocks": [
+            {
+              "t": "p",
+              "x": "The Tenant shall not carry out any activity or store such material that shall increase the building’s rate of insurance or cause it to be cancelled."
+            }
+          ]
+        },
+        {
+          "no": "3.8",
+          "blocks": [
+            {
+              "t": "p",
+              "x": "Any act that affects the appearance and sanitary condition of the building, whether internally or externally, is not allowed by the DSOA. For example, hanging laundry outside on clotheslines, balconies, or other apparatus visible from the street or the ground level is not permitted. Rugs, drapes, towels or other articles shall not be draped or hung on balcony railings or from windows. No pots or other items shall be placed on top of any wall, window, or railing. Tenant is responsible for cleaning the balcony glass rail from the interior and exterior."
+            }
+          ]
+        },
+        {
+          "no": "3.9",
+          "blocks": [
+            {
+              "t": "p",
+              "x": "Balconies and common areas may not be used for storage of any storage units, water bottles, boxes, unused furniture, cabinets, cartons, automobile parts, recyclable materials, storage and/or recycling containers, woodpiles, clotheslines, clothes drying racks, barbecue grills and/or other equipment, bicycles, or any children’s tricycles, wagons, strollers, skateboards, scooters, slides and playhouses."
+            }
+          ]
+        },
+        {
+          "no": "3.10",
+          "blocks": [
+            {
+              "t": "p",
+              "x": "No items in the balcony may extend higher than the balcony railing, including personal items. Plants kept in the balcony must be kept in good condition and be aesthetically agreeable. Any resulting damage to the exterior of the residence caused by the installation of hooks or attachments for hanging decorative items will be the responsibility of the Tenant."
+            }
+          ]
+        },
+        {
+          "no": "3.11",
+          "blocks": [
+            {
+              "t": "p",
+              "x": "Storage of any combustible items, such as charcoal lighter or other flammable items, on terraces and balconies is strictly prohibited."
+            }
+          ]
+        },
+        {
+          "no": "3.12",
+          "blocks": [
+            {
+              "t": "p",
+              "x": "Tenants are strictly prohibited from installing individual satellite dishes or related equipment on the premises, including balconies, rooftops, or external façades. Only the centralised satellite system provided by the Landlord may be used. Tenants may subscribe to licensed entertainment services offered by Etisalat and DU for access to television channels and related content. Any unauthorised installation constitutes a violation of building and municipal regulations and may result in penalties imposed by the relevant authorities. The Tenant shall bear full responsibility for any legal consequences, fines, or costs arising from such violations."
+            }
+          ]
+        },
+        {
+          "no": "3.13",
+          "blocks": [
+            {
+              "t": "p",
+              "x": "The building is equipped and ready for Etisalat services. Should the Tenant opt to subscribe to DU or any other telecommunications provider, any additional cabling, wiring, or replacement of existing infrastructure from the main telephone room to the apartment shall be carried out at the Tenant’s sole expense. The Landlord shall bear no responsibility for any charges levied by Etisalat, DU, or any other telecommunications company. In the event that the Landlord is invoiced for such services or related works on behalf of the Tenant, the Tenant shall be liable to reimburse the full amount without delay."
+            }
+          ]
+        },
+        {
+          "no": "3.14",
+          "blocks": [
+            {
+              "t": "p",
+              "x": "Pets are strictly not allowed in the premises."
+            }
+          ]
         }
-       ]
-      },
-      {
-       "t": "p",
-       "x": "Failure to meet these standards may result in deductions from the Security Deposit. If the Tenant chooses to carry out any required maintenance independently, with the written approval of the landlord, such work must be completed prior to the contract expiry date. Any post-expiry work will incur overstay rent charges."
-      }
-     ]
+      ]
     },
     {
-     "no": "7.12",
-     "blocks": [
-      {
-       "t": "p",
-       "x": "Restoration Rate Card (in AED, Excluding VAT):"
-      },
-      {
-       "t": "table",
-       "head": [
-        "Service",
-        "1-Bedroom unit",
-        "2-Bedroom unit"
-       ],
-       "rows": [
-        [
-         "Deep Cleaning",
-         "400",
-         "600"
-        ],
-        [
-         "Painting",
-         "1500",
-         "2000"
-        ],
-        [
-         "Pest Control",
-         "250",
-         "350"
-        ],
-        [
-         "Fly Mesh Replacement",
-         "150 per piece"
-        ],
-        [
-         "Key Lock Replacement",
-         "150 per lock"
-        ],
-        [
-         "Bidet Spray Replacement",
-         "125 per fixture"
-        ],
-        [
-         "Fire blanket",
-         "500 per piece"
-        ],
-        [
-         "Junk Removal",
-         "200 per piece"
-        ]
-       ]
-      }
-     ]
+      "no": 4,
+      "title": "Building Security And Vehicle Management",
+      "clauses": [
+        {
+          "no": "4.1",
+          "blocks": [
+            {
+              "t": "p",
+              "x": "For the safety and security of all occupants, the Landlord, Property Management, and/or authorized security personnel reserve the right to verify the identity and purpose of any individual entering or present within the premises who appears unfamiliar or whose presence is not pre-registered or expected.All visitors, contractors, delivery agents, or guests may be required to provide identification and register their details at the security desk or through the management system before being granted access. Failure to provide proper identification or to comply with security procedures may result in the visitor(s) being denied entry or asked to leave the premises. The Tenant shall ensure that all their visitors, guests, and representatives adhere to these security measures, and the Landlord or management shall bear no liability for any inconvenience caused by refusal of entry due to non-compliance."
+            }
+          ]
+        },
+        {
+          "no": "4.2",
+          "blocks": [
+            {
+              "t": "p",
+              "x": "The GRK Residency is a private property owned by the Landlord. The tenancy granted under this Agreement provides the Tenant only with a limited right of occupancy for the duration of the lease term and does not confer any ownership or proprietary rights whatsoever over the property or any part thereof. The security staff and building management, acting under the authority of the Landlord, reserve the right to refuse entry to any person(s) and/or vehicle(s) attempting to access the premises, if deemed necessary for safety, security, or operational reasons. The Tenant, together with his/her visitors, guests, employees, and family members, must strictly comply with all building rules, regulations, and instructions issued by the Landlord, management, or security personnel from time to time. Failure to comply with any of these rules or directions shall constitute a material breach of the Tenancy Agreement, entitling the Landlord to terminate the tenancy immediately and take any necessary legal action in accordance with applicable UAE laws."
+            }
+          ]
+        },
+        {
+          "no": "4.3",
+          "blocks": [
+            {
+              "t": "p",
+              "x": "When travelling, the Tenant may permit a relative to stay in the apartment, provided the individual is registered with property management and building security. If the apartment will be unoccupied, the Tenant must leave a spare key with the management (to be securely stored) for emergency access in case of maintenance, fire, or other urgent situations. The Tenant consents to such access, and the management will take reasonable steps to safeguard personal belongings."
+            }
+          ]
+        },
+        {
+          "no": "4.4",
+          "blocks": [
+            {
+              "t": "p",
+              "x": "Each apartment is allocated the number of parking spaces specified in the tenancy agreement or as approved by the Landlord or Building Management. These spaces are linked to the respective apartment and may not be exchanged, transferred, or sub-let without prior written consent from the Landlord or Management. The Landlord and/or Building Management shall bear no responsibility or liability for any loss, damage, theft, fire, or vandalism involving vehicles, bicycles, or personal belongings left inside vehicles parked within the premises, regardless of the cause. The Landlord shall likewise not be liable for any injury, accident, or property damage occurring in or around the parking area. All vehicle owners must ensure that their vehicles are properly registered, maintained in safe operating condition, and covered under a valid comprehensive insurance policy at all times. Vehicles must be parked only within their designated spaces, and any vehicle found obstructing traffic, emergency access routes, or other parking bays may be towed, relocated, or clamped at the vehicle owner’s cost and risk, without any liability on the Landlord or Management."
+            }
+          ]
+        },
+        {
+          "no": "4.5",
+          "blocks": [
+            {
+              "t": "p",
+              "x": "No part of the driveway, landscape, footpaths, or other common areas shall be used for the storage of personal belongings, materials, or any form of obstruction. The parking and open areas are reserved exclusively for vehicles duly authorised by the Landlord or Building Management. Parking or storage of motorbikes, scooters, dune buggies, boats, watercraft, trailers, trucks, recreational vehicles, mobile homes, vans, motor homes, or any detached camper shells is strictly prohibited within the premises unless prior written approval has been granted by the Landlord. The Landlord and/or Building Management reserves the right to remove, tow, or dispose of any unauthorised vehicle, object, or stored item found within the premises without prior notice, and shall not be responsible for any loss or damage arising from such removal or disposal. All costs incurred in the removal, towing, or disposal of unauthorised vehicles or items shall be borne solely by the Tenant. Repeated violations may constitute a material breach of the Tenancy Agreement and may result in termination of the tenancy."
+            }
+          ]
+        },
+        {
+          "no": "4.6",
+          "blocks": [
+            {
+              "t": "p",
+              "x": "Vehicles shall not be parked in designated handicapped parking spaces unless the Tenant/Visitor possesses a valid handicap placard or has received prior written authorisation from the management."
+            }
+          ]
+        },
+        {
+          "no": "4.7",
+          "blocks": [
+            {
+              "t": "p",
+              "x": "The installation or use of electric vehicle (EV) charging stations within the premises is strictly prohibited and will not be tolerated under any circumstances."
+            }
+          ]
+        },
+        {
+          "no": "4.8",
+          "blocks": [
+            {
+              "t": "p",
+              "x": "Mobile refuelling services (e.g., CAFU) are also strictly prohibited from entering the building premises, both for safety reasons and to maintain cleanliness standards. Tenants wishing to have their vehicles cleaned must use the official car cleaning service provider appointed by the Landlord."
+            }
+          ]
+        },
+        {
+          "no": "4.9",
+          "blocks": [
+            {
+              "t": "p",
+              "x": "Access remotes provided at the time of handover of the apartment may only be used by the Tenant and shall be promptly returned once the Tenant vacates the apartment. If the Tenant fails to return the remote(s) or requires a replacement, a fee of AED 250 (UAE Dirhams One Hundred Fifty only) per remote shall apply. Any attempt to access the premises using unauthorised or tampered remote devices is strictly prohibited, and such actions will be reported to the relevant authorities."
+            }
+          ]
+        },
+        {
+          "no": "4.10",
+          "blocks": [
+            {
+              "t": "p",
+              "x": "Visitor parking is provided free of charge and strictly at the discretion of the Building Management and Security Staff. The maximum parking duration permitted is four (4) hours per day. Vehicles exceeding this limit shall be charged AED 100 (UAE Dirhams One Hundred only) per additional hour. Tenant vehicles are strictly prohibited from using the visitors’ parking. Any tenant vehicle found in violation, or repeatedly warned by management, shall be clamped and fined AED 500 (UAE Dirhams Five Hundred only) per day, and the vehicle will be released only after full payment of penalties. The Landlord and Management accept no responsibility for any loss or damage resulting from enforcement actions such as clamping or towing."
+            }
+          ]
+        },
+        {
+          "no": "4.11",
+          "blocks": [
+            {
+              "t": "p",
+              "x": "Any misuse of the Landlord’s property, including unauthorised parking, installation of equipment, or violation of the above vehicle-related policies, shall result in immediate enforcement action by the Landlord. This may include, but is not limited to, towing of the vehicle at the owner’s expense, imposition of penalties, and cancellation of the tenancy agreement without reimbursement of rent or Security Deposit. The Landlord shall not be held liable for any damage caused to vehicles removed due to violations."
+            }
+          ]
+        },
+        {
+          "no": "4.12",
+          "blocks": [
+            {
+              "t": "p",
+              "x": "The Landlord further reserves the right to refuse renewal or to terminate this Tenancy Agreement with immediate effect should the Tenant fail to comply with the aforementioned regulations."
+            }
+          ]
+        },
+        {
+          "no": "4.13",
+          "blocks": [
+            {
+              "t": "p",
+              "x": "Subject to availability and at the sole discretion of the Landlord, the Tenant may request allocation of an additional parking space. If such a space becomes available, the applicable annual fee shall be advised by the Landlord at that time. All existing building rules, regulations, and policies related to parking shall apply to any additional parking space allocated. The Tenant shall be fully responsible for compliance with these rules, and any violation may result in the revocation of parking privileges without refund."
+            }
+          ]
+        },
+        {
+          "no": "4.14",
+          "blocks": [
+            {
+              "t": "p",
+              "x": "The Tenant acknowledges and agrees that any additional parking space provided separately from the apartment lease is subject to availability and approval by the Landlord/Building Management. The rental charges for such additional parking space may be revised, increased, or modified at the sole discretion of the Landlord without requiring a ninety (90) days’ prior notice. The Tenant shall comply with the revised parking charges upon notification from the Landlord/Building Management."
+            }
+          ]
+        }
+      ]
     },
     {
-     "no": "7.13",
-     "blocks": [
-      {
-       "t": "p",
-       "x": "Any item found to be damaged, broken, missing, or altered during the move-out inspection shall be charged to the Tenant in accordance with the rate card referenced above. For any item not included in the approved rate card, the cost will be based on the supplier’s price or any reasonable amount determined by the Landlord."
-      }
-     ]
+      "no": 5,
+      "title": "Common Facilities And Usage Guidelines",
+      "clauses": [
+        {
+          "no": "5.1",
+          "blocks": [
+            {
+              "t": "p",
+              "x": "Tenants may rent the multipurpose hall on the Roof floor for events, etc. The terms and conditions and rental amount shall be updated from time to time and shall be at the sole discretion of the Landlord."
+            }
+          ]
+        },
+        {
+          "no": "5.2",
+          "blocks": [
+            {
+              "t": "p",
+              "x": "The Tenant must dispose of all household waste using the garbage chute located inside the designated garbage rooms. Separate bins are provided for recyclable waste as well as outdoor bins for general disposal. The Tenant is responsible for arranging and covering the cost of the removal of any large or heavy items."
+            }
+          ]
+        },
+        {
+          "no": "5.3",
+          "blocks": [
+            {
+              "t": "p",
+              "x": "The Tenant, along with their family and visitors, must comply with all management rules regarding the use of the swimming pool and health club facilities (including gym, steam, and sauna). The Landlord shall not be liable under any circumstances for any damage, injury, or death arising from the use of these facilities. It is understood that the rent applies solely to the apartment and does not grant entitlement to any facilities such as the pool, gym, steam room, sauna, or car parking. Therefore, if any facility becomes unavailable for any reason, the Landlord or building management will not be responsible, and no compensation or rent reduction shall be granted. The Landlord reserves the right to modify facility operating hours, restrict access, or discontinue facilities entirely, without prior notice, and such actions shall not be considered a breach of the tenancy agreement nor grounds for rent reduction or early termination."
+            }
+          ]
+        },
+        {
+          "no": "5.4",
+          "blocks": [
+            {
+              "t": "p",
+              "x": "The swimming pool and health club facilities shall be open for use from 10:00 AM to 10:00 PM, or as otherwise determined by the Building Management. The schedule, rules, and conditions of use may be changed from time to time, and all tenants are required to comply with the latest instructions issued by the Management. Use of these facilities outside the permitted hours is strictly prohibited."
+            }
+          ]
+        },
+        {
+          "no": "5.5",
+          "blocks": [
+            {
+              "t": "p",
+              "x": "The Tenant shall ensure that the pool and gym are not used by children under the age of sixteen (16) and that all users follow the posted safety regulations.The Landlord and Management shall bear no responsibility or liability for any injury, accident, or incident arising from misuse, negligence, or violation of these rules."
+            }
+          ]
+        },
+        {
+          "no": "5.6",
+          "blocks": [
+            {
+              "t": "p",
+              "x": "A qualified lifeguard shall be on duty for twelve (12) hours daily during the designated pool operating hours. The instructions and decisions of the lifeguard regarding safety, hygiene, or conduct shall be final and binding on all tenants and visitors. The Tenant, his/her family members, and guests must not use the swimming pool in the absence of a lifeguard and must comply fully with all safety notices and directions displayed at the facility."
+            }
+          ]
+        },
+        {
+          "no": "5.7",
+          "blocks": [
+            {
+              "t": "p",
+              "x": "Use of the swimming pool and health club (gym) shall be strictly at the Tenant’s own risk. The Landlord, Building Management, and their representatives shall under no circumstance be held responsible or liable for any injury, illness, accident, drowning, death, loss, or damage arising from the use or misuse of these facilities, whether supervised or unsupervised. There is no gym trainer, instructor, or attendant assigned to monitor activities within the health club. Each user is solely responsible for ensuring that they are medically fit and capable of safely using the equipment. By using these facilities, the Tenant and all users irrevocably waive any right to claim compensation or hold the Landlord or Management accountable for any incident occurring within the premises."
+            }
+          ]
+        },
+        {
+          "no": "5.8",
+          "blocks": [
+            {
+              "t": "p",
+              "x": "The Landlord and Management reserve the right to suspend, restrict, or close access to the pool or gym at any time for safety, maintenance, or operational reasons, without any compensation or rent adjustment to the Tenant."
+            }
+          ]
+        },
+        {
+          "no": "5.9",
+          "blocks": [
+            {
+              "t": "p",
+              "x": "Tenants are required to comply with all rules, regulations, and usage conditions set by the Landlord concerning the building’s common facilities. The Tenant acknowledges that the payment of rent pertains solely to the leased apartment and does not constitute a right to unrestricted access or guaranteed functionality of any shared amenities. The Landlord reserves the right, at their sole discretion, to restrict or deny access to any common facility - including but not limited to gyms, pools, recreational areas, or other shared spaces - to the Tenant or their guests, particularly in cases of non-compliance or misuse. The Tenant shall not raise claims or objections regarding the availability or condition of such facilities."
+            }
+          ]
+        }
+      ]
     },
     {
-     "no": "7.14",
-     "blocks": [
-      {
-       "t": "p",
-       "x": "If the Tenant has replaced any fixture or fitting, it must be reinstated with the exact original model used by the Landlord. Should the Tenant fail to do so, the full cost of restoring the original item shall be deducted from the Tenant’s security deposit or any other sums due to the Landlord."
-      }
-     ]
+      "no": 6,
+      "title": "Liability Disclaimer And Insurance Advisory",
+      "clauses": [
+        {
+          "no": "6.1",
+          "blocks": [
+            {
+              "t": "p",
+              "x": "The act of littering, defacing property with graffiti, or engaging in vandalism within the building premises is strictly prohibited. The Tenant shall be held fully liable for the cost of cleaning, repair, or replacement resulting from any such prohibited activity committed by the Tenant, any occupant of the rented unit, or their visitors. Incidents involving serious vandalism shall be reported to the relevant authorities for appropriate legal action."
+            }
+          ]
+        },
+        {
+          "no": "6.2",
+          "blocks": [
+            {
+              "t": "p",
+              "x": "To ensure compliance with the Landlord's insurance policy and maintain safety standards, activities that may pose a fire hazard are strictly prohibited. This includes the use of open flames such as traditional oil lamps ('diyas') in common areas or inside apartments. As a safer alternative, tenants are encouraged to use battery-operated or electric decorative lamps, which are widely available and designed to replicate the traditional look."
+            }
+          ]
+        },
+        {
+          "no": "6.3",
+          "blocks": [
+            {
+              "t": "p",
+              "x": "The Tenant shall be fully responsible for the actions of any moving company or service provider engaged for relocation purposes. In the event that any damage is caused to the building’s property, common areas, or infrastructure – whether by the moving company’s vehicles, equipment, or personnel – the Tenant shall bear the full cost of reinstatement, repair, or replacement. Such costs may be deducted from the Security Deposit or charged to the Tenant separately. The Landlord shall not be held liable for any damage caused by third-party service providers engaged by the Tenant."
+            }
+          ]
+        },
+        {
+          "no": "6.4",
+          "blocks": [
+            {
+              "t": "p",
+              "x": "All move-in and move-out activities, including the movement of furniture, appliances, and other personal belongings, shall be conducted strictly within the following approved timings: Monday to Thursday and Saturday, from 9:00 AM to 5:00 PM; and Friday, from 9:00 AM to 12:00 PM and from 2:00 PM to 5:00 PM. Move-in and move-out activities are strictly prohibited on Sundays. Prior approval must be obtained directly from Building Management in advance, and Security personnel shall not grant access or permission without Management's prior approval. The Tenant shall ensure that the appointed movers strictly follow the approved date and timings, comply with all instructions issued by Management and Security, maintain the cleanliness of the work area, and take all necessary precautions to prevent damage to the lifts, corridors, walls, doors, building infrastructure, or any other common areas. The Tenant shall remain fully responsible for the conduct of the movers and for the full cost of repairing, reinstating, or replacing any property damaged during the move-in or move-out activity. Such costs may be deducted from the Security Deposit or recovered separately from the Tenant."
+            }
+          ]
+        },
+        {
+          "no": "6.5",
+          "blocks": [
+            {
+              "t": "p",
+              "x": "The Landlord shall not, under any circumstances, be held liable for any loss, damage, injury, or fatality – regardless of cause – suffered by the Tenant, their family members, guests, service providers, or any third party entering the premises at the Tenant’s invitation or association. This includes, but is not limited to, incidents arising from accidents, negligence, equipment failure, natural events, or intentional acts such as self-harm. The Tenant shall bear full responsibility for the conduct and safety of all individuals associated with their occupancy, and the Landlord shall remain fully indemnified against any claims, complaints, or involvement of external authorities in relation to such matters."
+            }
+          ]
+        },
+        {
+          "no": "6.6",
+          "blocks": [
+            {
+              "t": "p",
+              "x": "It is strongly recommended that the Tenant obtain comprehensive household insurance to cover personal belongings and contents within the rented premises. The Landlord shall not be held liable for any loss, damage, or deterioration of the Tenant’s personal property resulting from incidents such as equipment failure (including air conditioning units), water leakage, flooding, electrical faults, or any other unforeseen event occurring within the premises. In the absence of such insurance coverage, the Tenant shall bear full responsibility for any resulting loss or inconvenience. Under no circumstances shall the Tenant hold the Landlord accountable or involve any external authority in relation to such matters. Should the Landlord incur any costs or claims arising from such incidents, the Tenant shall be liable to reimburse the same."
+            }
+          ]
+        },
+        {
+          "no": "6.7",
+          "blocks": [
+            {
+              "t": "p",
+              "x": "Under no circumstances, for whatsoever reason, shall the tenant be entitled to any claim or compensation from the Landlord."
+            }
+          ]
+        }
+      ]
     },
     {
-     "no": "7.15",
-     "blocks": [
-      {
-       "t": "p",
-       "x": "The landlord’s Facilities Management team must confirm that the apartment is handed over in its original condition (i.e. the condition it was handed over in at the time of moving in)."
-      }
-     ]
+      "no": 7,
+      "title": "Lease Renewal, Vacating, And Restoration Guidelines",
+      "clauses": [
+        {
+          "no": "7.1",
+          "blocks": [
+            {
+              "t": "p",
+              "x": "If the Tenant intends to renew or terminate the Tenancy Agreement, such intention must be communicated in writing or via email from the Tenant’s registered email address. Once a confirmation is submitted, it shall be considered binding."
+            }
+          ]
+        },
+        {
+          "no": "7.2",
+          "blocks": [
+            {
+              "t": "p",
+              "x": "If the Tenant intends to renew the Tenancy Agreement, all rental payments must be made no later than forty-five (45) days prior to the expiration date of the current agreement."
+            }
+          ]
+        },
+        {
+          "no": "7.3",
+          "blocks": [
+            {
+              "t": "p",
+              "x": "This Tenancy Agreement shall automatically renew for successive periods under the same terms and conditions unless:"
+            },
+            {
+              "t": "list",
+              "items": [
+                {
+                  "l": "a.",
+                  "x": "The Landlord notifies the Tenant in writing at least ninety (90) days prior to the expiration date of any proposed adjustment to the rent, subject to prevailing market conditions and applicable laws or"
+                },
+                {
+                  "l": "b.",
+                  "x": "either party provides written notice of non-renewal at least sixty (60) days prior to the expiration date."
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "no": "7.4",
+          "blocks": [
+            {
+              "t": "p",
+              "x": "If the Tenant fails to provide written notice of termination at least sixty (60) days prior to the expiry of the existing Tenancy Agreement, the Tenant shall be liable to pay a penalty equivalent to two (2) months’ rent. This penalty shall be calculated from the date on which the Tenant submits the delayed notice of intent to vacate. The Landlord and/or Managing Agent shall have no obligation to issue reminders regarding renewal, and full responsibility for compliance rests solely with the Tenant."
+            }
+          ]
+        },
+        {
+          "no": "7.5",
+          "blocks": [
+            {
+              "t": "p",
+              "x": "If the Tenant confirms their intention to renew the Tenancy Agreement prior to the stipulated sixty (60) day notice deadline but subsequently withdraws such confirmation on or beyond the expiry of that deadline, the Tenant shall be liable for a penalty equivalent to two (2) months’ rent, as the prior consent to renew is deemed binding. This penalty shall be calculated from the date on which the Tenant communicates their revised decision to vacate. The revised decision to terminate the existing agreement shall be deemed an ‘Early Termination’ (refer to Clause 8.5), as the initial confirmation constituted a renewal of the Tenancy Agreement."
+            }
+          ]
+        },
+        {
+          "no": "7.6",
+          "blocks": [
+            {
+              "t": "p",
+              "x": "Where the Tenant has duly served a sixty (60) day notice to vacate, the Tenancy Agreement shall not be eligible for renewal, notwithstanding any subsequent change in the Tenant’s intention to remain in the Premises. Renewal of the Tenancy Agreement, in such a case, shall be at the sole and absolute discretion of the Landlord and subject to revised terms and conditions as determined by the Landlord. Such revised terms may include, without limitation, an increase in rent, adjustment of the Security Deposit, and imposition of additional charges or penalties as deemed appropriate by the Landlord."
+            }
+          ]
+        },
+        {
+          "no": "7.7",
+          "blocks": [
+            {
+              "t": "p",
+              "x": "At the sole discretion of the Landlord, if a short-term lease extension is approved, the following rent increase structure shall apply:"
+            },
+            {
+              "t": "list",
+              "items": [
+                {
+                  "l": "a.",
+                  "x": "Extension ≤ 30 days: 25% increase on annual rent."
+                },
+                {
+                  "l": "b.",
+                  "x": "Extension > 30 days and ≤ 90 days: 35% increase on annual rent."
+                },
+                {
+                  "l": "c.",
+                  "x": "Extension > 90 days and ≤ 180 days: 45% increase on annual rent."
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "no": "7.8",
+          "blocks": [
+            {
+              "t": "p",
+              "x": "All renewals or short-term extensions (if approved by the Landlord) are subject to a non-refundable administration fee of AED 1,000 (UAE Dirhams One Thousand only), payable by the Tenant prior to renewal. The Tenancy Agreement shall not be renewed until this payment is received."
+            }
+          ]
+        },
+        {
+          "no": "7.9",
+          "blocks": [
+            {
+              "t": "p",
+              "x": "For clarity, the rent calculation (and penalties) under Section 7 shall be based on the higher of (i) the existing rent or (ii) the latest RERA index rate."
+            }
+          ]
+        },
+        {
+          "no": "7.10",
+          "blocks": [
+            {
+              "t": "p",
+              "x": "Upon expiry or termination of the tenancy, the Tenant shall vacate the Premises no later than the last day of the contract period. Failure to vacate and hand over possession of the Premises by the contract expiry date shall constitute an unauthorised overstay, and the Landlord shall be entitled to charge the Tenant an overstay rent of AED 500 (UAE Dirhams Five Hundred only) per day until the apartment is fully vacated and accepted by the Landlord."
+            }
+          ]
+        },
+        {
+          "no": "7.11",
+          "blocks": [
+            {
+              "t": "p",
+              "x": "Prior to vacating the premises, the Tenant shall restore the apartment to its original condition, as handed over at the commencement of the tenancy. This includes, but is not limited to, full painting, deep cleaning, and repair of any damages. All restoration works must be carried out by the Landlord’s designated Facilities Management (FM) company unless otherwise approved in writing."
+            },
+            {
+              "t": "p",
+              "x": "The apartment must meet the following minimum standards at the time of handover:"
+            },
+            {
+              "t": "list",
+              "items": [
+                {
+                  "l": "a.",
+                  "x": "Tiles: All floor and wall tiles throughout the Premises must be intact, free from cracks or damage, and thoroughly cleaned."
+                },
+                {
+                  "l": "b.",
+                  "x": "Paint and Walls: All walls and ceilings must be freshly painted or spot-cleaned using the original specified colours, and must be free from nails, hooks, stains, or marks. Only use Low-VOC JOTUN 1442 Fenomastic paint for Walls and Jotun White for the ceiling."
+                },
+                {
+                  "l": "c.",
+                  "x": "Doors and Wardrobes: All doors, door frames, and wardrobes (interior and exterior) must be clean, undamaged, and in proper working condition."
+                },
+                {
+                  "l": "d.",
+                  "x": "Sanitaryware and Fittings: All bathroom and kitchen sanitary fittings, accessories, and fixtures must be clean, functional, and of the original Bagnodesign (Sanipex) brand."
+                },
+                {
+                  "l": "e.",
+                  "x": "Cabinets and Appliances: Kitchen cabinets, shelves, and installed appliances must be clean, free from damage, and properly maintained."
+                },
+                {
+                  "l": "f.",
+                  "x": "Windows and Fly Screens: All accessible windows and fly screens must be clean, intact, and in working condition."
+                },
+                {
+                  "l": "g.",
+                  "x": "General Cleanliness: All rooms, living areas, bathrooms, kitchens, and balconies must be deep cleaned and completely cleared of personal belongings, waste, or debris."
+                }
+              ]
+            },
+            {
+              "t": "p",
+              "x": "Failure to meet these standards may result in deductions from the Security Deposit. If the Tenant chooses to carry out any required maintenance independently, with the written approval of the landlord, such work must be completed prior to the contract expiry date. Any post-expiry work will incur overstay rent charges."
+            }
+          ]
+        },
+        {
+          "no": "7.12",
+          "blocks": [
+            {
+              "t": "p",
+              "x": "Restoration Rate Card (in AED, Excluding VAT):"
+            },
+            {
+              "t": "table",
+              "head": [
+                "Service",
+                "1-Bedroom unit",
+                "2-Bedroom unit"
+              ],
+              "rows": [
+                [
+                  "Deep Cleaning",
+                  "400",
+                  "600"
+                ],
+                [
+                  "Painting",
+                  "1500",
+                  "2000"
+                ],
+                [
+                  "Pest Control",
+                  "250",
+                  "350"
+                ],
+                [
+                  "Fly Mesh Replacement",
+                  "150 per piece"
+                ],
+                [
+                  "Key Lock Replacement",
+                  "150 per lock"
+                ],
+                [
+                  "Bidet Spray Replacement",
+                  "125 per fixture"
+                ],
+                [
+                  "Fire blanket",
+                  "500 per piece"
+                ],
+                [
+                  "Junk Removal",
+                  "200 per piece"
+                ]
+              ]
+            }
+          ]
+        },
+        {
+          "no": "7.13",
+          "blocks": [
+            {
+              "t": "p",
+              "x": "Any item found to be damaged, broken, missing, or altered during the move-out inspection shall be charged to the Tenant in accordance with the rate card referenced above. For any item not included in the approved rate card, the cost will be based on the supplier’s price or any reasonable amount determined by the Landlord."
+            }
+          ]
+        },
+        {
+          "no": "7.14",
+          "blocks": [
+            {
+              "t": "p",
+              "x": "If the Tenant has replaced any fixture or fitting, it must be reinstated with the exact original model used by the Landlord. Should the Tenant fail to do so, the full cost of restoring the original item shall be deducted from the Tenant’s security deposit or any other sums due to the Landlord."
+            }
+          ]
+        },
+        {
+          "no": "7.15",
+          "blocks": [
+            {
+              "t": "p",
+              "x": "The landlord’s Facilities Management team must confirm that the apartment is handed over in its original condition (i.e. the condition it was handed over in at the time of moving in)."
+            }
+          ]
+        },
+        {
+          "no": "7.16",
+          "blocks": [
+            {
+              "t": "p",
+              "x": "The Security Deposit shall be refunded only upon fulfilment of the following:"
+            },
+            {
+              "t": "bullets",
+              "items": [
+                "Disconnection of all utility accounts (Etisalat/DU, DEWA, Al Fanar Gas).",
+                "Submission of final DEWA meter reading and settlement receipt.",
+                "Apartment returned in clean, habitable condition, including deep cleaning and painting. If the apartment is found in unsatisfactory condition, the Landlord may engage professional services (e.g., cleaning, painting, pest control) and deduct the costs from the Security Deposit.",
+                "No outstanding dues or fines."
+              ]
+            }
+          ]
+        },
+        {
+          "no": "7.17",
+          "blocks": [
+            {
+              "t": "p",
+              "x": "The tenant does not have any pending dues, such as, but not limited to, non-payment of Authority fine(s), etc."
+            }
+          ]
+        }
+      ]
     },
     {
-     "no": "7.16",
-     "blocks": [
-      {
-       "t": "p",
-       "x": "The Security Deposit shall be refunded only upon fulfilment of the following:"
-      },
-      {
-       "t": "bullets",
-       "items": [
-        "Disconnection of all utility accounts (Etisalat/DU, DEWA, Al Fanar Gas).",
-        "Submission of final DEWA meter reading and settlement receipt.",
-        "Apartment returned in clean, habitable condition, including deep cleaning and painting. If the apartment is found in unsatisfactory condition, the Landlord may engage professional services (e.g., cleaning, painting, pest control) and deduct the costs from the Security Deposit.",
-        "No outstanding dues or fines."
-       ]
-      }
-     ]
-    },
-    {
-     "no": "7.17",
-     "blocks": [
-      {
-       "t": "p",
-       "x": "The tenant does not have any pending dues, such as, but not limited to, non-payment of Authority fine(s), etc."
-      }
-     ]
+      "no": 8,
+      "title": "Administrative Fees and Charges",
+      "clauses": [
+        {
+          "no": "8.1",
+          "blocks": [
+            {
+              "t": "p",
+              "x": "Administration Fee: Upon renewal or registration of a new unit, the Tenant shall be required to pay an administration fee of AED 1,500 (UAE Dirhams One Thousand Five Hundred only), exclusive of VAT. Renewal or registration of a new unit will not be processed unless the Administration Fee has been paid in full."
+            }
+          ]
+        },
+        {
+          "no": "8.2",
+          "blocks": [
+            {
+              "t": "p",
+              "x": "Ejari Fee: The Tenant shall pay an Ejari registration fee of AED 250 (UAE Dirhams Two Hundred and Fifty only), inclusive of VAT, upon renewal or registration of a new unit. Renewal or registration of a new unit will not be processed unless the Ejari Fee has been paid in full. The administration fee is payable at the time of renewal. The renewal fees will not be waived under any circumstances, and the Tenancy Agreement will not be renewed until and unless the payment has been received."
+            }
+          ]
+        },
+        {
+          "no": "8.3",
+          "blocks": [
+            {
+              "t": "p",
+              "x": "Termination Clause: The Tenant is fully responsible for ensuring that all occupants and visitors adhere to the terms and obligations set out in this Agreement. If the Tenant fails or refuses to comply with any clause herein, the Landlord reserves the right to terminate the Tenancy Agreement or decline its renewal. In the event the Tenant is evicted due to such non-compliance, the Tenant shall forfeit any remaining rent and the Security Deposit, which will not be refunded."
+            }
+          ]
+        },
+        {
+          "no": "8.4",
+          "blocks": [
+            {
+              "t": "p",
+              "x": "Unit Cancellation Fee: For new tenants, if the lease agreement has been signed but the Tenant chooses not to proceed with the tenancy before the issuance of Ejari, the Security Deposit and any agency fees or other charges paid shall not be reimbursed."
+            }
+          ]
+        },
+        {
+          "no": "8.5",
+          "blocks": [
+            {
+              "t": "p",
+              "x": "Early Termination Fee: If the tenant wishes to terminate the tenancy before the expiry of the contract, the tenant must provide thirty (30) days’ prior written notice and vacate the apartment within the notice period. The tenant shall pay a penalty equivalent to two (2) months’ rent, calculated from the date of completion of the notice period. This clause also applies to tenants relocating within the same building. The remaining rent and security deposit will be refunded, provided the apartment is returned in the same condition as at the commencement of the lease, subject to normal wear and tear."
+            }
+          ]
+        },
+        {
+          "no": "8.6",
+          "blocks": [
+            {
+              "t": "p",
+              "x": "Bounced Cheque Penalty Fee: AED 1,000 (UAE Dirhams One Thousand only), excluding VAT, and applicable late payment fee to the Landlord’s account."
+            }
+          ]
+        },
+        {
+          "no": "8.7",
+          "blocks": [
+            {
+              "t": "p",
+              "x": "Cheque Deferral Fee: All post-dated cheques provided by the Tenant will be securely held by the Landlord. If the Tenant requests to defer a cheque, a non-refundable administrative fee of AED 500 (UAE Dirhams Five Hundred only) per cheque shall apply. Each cheque may be deferred only once, and for a maximum of 7 days."
+            }
+          ]
+        },
+        {
+          "no": "8.8",
+          "blocks": [
+            {
+              "t": "p",
+              "x": "Replacement of Cheque: If a cheque is replaced with another payment method (e.g., cash, online transfer, credit card), no additional charges shall be applied. However, in case of credit card swipe, card charges or interest are the Tenant’s responsibility."
+            }
+          ]
+        },
+        {
+          "no": "8.9",
+          "blocks": [
+            {
+              "t": "p",
+              "x": "Late Renewal Fee: 20% per annum of the rent calculated daily if the tenant entered into a renewal contract after the expiry date."
+            }
+          ]
+        }
+      ]
     }
-   ]
-  },
-  {
-   "no": 8,
-   "title": "Administrative Fees and Charges",
-   "clauses": [
-    {
-     "no": "8.1",
-     "blocks": [
-      {
-       "t": "p",
-       "x": "Administration Fee: Upon renewal or registration of a new unit, the Tenant shall be required to pay an administration fee of AED 1,500 (UAE Dirhams One Thousand Five Hundred only), exclusive of VAT. Renewal or registration of a new unit will not be processed unless the Administration Fee has been paid in full."
-      }
-     ]
-    },
-    {
-     "no": "8.2",
-     "blocks": [
-      {
-       "t": "p",
-       "x": "Ejari Fee: The Tenant shall pay an Ejari registration fee of AED 250 (UAE Dirhams Two Hundred and Fifty only), inclusive of VAT, upon renewal or registration of a new unit. Renewal or registration of a new unit will not be processed unless the Ejari Fee has been paid in full. The administration fee is payable at the time of renewal. The renewal fees will not be waived under any circumstances, and the Tenancy Agreement will not be renewed until and unless the payment has been received."
-      }
-     ]
-    },
-    {
-     "no": "8.3",
-     "blocks": [
-      {
-       "t": "p",
-       "x": "Termination Clause: The Tenant is fully responsible for ensuring that all occupants and visitors adhere to the terms and obligations set out in this Agreement. If the Tenant fails or refuses to comply with any clause herein, the Landlord reserves the right to terminate the Tenancy Agreement or decline its renewal. In the event the Tenant is evicted due to such non-compliance, the Tenant shall forfeit any remaining rent and the Security Deposit, which will not be refunded."
-      }
-     ]
-    },
-    {
-     "no": "8.4",
-     "blocks": [
-      {
-       "t": "p",
-       "x": "Unit Cancellation Fee: For new tenants, if the lease agreement has been signed but the Tenant chooses not to proceed with the tenancy before the issuance of Ejari, the Security Deposit and any agency fees or other charges paid shall not be reimbursed."
-      }
-     ]
-    },
-    {
-     "no": "8.5",
-     "blocks": [
-      {
-       "t": "p",
-       "x": "Early Termination Fee: If the tenant wishes to terminate the tenancy before the expiry of the contract, the tenant must provide thirty (30) days’ prior written notice and vacate the apartment within the notice period. The tenant shall pay a penalty equivalent to two (2) months’ rent, calculated from the date of completion of the notice period. This clause also applies to tenants relocating within the same building. The remaining rent and security deposit will be refunded, provided the apartment is returned in the same condition as at the commencement of the lease, subject to normal wear and tear."
-      }
-     ]
-    },
-    {
-     "no": "8.6",
-     "blocks": [
-      {
-       "t": "p",
-       "x": "Bounced Cheque Penalty Fee: AED 1,000 (UAE Dirhams One Thousand only), excluding VAT, and applicable late payment fee to the Landlord’s account."
-      }
-     ]
-    },
-    {
-     "no": "8.7",
-     "blocks": [
-      {
-       "t": "p",
-       "x": "Cheque Deferral Fee: All post-dated cheques provided by the Tenant will be securely held by the Landlord. If the Tenant requests to defer a cheque, a non-refundable administrative fee of AED 500 (UAE Dirhams Five Hundred only) per cheque shall apply. Each cheque may be deferred only once, and for a maximum of 7 days."
-      }
-     ]
-    },
-    {
-     "no": "8.8",
-     "blocks": [
-      {
-       "t": "p",
-       "x": "Replacement of Cheque: If a cheque is replaced with another payment method (e.g., cash, online transfer, credit card), no additional charges shall be applied. However, in case of credit card swipe, card charges or interest are the Tenant’s responsibility."
-      }
-     ]
-    },
-    {
-     "no": "8.9",
-     "blocks": [
-      {
-       "t": "p",
-       "x": "Late Renewal Fee: 20% per annum of the rent calculated daily if the tenant entered into a renewal contract after the expiry date."
-      }
-     ]
-    }
-   ]
-  }
- ]
+  ]
 }

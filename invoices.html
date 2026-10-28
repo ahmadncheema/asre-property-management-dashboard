@@ -1027,22 +1027,27 @@
         const vat = subtotal * 0.05;
         const total = subtotal + vat;
 
-        // Save to database
-        const { data: saved, error } = await supabase
+        // Save to database (the date and notes are kept so the same PDF can be made again later)
+        const row = {
+          invoice_number: invNum,
+          type: selectedType.type,
+          unit_id: selectedUnit.id,
+          building_id: selectedUnit.building_id,
+          tenant_name: selectedUnit.tenant_name || "Vacant Unit",
+          amount: subtotal,
+          vat_amount: vat,
+          total: total,
+          line_items: lineItems,
+        };
+        let { data: saved, error } = await supabase
           .from("invoices")
-          .insert({
-            invoice_number: invNum,
-            type: selectedType.type,
-            unit_id: selectedUnit.id,
-            building_id: selectedUnit.building_id,
-            tenant_name: selectedUnit.tenant_name || "Vacant Unit",
-            amount: subtotal,
-            vat_amount: vat,
-            total: total,
-            line_items: lineItems,
-          })
+          .insert({ ...row, invoice_date: invDate || null, notes: notes || null })
           .select()
           .single();
+        if (error && /invoice_date|notes|column/i.test(error.message || "")) {
+          // the new columns are not in the database yet: save without them
+          ({ data: saved, error } = await supabase.from("invoices").insert(row).select().single());
+        }
 
         if (error) {
           showToast("Error saving invoice.", "error");
@@ -1699,7 +1704,11 @@
                   ${formatCurrency(inv.total)}
                 </td>
                 <td>${formatDate(inv.created_at)}</td>
-                <td>
+                <td style="white-space:nowrap">
+                  <button class="btn btn-outline btn-sm" title="Download this invoice again"
+                    onclick="redownloadInvoice('${inv.id}')">
+                    ⬇ PDF
+                  </button>
                   <button class="btn btn-danger btn-sm"
                     onclick="deleteInvoice('${inv.id}')">
                     🗑️
@@ -1714,6 +1723,32 @@
       }
 
       window.loadHistory = loadHistory;
+
+      // Make the same PDF again from the saved record
+      window.redownloadInvoice = async function (id) {
+        const { data: inv, error } = await supabase.from("invoices").select("*").eq("id", id).single();
+        if (error || !inv) { showToast("Could not find this invoice.", "error"); return; }
+        const type = INVOICE_TYPES.find((t) => t.type === inv.type) || { type: inv.type, code: inv.type, label: inv.type };
+        let unit = null;
+        if (inv.unit_id) {
+          const r = await supabase.from("units").select("*, floors(name), buildings(name)").eq("id", inv.unit_id).single();
+          unit = r.data;
+        }
+        unit = { ...(unit || { unit_number: "—" }), tenant_name: inv.tenant_name };
+        let items = inv.line_items;
+        if (typeof items === "string") { try { items = JSON.parse(items); } catch (e) { items = []; } }
+        items = Array.isArray(items) ? items : [];
+        const subtotal = Number(inv.amount) || items.reduce((s, x) => s + (x.qty || 1) * (x.rate || 0), 0);
+        const vat = inv.vat_amount != null ? Number(inv.vat_amount) : subtotal * 0.05;
+        generatePDF({
+          invNum: inv.invoice_number,
+          invDate: inv.invoice_date || String(inv.created_at || "").slice(0, 10),
+          notes: inv.notes || "",
+          subtotal, vat, total: Number(inv.total) || subtotal + vat,
+          unit, type, items,
+        });
+        showToast("Downloading " + inv.invoice_number + "…");
+      };
 
       window.deleteInvoice = async function (id) {
         const ok = await showConfirm(

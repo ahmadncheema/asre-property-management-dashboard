@@ -154,7 +154,7 @@ function render() {
     <label>Your signature (draw with your finger or mouse)</label>
     <canvas id="pad"></canvas>
     <div class="row"><button class="link" id="clr" type="button">Clear</button><span id="hint" style="font-size:12px;color:#6e737d">Signature is required</span></div>
-    <label class="chk"><input type="checkbox" id="ag"><span>I have read and agree to this Contract Addendum, and I understand it forms part of my Tenancy Contract.</span></label>
+    <label class="chk"><input type="checkbox" id="ag"><span>${t.contractOnly ? "I have read and agree to this Tenancy Contract." : data.hasContract ? `I have read and agree to this Tenancy Contract and the ${esc(t.title)}.` : `I have read and agree to this ${esc(t.title)}, and I understand it forms part of my Tenancy Contract.`}</span></label>
     <button class="btn" id="go" disabled>Sign and submit</button>
     <div id="err" class="msg err hide" style="margin-top:12px"></div>
   </div>`;

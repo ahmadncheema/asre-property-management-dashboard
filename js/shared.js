@@ -267,6 +267,8 @@ export function renderNav(activePage) {
         "uploadDoc",
         "createSignRequest",
         "cancelSign",
+        "deleteSign",
+        "deleteSignRequest",
         "emailSignLink",
         "deleteDeposit",
         "deleteExpense",

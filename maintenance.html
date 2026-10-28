@@ -27,6 +27,13 @@
       .maint-photo .x { position:absolute; top:2px; right:2px; width:20px; height:20px; border-radius:50%; background:rgba(0,0,0,.65); color:#fff; border:0; font-size:13px; line-height:20px; cursor:pointer; padding:0; }
       .maint-add-photo { display:inline-flex; align-items:center; gap:6px; padding:8px 12px; border:1px dashed var(--border); border-radius:8px; font-size:0.8rem; cursor:pointer; color:var(--text-muted); background:transparent; }
       .maint-add-photo:hover { border-color:var(--green); color:var(--green); }
+      .pv { position:fixed; inset:0; z-index:5000; background:rgba(5,10,20,.92); display:flex; align-items:center; justify-content:center; }
+      .pv img { max-width:92vw; max-height:80vh; object-fit:contain; border-radius:6px; box-shadow:0 8px 40px #000a; }
+      .pv-x { position:absolute; top:12px; right:16px; background:rgba(255,255,255,.12); border:0; color:#fff; width:40px; height:40px; border-radius:50%; font-size:26px; line-height:38px; cursor:pointer; }
+      .pv-nav { position:absolute; top:50%; transform:translateY(-50%); background:rgba(255,255,255,.12); border:0; color:#fff; width:44px; height:64px; border-radius:10px; font-size:34px; cursor:pointer; }
+      .pv-prev { left:10px; } .pv-next { right:10px; }
+      .pv-bar { position:absolute; bottom:16px; left:0; right:0; display:flex; gap:14px; justify-content:center; align-items:center; color:#dfe6f2; font-size:0.85rem; }
+      @media (max-width:600px) { .pv-nav { width:36px; height:52px; font-size:28px; } }
       .maint-card.completed {
         border-left-color: var(--green);
         opacity: 0.72;
@@ -216,6 +223,7 @@
         border-top: 1px solid var(--border);
       }
     </style>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   </head>
   <body>
     <nav id="main-nav"></nav>
@@ -229,9 +237,14 @@
               Track and manage maintenance requests across all properties
             </div>
           </div>
-          <button class="btn btn-green" onclick="openAddMaintenance()">
-            + Add Request
-          </button>
+          <div style="display:flex;gap:8px;flex-wrap:wrap">
+            <button class="btn btn-outline" onclick="openReportModal()">
+              📄 Download Report
+            </button>
+            <button class="btn btn-green" onclick="openAddMaintenance()">
+              + Add Request
+            </button>
+          </div>
         </div>
 
         <!-- Summary Bar -->
@@ -322,6 +335,47 @@
     </div>
 
     <!-- ── Add / Edit Maintenance Modal ───────────────────────────── -->
+    <div class="modal-overlay" id="modal-report" style="display: none">
+      <div class="modal">
+        <div class="modal-header">
+          <div class="modal-title">Download Maintenance Report (PDF)</div>
+          <button class="modal-close" onclick="closeModal('modal-report')">×</button>
+        </div>
+        <div class="modal-body">
+          <div class="form-group">
+            <label class="form-label">Building</label>
+            <select id="rp-building" class="form-control"></select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Which requests</label>
+            <select id="rp-status" class="form-control">
+              <option value="">All requests</option>
+              <option value="open">Open only</option>
+              <option value="completed">Completed only</option>
+            </select>
+          </div>
+          <label style="display:flex;gap:8px;align-items:center;font-size:0.88rem;margin-top:4px">
+            <input type="checkbox" id="rp-photos" checked /> Include photos
+          </label>
+          <div style="font-size:0.78rem;color:var(--text-muted);margin-top:10px">
+            Requests are grouped by building and unit. With photos on and many images, the PDF can take a few seconds to build.
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button class="btn btn-outline" onclick="closeModal('modal-report')">Cancel</button>
+          <button class="btn btn-green" id="rp-go" onclick="downloadReport()">Download PDF</button>
+        </div>
+      </div>
+    </div>
+
+    <div id="photo-viewer" class="pv" style="display:none" onclick="if(event.target===this)closeViewer()">
+      <button class="pv-x" onclick="closeViewer()" title="Close">×</button>
+      <button class="pv-nav pv-prev" onclick="stepViewer(-1)" title="Previous">‹</button>
+      <img id="pv-img" alt="Maintenance photo" />
+      <button class="pv-nav pv-next" onclick="stepViewer(1)" title="Next">›</button>
+      <div class="pv-bar"><span id="pv-count"></span><a id="pv-dl" class="btn btn-outline btn-sm" download>⬇ Download photo</a></div>
+    </div>
+
     <div class="modal-overlay" id="modal-maintenance" style="display: none">
       <div class="modal modal-lg">
         <div class="modal-header">
@@ -446,6 +500,7 @@
         logActivity,
       } from "./js/shared.js";
       import { supabase } from "./js/supabase.js";
+      import { downloadRequestPdf, downloadBuildingReport } from "./js/maintenance-pdf.js";
 
       const session = requireAuth();
       if (!session) throw new Error("Not authenticated");
@@ -751,6 +806,10 @@
             onclick="openEditMaintenance('${r.id}')">
             ✏️ Edit
           </button>
+          <button class="btn btn-outline btn-sm"
+            onclick="downloadRequestReport('${r.id}', this)">
+            📄 PDF Report
+          </button>
           <button class="btn btn-danger btn-sm"
             onclick="deleteRequest('${r.id}')">
             🗑️ Delete
@@ -763,8 +822,8 @@
       function photosHtml(id) {
         const imgs = maintImgs[id] || [];
         return (
-          imgs.map((f) => `
-            <div class="maint-photo" onclick="viewMaintImg('${f.url}')">
+          imgs.map((f, i) => `
+            <div class="maint-photo" onclick="viewMaintImg('${id}', ${i})">
               <img src="${f.url}" alt="Maintenance photo" loading="lazy" />
               <button class="x" title="Delete" onclick="event.stopPropagation();deleteMaintImg('${id}','${f.filename}')">×</button>
             </div>`).join("") +
@@ -834,7 +893,76 @@
           refreshPhotos(id);
         } catch (e) { showToast(e.message, "error"); }
       };
-      window.viewMaintImg = (url) => window.open(url, "_blank");
+      // Photo viewer: opens right here on the page, with next/previous
+      let viewerList = [], viewerAt = 0;
+      function showViewer() {
+        const f = viewerList[viewerAt];
+        if (!f) return;
+        document.getElementById("pv-img").src = f.url;
+        document.getElementById("pv-count").textContent = (viewerAt + 1) + " / " + viewerList.length;
+        const dl = document.getElementById("pv-dl");
+        dl.href = f.url; dl.setAttribute("download", f.filename || "photo.jpg");
+        const many = viewerList.length > 1;
+        document.querySelector(".pv-prev").style.display = many ? "" : "none";
+        document.querySelector(".pv-next").style.display = many ? "" : "none";
+      }
+      window.viewMaintImg = (id, i) => {
+        viewerList = maintImgs[id] || [];
+        viewerAt = i || 0;
+        document.getElementById("photo-viewer").style.display = "flex";
+        showViewer();
+      };
+      window.closeViewer = () => { document.getElementById("photo-viewer").style.display = "none"; document.getElementById("pv-img").src = ""; };
+      window.stepViewer = (d) => { viewerAt = (viewerAt + d + viewerList.length) % viewerList.length; showViewer(); };
+      document.addEventListener("keydown", (e) => {
+        if (document.getElementById("photo-viewer").style.display === "none") return;
+        if (e.key === "Escape") closeViewer();
+        if (e.key === "ArrowRight") stepViewer(1);
+        if (e.key === "ArrowLeft") stepViewer(-1);
+      });
+      // swipe on phones
+      (() => {
+        let sx = null; const v = document.getElementById("photo-viewer");
+        v.addEventListener("touchstart", (e) => { sx = e.touches[0].clientX; }, { passive: true });
+        v.addEventListener("touchend", (e) => { if (sx == null) return; const dx = e.changedTouches[0].clientX - sx; if (Math.abs(dx) > 50 && viewerList.length > 1) stepViewer(dx < 0 ? 1 : -1); sx = null; });
+      })();
+
+      // ── PDF reports ──────────────────────────────────────────────────
+      window.downloadRequestReport = async function (id, btn) {
+        const rec = allRecords.find((r) => r.id === id);
+        if (!rec) return;
+        const old = btn ? btn.textContent : "";
+        if (btn) { btn.disabled = true; btn.textContent = "Building PDF…"; }
+        try { await downloadRequestPdf({ ...rec, photos: maintImgs[id] || [] }); }
+        catch (e) { console.error(e); showToast("Could not build the PDF.", "error"); }
+        if (btn) { btn.disabled = false; btn.textContent = old; }
+      };
+      window.openReportModal = function () {
+        const sel = document.getElementById("rp-building");
+        sel.innerHTML = '<option value="">All buildings</option>' +
+          allBuildings.map((b) => `<option value="${b.id}">${b.name}</option>`).join("");
+        sel.value = document.getElementById("filter-building").value || "";
+        document.getElementById("rp-status").value = document.getElementById("filter-status").value || "";
+        openModal("modal-report");
+      };
+      window.downloadReport = async function () {
+        const bId = document.getElementById("rp-building").value;
+        const st = document.getElementById("rp-status").value;
+        const photos = document.getElementById("rp-photos").checked;
+        let list = allRecords.filter((r) => (!bId || r.building_id === bId) && (!st || r.status === st));
+        if (!list.length) { showToast("No requests match that choice.", "error"); return; }
+        const btn = document.getElementById("rp-go");
+        btn.disabled = true; btn.textContent = "Building PDF…";
+        try {
+          await downloadBuildingReport(list.map((r) => ({ ...r, photos: maintImgs[r.id] || [] })), {
+            label: bId ? (allBuildings.find((b) => b.id === bId) || {}).name || "Building" : "All buildings",
+            includePhotos: photos,
+            statusLabel: st === "open" ? "Open requests" : st === "completed" ? "Completed requests" : "All requests",
+          });
+          closeModal("modal-report");
+        } catch (e) { console.error(e); showToast("Could not build the PDF.", "error"); }
+        btn.disabled = false; btn.textContent = "Download PDF";
+      };
       // photos chosen inside the Add / Edit window are uploaded when the request is saved
       function drawStaged() {
         document.getElementById("m-photo-preview").innerHTML = stagedImgs

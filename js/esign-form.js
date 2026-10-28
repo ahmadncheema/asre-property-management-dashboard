@@ -59,7 +59,9 @@ export async function mountEsignForm(box, { building, unit, session, onCreated }
   const ad = adRes && adRes.addendum;
   const opts = [];
   if (ad) opts.push({ id: "building", label: "This building's addendum: " + ad.title, defaults: {} });
-  templates.forEach((t) => opts.push(t));
+  // a ready-made addendum (like GRK's) is only offered for the building it belongs to
+  const bname = String(building.name || "").toLowerCase();
+  templates.filter((t) => !t.buildings || t.buildings.some((k) => bname.includes(String(k).toLowerCase()))).forEach((t) => opts.push(t));
   opts.push({ id: "contract-only", label: "Tenancy contract only (no addendum)", defaults: {} });
 
   box.innerHTML = `

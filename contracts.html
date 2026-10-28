@@ -138,8 +138,10 @@
             </div>
             <div class="a">
               ${r.status === "signed" && r.file ? `<a class="btn btn-outline btn-sm" href="${r.file}" target="_blank" rel="noopener">View PDF</a><a class="btn btn-outline btn-sm" href="${r.file}?dl=1">⬇</a>` : ""}
-              ${r.status === "tenant_signed" ? `${r.interim ? `<a class="btn btn-outline btn-sm" href="${r.interim}" target="_blank" rel="noopener">View (tenant signed)</a>` : ""}<button class="btn btn-danger btn-sm" onclick="cancelSignRequest('${r.token}')">Cancel</button>` : ""}
-              ${r.status === "pending" ? `<button class="btn btn-outline btn-sm" onclick="showLink('${r.token}')">Link</button><button class="btn btn-danger btn-sm" onclick="cancelSignRequest('${r.token}')">Cancel</button>` : ""}
+              ${r.status === "tenant_signed" && r.interim ? `<a class="btn btn-outline btn-sm" href="${r.interim}" target="_blank" rel="noopener">View (tenant signed)</a>` : ""}
+              ${r.status === "pending" ? `<button class="btn btn-green btn-sm" onclick="copyLink('${r.token}')">📋 Copy link</button><button class="btn btn-outline btn-sm" onclick="showLink('${r.token}')">Share</button>` : ""}
+              ${r.status === "pending" || r.status === "tenant_signed" ? `<button class="btn btn-outline btn-sm" onclick="cancelSignRequest('${r.token}')">Cancel</button>` : ""}
+              <button class="btn btn-danger btn-sm" onclick="deleteSignRequest('${r.token}')">🗑️ Delete</button>
             </div>
             <div id="lk-${r.token}" style="flex-basis:100%"></div>
           </div>`).join("") : '<p style="color:var(--text-muted);padding:10px 0">Nothing here yet.</p>';
@@ -151,6 +153,24 @@
         const r = requests.find((x) => x.token === token);
         const u = units.find((x) => String(x.id) === String(r.unitId)) || {};
         renderLinkPanel(document.getElementById("lk-" + token), { token, tenant: r.tenantName, email: r.tenantEmail, whatsapp: u.tenant_whatsapp, onNew: () => (document.getElementById("lk-" + token).innerHTML = "") });
+      };
+      window.copyLink = async (token) => {
+        const link = location.origin + "/sign.html?t=" + token;
+        try { await navigator.clipboard.writeText(link); }
+        catch (e) { const t = document.createElement("textarea"); t.value = link; document.body.appendChild(t); t.select(); document.execCommand("copy"); t.remove(); }
+        showToast("Link copied.");
+      };
+      window.deleteSignRequest = async (token) => {
+        const r = requests.find((x) => x.token === token) || {};
+        const msg = r.status === "signed"
+          ? "Delete this signing record? The signed PDF stays in the unit's Contract list."
+          : "Delete this signing request? The link will stop working. This cannot be undone.";
+        if (!(await showConfirm(msg))) return;
+        try {
+          const res = await fetch("/api/sign-delete", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ token }) });
+          if (!res.ok) throw new Error((await res.json()).error);
+          showToast("Request deleted."); loadRequests();
+        } catch (e) { showToast(e.message || "Could not delete", "error"); }
       };
       window.cancelSignRequest = async (token) => {
         if (!(await showConfirm("Cancel this signing request? The link will stop working."))) return;
