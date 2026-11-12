@@ -177,6 +177,7 @@ const dayBadge = (n) =>
   `<span class="badge ${n <= 30 ? "badge-red" : "badge-orange"}">${n} day${n === 1 ? "" : "s"}</span>`;
 
 // opts.unitDetail: add a unit-by-unit list under each building
+// opts.unitDocs: add a "Documents" button on each occupied unit
 export function renderPortfolio(el, d, a, opts = {}) {
   if (!document.getElementById("pf-css")) {
     const st = document.createElement("style");
@@ -244,9 +245,9 @@ export function renderPortfolio(el, d, a, opts = {}) {
         .map((r) => {
           const list = [...r.units].sort((x, y) => byNum(x.unit_number, y.unit_number));
           return `<details><summary>${esc(r.b.name)} — ${r.occupied}/${r.units.length} occupied</summary>
-          <div class="pf-scroll"><table><thead><tr><th>Unit</th><th>Tenant</th><th class="r">Rent / year</th><th>Lease ends</th></tr></thead><tbody>${list
+          <div class="pf-scroll"><table><thead><tr><th>Unit</th><th>Tenant</th><th class="r">Rent / year</th><th>Lease ends</th>${opts.unitDocs ? "<th></th>" : ""}</tr></thead><tbody>${list
             .map(
-              (u) => `<tr><td>${esc(u.unit_number)}</td><td>${isOcc(u) ? esc(u.tenant_name) : '<span class="badge badge-grey">Vacant</span>'}</td><td class="r">${isOcc(u) ? money(u.rent) : "-"}</td><td>${isOcc(u) ? fmtDate(u.end_date) : "-"}</td></tr>`,
+              (u) => `<tr><td>${esc(u.unit_number)}</td><td>${isOcc(u) ? esc(u.tenant_name) : '<span class="badge badge-grey">Vacant</span>'}</td><td class="r">${isOcc(u) ? money(u.rent) : "-"}</td><td>${isOcc(u) ? fmtDate(u.end_date) : "-"}</td>${opts.unitDocs ? `<td>${isOcc(u) ? `<button type="button" class="btn btn-outline btn-sm" data-doc-unit="${esc(u.id)}" data-doc-label="${esc(r.b.name)} · Unit ${esc(u.unit_number)} · ${esc(u.tenant_name)}">📁 Documents</button>` : ""}</td>` : ""}</tr>`,
             )
             .join("")}</tbody></table></div></details>`;
         })

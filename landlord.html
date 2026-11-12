@@ -40,6 +40,17 @@
       </div>
     </div>
 
+
+    <div class="modal-overlay" id="modal-docs" style="display:none">
+      <div class="modal modal-lg">
+        <div class="modal-header">
+          <div class="modal-title" id="docs-title">Documents</div>
+          <button class="modal-close" onclick="closeDocs()">✕</button>
+        </div>
+        <div class="modal-body" id="docs-body"></div>
+      </div>
+    </div>
+
     <script type="module">
       import { requireAuth, roleOf } from "./js/auth.js";
       import { renderNav } from "./js/shared.js";
@@ -76,6 +87,7 @@
           const d = await loadPortfolio(buildings);
           renderPortfolio(body, d, analysePortfolio(d), {
             unitDetail: true,
+            unitDocs: true,
             emptyText:
               "No buildings are linked to your login yet. Please contact the office.",
           });
@@ -109,6 +121,44 @@
           </div>`;
         } catch (e) { /* not on the live server */ }
       }
+
+
+      // ── Tenant documents (view and download only) ─────────────────
+      const escH = (s) => String(s == null ? "" : s).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
+      const sizeTxt = (n) => (n > 1048576 ? (n / 1048576).toFixed(1) + " MB" : Math.max(1, Math.round((n || 0) / 1024)) + " KB");
+      const dateTxt = (v) => (v ? new Date(v).toLocaleDateString("en-GB", { day: "2-digit", month: "short", year: "numeric" }) : "");
+      window.closeDocs = () => { document.getElementById("modal-docs").style.display = "none"; };
+      async function fetchFiles(url) {
+        try {
+          const r = await fetch(url + "?t=" + Date.now(), { cache: "no-store" });
+          if (!r.ok) return null;
+          return (await r.json()).files || [];
+        } catch (e) { return null; }
+      }
+      function fileRows(files, label) {
+        if (files === null) return '<p style="color:var(--text-muted);font-size:0.85rem">Not available right now.</p>';
+        if (!files.length) return '<p style="color:var(--text-muted);font-size:0.85rem">None on file.</p>';
+        return files.map((f) => `<div style="display:flex;gap:10px;align-items:center;justify-content:space-between;flex-wrap:wrap;padding:10px 0;border-top:1px solid var(--border)">
+          <div style="flex:1;min-width:160px"><b>${escH(f.categoryLabel || label)}</b>
+            <div style="font-size:0.8rem;color:var(--text-muted)">${escH(f.name)}${f.uploadedAt ? " · " + dateTxt(f.uploadedAt) : ""}${f.size ? " · " + sizeTxt(f.size) : ""}</div></div>
+          <div><a class="btn btn-outline btn-sm" href="${escH(f.url)}" target="_blank" rel="noopener">View</a>
+          <a class="btn btn-outline btn-sm" href="${escH(f.url)}?dl=1">⬇</a></div></div>`).join("");
+      }
+      document.addEventListener("click", async (e) => {
+        const btn = e.target.closest("[data-doc-unit]");
+        if (!btn) return;
+        const id = btn.dataset.docUnit;
+        document.getElementById("docs-title").textContent = btn.dataset.docLabel || "Documents";
+        const body = document.getElementById("docs-body");
+        body.innerHTML = '<div class="loading-state"><div class="spinner"></div></div>';
+        document.getElementById("modal-docs").style.display = "flex";
+        const [docs, contracts] = await Promise.all([
+          fetchFiles("/api/docs/" + encodeURIComponent(id)),
+          fetchFiles("/api/contracts/" + encodeURIComponent(id)),
+        ]);
+        body.innerHTML = `<div style="font-weight:700;margin-bottom:2px">Tenant documents</div>${fileRows(docs, "Document")}
+          <div style="font-weight:700;margin:18px 0 2px">Contracts</div>${fileRows(contracts, "Contract")}`;
+      });
 
       window.openReportPicker = () => openReport(buildings);
       loadSign();

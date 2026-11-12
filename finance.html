@@ -182,6 +182,9 @@
             <div class="page-subtitle" id="finance-date"></div>
           </div>
           <div style="display: flex; gap: 10px">
+            <a href="finance-buildings.html" class="btn btn-outline">
+              🏢 By Building
+            </a>
             <a href="finance-reports.html" class="btn btn-green">
               📊 Generate Report
             </a>
@@ -527,8 +530,8 @@
         <div style="margin-bottom:14px">
           <div style="display:flex;justify-content:space-between;
             align-items:center;margin-bottom:4px">
-            <span style="font-size:0.88rem;font-weight:600;
-              color:var(--white)">${b.name}</span>
+            <a href="finance-buildings.html?b=${encodeURIComponent(b.id)}" style="font-size:0.88rem;font-weight:600;
+              color:var(--white);text-decoration:none">${b.name} →</a>
             <span style="font-size:0.85rem;font-weight:700;
               color:var(--green)">
               AED ${monthly.toLocaleString("en-AE")}

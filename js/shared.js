@@ -160,6 +160,11 @@ export function renderNav(activePage) {
     { href: "/finance.html", label: "Dashboard", key: "finance" },
     { href: "/finance-income.html", label: "Income", key: "finance-income" },
     {
+      href: "/finance-buildings.html",
+      label: "By Building",
+      key: "finance-buildings",
+    },
+    {
       href: "/finance-invoices.html",
       label: "Invoices",
       key: "finance-invoices",

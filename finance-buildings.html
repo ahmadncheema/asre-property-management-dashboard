@@ -1,0 +1,237 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link
+      rel="icon"
+      href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🏦</text></svg>"
+    />
+    <title>ASRE — Finance by Building</title>
+    <link rel="stylesheet" href="css/main.css" />
+    
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <style>
+      .tabs{display:flex;gap:6px;flex-wrap:wrap;margin:18px 0 14px}
+      .tab-btn{background:var(--bg-card);border:1px solid var(--border);color:var(--text-muted);border-radius:20px;padding:7px 16px;font-size:.85rem;font-weight:600;cursor:pointer}
+      .tab-btn.active{background:var(--green);border-color:var(--green);color:#fff}
+      .bsum{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin-bottom:6px}
+      .bsum .it{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);padding:14px}
+      .bsum .n{font-size:1.15rem;font-weight:800;color:var(--white)}
+      .bsum .l{font-size:.75rem;color:var(--text-muted);margin-top:2px}
+      .bsum .s{font-size:.72rem;color:var(--text-muted)}
+      .dsec{font-weight:700;margin:16px 0 6px}
+      .dsec:first-child{margin-top:0}
+      @media (max-width:600px){.tab-btn{flex:1;text-align:center;padding:7px 8px}}
+    </style>
+  </head>
+  <body>
+    <nav id="main-nav"></nav>
+    <div class="page-wrapper">
+      <div class="container">
+        <div class="page-header">
+          <div>
+            <div class="page-title">Finance by <span>Building</span></div>
+            <div class="page-subtitle">Pick a building to see its income, invoices, cheques and bounced cheques, apartment by apartment</div>
+          </div>
+          <button class="btn btn-outline" onclick="exportExcel()">⬇️ Export to Excel</button>
+        </div>
+
+        <div class="filter-bar">
+          <select class="form-control" id="f-building" onchange="loadBuilding()" style="min-width:220px"></select>
+          <select class="form-control" id="f-unit" onchange="renderAll()" style="min-width:180px"><option value="">All apartments</option></select>
+          <input type="text" class="form-control" id="f-search" placeholder="🔍 Search tenant, invoice # or cheque #" oninput="renderAll()" style="flex:1;min-width:200px" />
+        </div>
+
+        <div id="summary" class="bsum"></div>
+
+        <div class="tabs" id="tabs">
+          <button class="tab-btn active" data-tab="units">Apartments</button>
+          <button class="tab-btn" data-tab="invoices">Invoices</button>
+          <button class="tab-btn" data-tab="cheques">Cheques</button>
+          <button class="tab-btn" data-tab="bounced">Bounced</button>
+        </div>
+        <div id="view"><div class="loading-state"><div class="spinner"></div></div></div>
+      </div>
+    </div>
+
+    <div class="modal-overlay" id="modal-unit" style="display:none">
+      <div class="modal modal-lg">
+        <div class="modal-header">
+          <div class="modal-title" id="unit-title">Apartment</div>
+          <button class="modal-close" onclick="document.getElementById('modal-unit').style.display='none'">✕</button>
+        </div>
+        <div class="modal-body" id="unit-body"></div>
+      </div>
+    </div>
+
+    <script type="module">
+      import { requireFinanceOrAdmin } from "./js/auth.js";
+      import { renderNav, showToast, formatCurrency, formatDate } from "./js/shared.js";
+      import { supabase } from "./js/supabase.js";
+
+      const session = requireFinanceOrAdmin();
+      if (!session) throw new Error("Not authenticated");
+      renderNav("finance-buildings");
+
+      const esc = (s) => String(s == null ? "" : s).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
+      const num = (v) => parseFloat(v) || 0;
+      const aed = (v) => "AED " + num(v).toLocaleString("en-AE", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+      const byNum = (a, b) => String(a.unit_number).localeCompare(String(b.unit_number), undefined, { numeric: true });
+      const occ = (u) => u.tenant_name && u.tenant_name.trim() !== "";
+      const TYPES = {
+        rent: "Rent", maintenance: "Quotation", maintenanceinvoice: "Maintenance", checkhold: "Cheque hold",
+        bouncedpenalty: "Bounce penalty", checkswap: "Cheque swap", commission: "Commission",
+        checkreceived: "Cheque received", acknowledgement: "Acknowledgement",
+      };
+      const chBadge = (s) => `<span class="badge ${{ held: "badge-orange", deposited: "badge-green", bounced: "badge-red", cancelled: "badge-grey" }[s] || "badge-grey"}">${esc(s)}</span>`;
+      const bBadge = (s) => `<span class="badge ${s === "active" ? "badge-red" : "badge-green"}">${esc(s)}</span>`;
+
+      let buildings = [], units = [], invoices = [], cheques = [], bounces = [], deposits = [];
+      let tab = "units";
+
+      async function init() {
+        const { data } = await supabase.from("buildings").select("id, name").order("name");
+        buildings = data || [];
+        const sel = document.getElementById("f-building");
+        sel.innerHTML = buildings.length
+          ? buildings.map((b) => `<option value="${esc(b.id)}">${esc(b.name)}</option>`).join("")
+          : '<option value="">No buildings</option>';
+        const want = new URLSearchParams(location.search).get("b");
+        if (want && buildings.some((b) => String(b.id) === want)) sel.value = want;
+        loadBuilding();
+      }
+
+      window.loadBuilding = async function () {
+        const id = document.getElementById("f-building").value;
+        if (!id) { document.getElementById("view").innerHTML = ""; return; }
+        document.getElementById("view").innerHTML = '<div class="loading-state"><div class="spinner"></div></div>';
+        const get = async (q) => { const { data, error } = await q; if (error) throw error; return data || []; };
+        try {
+          [units, invoices, cheques, bounces, deposits] = await Promise.all([
+            get(supabase.from("units").select("*").eq("building_id", id)),
+            get(supabase.from("invoices").select("*").eq("building_id", id).order("created_at", { ascending: false })),
+            get(supabase.from("cheques").select("*").eq("building_id", id).order("cheque_date", { ascending: false })),
+            get(supabase.from("bounce_checks").select("*").eq("building_id", id).order("date_of_bounce", { ascending: false })),
+            get(supabase.from("deposit_register").select("*").eq("building_id", id)).catch(() => []),
+          ]);
+        } catch (e) {
+          console.error(e);
+          document.getElementById("view").innerHTML = '<div class="card" style="color:var(--danger)">Could not load this building. Please refresh.</div>';
+          return;
+        }
+        units.sort(byNum);
+        const us = document.getElementById("f-unit");
+        us.innerHTML = '<option value="">All apartments</option>' + units.map((u) => `<option value="${esc(u.id)}">Unit ${esc(u.unit_number)}${occ(u) ? " — " + esc(u.tenant_name) : " (vacant)"}</option>`).join("");
+        renderAll();
+      };
+
+      const unitNo = (id) => { const u = units.find((x) => String(x.id) === String(id)); return u ? u.unit_number : "—"; };
+      const realInvoices = () => invoices.filter((i) => i.type !== "maintenance"); // quotations are not invoices
+
+      // What is currently shown (apartment + search filters)
+      function filtered() {
+        const uid = document.getElementById("f-unit").value;
+        const q = document.getElementById("f-search").value.trim().toLowerCase();
+        const hit = (...f) => !q || f.some((x) => String(x || "").toLowerCase().includes(q));
+        const mine = (r) => !uid || String(r.unit_id) === uid;
+        return {
+          uid,
+          units: units.filter((u) => (!uid || String(u.id) === uid) && hit(u.unit_number, u.tenant_name)),
+          invoices: invoices.filter((i) => mine(i) && hit(i.invoice_number, i.tenant_name, unitNo(i.unit_id))),
+          cheques: cheques.filter((c) => mine(c) && hit(c.cheque_number, c.tenant_name, c.bank_name, unitNo(c.unit_id))),
+          bounces: bounces.filter((b) => mine(b) && hit(b.tenant_name, b.remarks, unitNo(b.unit_id))),
+        };
+      }
+
+      function renderSummary(f) {
+        const occupied = f.units.filter(occ);
+        const annual = occupied.reduce((s, u) => s + num(u.rent), 0);
+        const inv = f.invoices.filter((i) => i.type !== "maintenance");
+        const held = f.cheques.filter((c) => c.status === "held");
+        const dep = f.cheques.filter((c) => c.status === "deposited");
+        const act = f.bounces.filter((b) => b.status === "active");
+        const dh = deposits.filter((d) => d.status === "held" && (!f.uid || String(d.unit_id) === f.uid));
+        const it = (n, l, s) => `<div class="it"><div class="n">${n}</div><div class="l">${l}</div>${s ? `<div class="s">${s}</div>` : ""}</div>`;
+        document.getElementById("summary").innerHTML = [
+          it(`${occupied.length} / ${f.units.length}`, "Occupied apartments"),
+          it(aed(annual / 12), "Rent per month", aed(annual) + " per year"),
+          it(inv.length, "Invoices", aed(inv.reduce((s, i) => s + num(i.total), 0)) + " · VAT " + aed(inv.reduce((s, i) => s + num(i.vat_amount), 0))),
+          it(held.length, "Cheques held", aed(held.reduce((s, c) => s + num(c.amount), 0))),
+          it(dep.length, "Cheques deposited", aed(dep.reduce((s, c) => s + num(c.amount), 0))),
+          it(`<span style="color:${act.length ? "var(--danger)" : "inherit"}">${act.length}</span>`, "Active bounced cheques", aed(act.reduce((s, b) => s + num(b.rent), 0))),
+          it(aed(dh.reduce((s, d) => s + num(d.amount), 0)), "Security deposits held"),
+        ].join("");
+      }
+
+      const empty = (t) => `<div class="empty-state"><div class="empty-state-title">${t}</div></div>`;
+      const table = (head, rows) => `<div class="table-wrapper"><table><thead><tr>${head.map((h) => `<th>${h}</th>`).join("")}</tr></thead><tbody>${rows.join("")}</tbody></table></div>`;
+
+      const invRow = (i, showUnit = true) => `<tr><td style="font-weight:700;color:var(--green)">${esc(i.invoice_number)}</td><td><span class="badge badge-blue">${esc(TYPES[i.type] || i.type)}</span></td>${showUnit ? `<td>${esc(unitNo(i.unit_id))}</td>` : ""}<td>${esc(i.tenant_name || "—")}</td><td>${formatCurrency(i.amount)}</td><td>${formatCurrency(i.vat_amount)}</td><td style="font-weight:700">${formatCurrency(i.total)}</td><td>${formatDate(i.invoice_date || i.created_at)}</td></tr>`;
+      const invHead = (showUnit = true) => ["Invoice #", "Type", ...(showUnit ? ["Unit"] : []), "Tenant", "Subtotal", "VAT", "Total", "Date"];
+      const chRow = (c, showUnit = true) => `<tr>${showUnit ? `<td>${esc(unitNo(c.unit_id))}</td>` : ""}<td>${esc(c.tenant_name || "—")}</td><td>${esc(c.cheque_number || "—")}</td><td>${esc(c.bank_name || "—")}</td><td style="font-weight:700">${formatCurrency(c.amount)}</td><td>${formatDate(c.cheque_date)}</td><td>${formatDate(c.deposit_date)}</td><td>${chBadge(c.status)}</td></tr>`;
+      const chHead = (showUnit = true) => [...(showUnit ? ["Unit"] : []), "Tenant", "Cheque #", "Bank", "Amount", "Cheque date", "Deposit date", "Status"];
+      const bnRow = (b, showUnit = true) => `<tr>${showUnit ? `<td>${esc(unitNo(b.unit_id))}</td>` : ""}<td>${esc(b.tenant_name || "—")}</td><td>${formatDate(b.date_of_bounce)}</td><td>${formatCurrency(b.rent)}</td><td>${formatCurrency(b.deposit)}</td><td>${bBadge(b.status)}</td><td>${esc(b.remarks || "")}</td></tr>`;
+      const bnHead = (showUnit = true) => [...(showUnit ? ["Unit"] : []), "Tenant", "Bounce date", "Rent", "Deposit", "Status", "Remarks"];
+
+      window.renderAll = function () {
+        const f = filtered();
+        renderSummary(f);
+        const v = document.getElementById("view");
+        if (tab === "units") {
+          v.innerHTML = f.units.length ? table(["Unit", "Tenant", "Rent / year", "Lease ends", "Invoices", "Cheques held", "Bounced", ""], f.units.map((u) => {
+            const ui = invoices.filter((i) => String(i.unit_id) === String(u.id) && i.type !== "maintenance");
+            const uh = cheques.filter((c) => String(c.unit_id) === String(u.id) && c.status === "held");
+            const ub = bounces.filter((b) => String(b.unit_id) === String(u.id) && b.status === "active");
+            return `<tr><td style="font-weight:700">${esc(u.unit_number)}</td><td>${occ(u) ? esc(u.tenant_name) : '<span class="badge badge-grey">Vacant</span>'}</td><td>${occ(u) ? formatCurrency(u.rent) : "—"}</td><td>${occ(u) ? formatDate(u.end_date) : "—"}</td><td>${ui.length} <span style="color:var(--text-muted);font-size:.8rem">(${aed(ui.reduce((s, i) => s + num(i.total), 0))})</span></td><td>${uh.length}</td><td>${ub.length ? `<span class="badge badge-red">${ub.length}</span>` : 0}</td><td><button class="btn btn-outline btn-sm" onclick="openUnit('${esc(u.id)}')">Open</button></td></tr>`;
+          })) : empty("No apartments match");
+        } else if (tab === "invoices") {
+          v.innerHTML = f.invoices.length ? table(invHead(), f.invoices.map((i) => invRow(i))) : empty("No invoices found");
+        } else if (tab === "cheques") {
+          v.innerHTML = f.cheques.length ? table(chHead(), f.cheques.map((c) => chRow(c))) : empty("No cheques found");
+        } else {
+          v.innerHTML = f.bounces.length ? table(bnHead(), f.bounces.map((b) => bnRow(b))) : empty("No bounced cheques");
+        }
+      };
+
+      // One apartment: everything in one place
+      window.openUnit = function (id) {
+        const u = units.find((x) => String(x.id) === String(id));
+        if (!u) return;
+        const ui = invoices.filter((i) => String(i.unit_id) === String(id));
+        const uc = cheques.filter((c) => String(c.unit_id) === String(id));
+        const ub = bounces.filter((b) => String(b.unit_id) === String(id));
+        document.getElementById("unit-title").textContent = `Unit ${u.unit_number} — ${occ(u) ? u.tenant_name : "Vacant"}`;
+        document.getElementById("unit-body").innerHTML = `
+          <div style="font-size:.85rem;color:var(--text-muted);margin-bottom:10px">${occ(u) ? `Rent ${aed(u.rent)} per year · Lease ${formatDate(u.start_date)} to ${formatDate(u.end_date)}` : "Vacant"}</div>
+          <div class="dsec">Invoices (${ui.length})</div>${ui.length ? table(invHead(false), ui.map((i) => invRow(i, false))) : "<p style='color:var(--text-muted);font-size:.85rem'>None.</p>"}
+          <div class="dsec">Cheques (${uc.length})</div>${uc.length ? table(chHead(false), uc.map((c) => chRow(c, false))) : "<p style='color:var(--text-muted);font-size:.85rem'>None.</p>"}
+          <div class="dsec">Bounced cheques (${ub.length})</div>${ub.length ? table(bnHead(false), ub.map((b) => bnRow(b, false))) : "<p style='color:var(--text-muted);font-size:.85rem'>None.</p>"}`;
+        document.getElementById("modal-unit").style.display = "flex";
+      };
+
+      document.getElementById("tabs").addEventListener("click", (e) => {
+        const b = e.target.closest("[data-tab]");
+        if (!b) return;
+        tab = b.dataset.tab;
+        document.querySelectorAll("#tabs .tab-btn").forEach((x) => x.classList.toggle("active", x === b));
+        renderAll();
+      });
+
+      window.exportExcel = function () {
+        if (typeof XLSX === "undefined") { showToast("Excel library did not load. Check your connection.", "error"); return; }
+        const f = filtered();
+        const bname = (buildings.find((b) => String(b.id) === document.getElementById("f-building").value) || {}).name || "Building";
+        const wb = XLSX.utils.book_new();
+        const add = (name, rows) => XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(rows.length ? rows : [{ Note: "No records" }]), name);
+        add("Apartments", f.units.map((u) => ({ Unit: u.unit_number, Tenant: occ(u) ? u.tenant_name : "Vacant", "Rent per year": num(u.rent), "Lease ends": u.end_date || "" })));
+        add("Invoices", f.invoices.map((i) => ({ "Invoice #": i.invoice_number, Type: TYPES[i.type] || i.type, Unit: unitNo(i.unit_id), Tenant: i.tenant_name, Subtotal: num(i.amount), VAT: num(i.vat_amount), Total: num(i.total), Date: (i.invoice_date || i.created_at || "").slice(0, 10) })));
+        add("Cheques", f.cheques.map((c) => ({ Unit: unitNo(c.unit_id), Tenant: c.tenant_name, "Cheque #": c.cheque_number, Bank: c.bank_name, Amount: num(c.amount), "Cheque date": c.cheque_date, "Deposit date": c.deposit_date, Status: c.status })));
+        add("Bounced", f.bounces.map((b) => ({ Unit: unitNo(b.unit_id), Tenant: b.tenant_name, "Bounce date": b.date_of_bounce, Rent: num(b.rent), Deposit: num(b.deposit), Status: b.status, Remarks: b.remarks })));
+        XLSX.writeFile(wb, `ASRE_${bname.replace(/[^a-z0-9]+/gi, "_")}_Finance_${new Date().toISOString().slice(0, 10)}.xlsx`);
+      };
+
+      init();
+    </script>
+  </body>
+</html>
